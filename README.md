@@ -41,10 +41,11 @@ yaml
 
 ## 🛠️ Installation
 
-```bash
 git clone https://github.com/your-username/GreenScan.git
 cd GreenScan
-pip install -r requirements.txt
+pip install --index-url https://download.pytorch.org/whl/cu118 -r requirements.txt
+
+⚠️ 위 명령어를 사용하지 않으면 PyTorch GPU 버전이 설치되지 않아 오류가 날 수 있습니다.
 
 
 Dependencies include:
