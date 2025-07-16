@@ -1,0 +1,112 @@
+[
+  {
+    "name": "알류",
+    "similar_word": ["계란", "달걀"],
+    "derivative_ingredient": ["난백", "난황", "알부민"]
+  },
+  {
+    "name": "우유",
+    "similar_word": ["유제품", "치즈", "버터", "요구르트", "연유", "크림", "분유"],
+    "derivative_ingredient": ["카제인", "유청", "락토스"]
+  },
+  {
+    "name": "메밀",
+    "similar_word": ["메밀가루", "메밀국수", "메밀전병", "메밀묵", "소바"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "땅콩",
+    "similar_word": ["낙화생", "남경두", "향우", "호콩", "땅콩버터", "땅콩기름"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "대두",
+    "similar_word": ["콩", "두부", "두유", "콩나물", "된장", "고추장", "간장", "콩기름"],
+    "derivative_ingredient": ["레시틴", "대두단백질"]
+  },
+  {
+    "name": "밀",
+    "similar_word": ["밀가루", "면류", "빵", "과자", "시판된장", "고추장", "간장"],
+    "derivative_ingredient": ["글루텐", "글리아딘"]
+  },
+  {
+    "name": "고등어",
+    "similar_word": ["고등어"], 
+    "derivative_ingredient": []
+  },
+  {
+    "name": "게",
+    "similar_word": ["꽃게", "대게", "게살"],
+    "derivative_ingredient": ["키틴", "키토산"]
+  },
+  {
+    "name": "새우",
+    "similar_word": ["깐새우", "칵테일새우", "새우젓", "건새우"],
+    "derivative_ingredient": ["키틴", "키토산"]
+  },
+  {
+    "name": "돼지고기",
+    "similar_word": ["돈육", "삼겹살", "훈제베이컨"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "복숭아",
+    "similar_word": ["백도", "황도", "복숭아농축액", "복숭아향"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "토마토",
+    "similar_word": ["방울토마토", "토마토페이스트", "토마토케첩", "토마토소스", "토마토즙"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "아황산류",
+    "similar_word": ["아황산나트륨", "아황산가스", "아황산칼륨", "아황산염"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "호두",
+    "similar_word": ["호두", "호두가루"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "닭고기",
+    "similar_word": ["계육", "닭", "치킨"], 
+    "derivative_ingredient": []
+  },
+  {
+    "name": "쇠고기",
+    "similar_word": ["소고기", "육우", "한우"], 
+    "derivative_ingredient": []
+  },
+  {
+    "name": "오징어",
+    "similar_word": ["오징어", "오징어채", "오징어순대"],
+    "derivative_ingredient": ["키틴", "키토산"]
+  },
+  {
+    "name": "조개류",
+    "similar_word": ["조개", "바지락", "맛조개", "재첩"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "굴",
+    "similar_word": ["굴", "석화"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "전복",
+    "similar_word": ["전복"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "홍합",
+    "similar_word": ["홍합"],
+    "derivative_ingredient": []
+  },
+  {
+    "name": "잣",
+    "similar_word": ["파인넛", "솔잣"],
+    "derivative_ingredient": []
+  }
+]
