@@ -1,12 +1,12 @@
-# 🥬 GreenScan
+# 🥬 VeganLens
 
 **A simple scanner that tells you whether your food is vegan — powered by OCR and ingredient matching.**
 
 ---
 
-## 📌 What is GreenScan?
+## 📌 What is VeganLens?
 
-GreenScan is a lightweight AI-powered tool that uses OCR to extract text from ingredient labels and determines whether the food is vegan. It detects animal-derived substances based on a keyword-matching system and provides clear feedback for plant-based consumers.
+VeganLens is a lightweight AI-powered tool that uses OCR to extract text from ingredient labels and determines whether the food is vegan. It detects animal-derived substances based on a keyword-matching system and provides clear feedback for plant-based consumers.
 
 ---
 

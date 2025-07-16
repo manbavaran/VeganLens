@@ -6,7 +6,7 @@ from PIL import Image
 import io
 import json
 import os 
-from app.greenscan import extract_text, check_vegan
+from app.veganLens import extract_text, check_vegan
 
 '''
 cd backend 로 main.py가 있는 폴더로 이동
