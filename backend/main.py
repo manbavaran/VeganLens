@@ -6,7 +6,7 @@ from PIL import Image
 import io
 import json
 import os 
-from app.veganLens import extract_text, check_vegan
+from app.veganLens import extract_text, check_keywords
 
 '''
 cd backend 로 main.py가 있는 폴더로 이동
@@ -23,7 +23,7 @@ data_dir = os.path.abspath(os.path.join(base_dir, '..', 'data'))
 keywords_path = os.path.abspath(os.path.join(data_dir, 'keywords.json'))
 
 app = FastAPI(
-    title="GreenScan API",
+    title="VeganLens API",
     description="Upload food label image and check if it's vegan",
     version="beta - v_0.0.1"
 )
@@ -52,11 +52,11 @@ async def analyze_image(file: UploadFile = File(...)):
 
     # 2. OCR 수행
     text = extract_text(image)
-    # greenscan 에서 정의한 함수
+    # veganLens 에서 정의한 함수
 
     # 3. 비건 여부 판단
-    found = check_vegan(text, NON_VEGAN_KEYWORDS)
-    # greenscan 에서 정의한 함수
+    found = check_keywords(text, NON_VEGAN_KEYWORDS)
+    # veganLens 에서 정의한 함수
 
     return JSONResponse({
         "is_vegan": len(found) == 0,

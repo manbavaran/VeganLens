@@ -20,5 +20,5 @@ def extract_text(image: Image.Image) -> str:
     text = " ".join(result).lower()
     return text
 
-def check_vegan(text: str, keywords: list[str]) -> list[str]:
+def check_keywords(text: str, keywords: list[str]) -> list[str]:
     return [kw for kw in keywords if kw in text]
