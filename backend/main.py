@@ -6,7 +6,7 @@ from PIL import Image
 import io
 import json
 import os
-from app.veganLens import extract_text, check_keywords
+from app import extract_text, check_keywords
 from datetime import datetime
 
 """

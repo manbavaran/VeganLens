@@ -1,10 +1,8 @@
 from PIL import Image
 import easyocr
 import torch
-import numpy as np
-from preprocessing import preprocess
-import os
-from logger import get_logger
+from .preprocessing import preprocess
+from .logger import get_logger
 
 # OCR 모델은 전역에서 미리 로딩해두는 게 성능에 좋음
 
