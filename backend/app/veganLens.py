@@ -3,23 +3,17 @@ import easyocr
 import torch
 import numpy as np
 from preprocessing import preprocess
-import logging
 import os
+from logger import get_logger
 
 # OCR 모델은 전역에서 미리 로딩해두는 게 성능에 좋음
 
-base_dir = os.path.abspath(os.getcwd())
-log_dir = os.path.abspath(os.path.join(base_dir, 'logs'))
-os.makedirs(log_dir, exist_ok=True)
-
-# 로깅 설정
-logging.basicConfig(
-    filename=os.path.join(log_dir, "ocr.log"),
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
 reader = easyocr.Reader(['en', 'ko'], gpu=True)  # 영어, 한국어 지원
+
+
+logger = get_logger("ocr")
+
 
 print("버전:", torch.__version__)
 print("CUDA 지원:", torch.version.cuda)
@@ -28,9 +22,13 @@ print("GPU 이름:", torch.cuda.get_device_name(0) if torch.cuda.is_available() 
 
 def extract_text(image: Image.Image) -> str:
     try:
+        logger.info("OCR started.")  # 1️⃣ OCR 시작 로그
+        
         # 1. 이미지 전처리
         img_array = preprocess(image)
+        
         if img_array is None:
+            logger.warning("preprocessing returned None.")
             return ""
     
         # 2. OCR 수행
@@ -46,15 +44,17 @@ def extract_text(image: Image.Image) -> str:
         
         # 3. OCR 결과 방어 처리
         if not result:
+            logger.warning("OCR result is empty.")
             return ""
         
         # 4. 문자열로 안전하게 변환 후 합치기
         text = " ".join(str(r) for r in result).lower()
+        logger.info(f"OCR completed successfully : {text}")
         return text
     
     except Exception as e:
         # 예외 발생 시 로깅 후 빈 문자열 반환
-        print(f"[extract_text] OCR 처리 중 오류 발생: {e}")
+        logger.error("OCR failed: %s", str(e)) # 2️⃣ 에러 로그
         return ""
 
 def check_keywords(text: str, keywords: list[str]) -> list[str]:
