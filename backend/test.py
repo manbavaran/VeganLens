@@ -33,15 +33,16 @@ image_files = [f for f in os.listdir(pictures_dir)
                 if f.lower().endswith((".jpg", ".jpeg", ".png"))]
 
 # 상위 30개만 선택
-selected_images = image_files[:100]
+selected_images = image_files[:]
 
 
 # OCR 수행
 for idx, filename in enumerate(selected_images, start=1):
     img_path = os.path.join(pictures_dir, filename)
+    base_filename = os.path.splitext(filename)[0]
     try:
         image = Image.open(img_path)
-        text = extract_text(image, True)
+        text = extract_text(image, debug=True, base_filename=base_filename)
         found = check_keywords(text, ban_list)
         print(f"\n[{idx}] 파일명: {filename}")
         print("  🔍 OCR 결과:", text)

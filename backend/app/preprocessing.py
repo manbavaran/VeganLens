@@ -81,13 +81,14 @@ def perspective_transform(image: np.ndarray, corners: np.ndarray) -> np.ndarray:
     return warped
 
 
-def save_debug_image(image: np.ndarray, prefix="debug"):
-    filename = f"{prefix}_{uuid.uuid4().hex[:8]}.png"
+def save_debug_image(image: np.ndarray, base_filename: str):
+    filename = f"{base_filename}_debug.png"
+
     filepath = os.path.join(preprocessed_dir, filename)
     cv2.imwrite(filepath, image)
     return filepath
 
-def preprocess(image: Image.Image, debug : bool = False) -> np.ndarray:
+def preprocess(image: Image.Image, debug : bool = False, base_filename: str = "debug") -> np.ndarray:
     # PIL 이미지를 numpy 배열로 변환 (easyocr는 numpy 이미지 사용)
     img = np.array(image)  # PIL → ndarray
     
@@ -139,7 +140,7 @@ def preprocess(image: Image.Image, debug : bool = False) -> np.ndarray:
     
     # 디버그용 저장
     if debug:
-        save_debug_image(result, prefix="preprocessed")
+        save_debug_image(result, base_filename)
     
     return result 
     # 전처리된 이미지 (numpy array)

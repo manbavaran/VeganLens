@@ -18,16 +18,16 @@ print("CUDA 지원:", torch.version.cuda)
 print("GPU 사용 가능:", torch.cuda.is_available())
 print("GPU 이름:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A")
 
-def extract_text(image: Image.Image, debug : bool = False) -> str:
+def extract_text(image: Image.Image, debug : bool = False, base_filename: str = "debug") -> str:
     try:
-        logger.info("OCR started.")  # 1️⃣ OCR 시작 로그
+        logger.info(f"OCR started: {base_filename}")  # 1️⃣ OCR 시작 로그
         
         # 1. 이미지 전처리
-        img_array = preprocess(image, debug)
+        img_array = preprocess(image, debug=debug, base_filename=base_filename)
         
         
         if img_array is None:
-            logger.warning("preprocessing returned None.")
+            logger.warning(f"preprocessing returned None: {base_filename}")
             return ""
     
         # 2. OCR 수행
@@ -43,17 +43,17 @@ def extract_text(image: Image.Image, debug : bool = False) -> str:
         
         # 3. OCR 결과 방어 처리
         if not result:
-            logger.warning("OCR result is empty.")
+            logger.warning(f"OCR result is empty: {base_filename}")
             return ""
         
         # 4. 문자열로 안전하게 변환 후 합치기
         text = " ".join(str(r) for r in result).lower()
-        logger.info(f"OCR completed successfully : {text}")
+        logger.info(f"OCR completed [{base_filename}]: {text}")
         return text
     
     except Exception as e:
         # 예외 발생 시 로깅 후 빈 문자열 반환
-        logger.error("OCR failed: %s", str(e)) # 2️⃣ 에러 로그
+        logger.error(f"OCR failed [{base_filename}]: {str(e)}") # 2️⃣ 에러 로그
         return ""
 
 def check_keywords(text: str, keywords: list[str]) -> list[str]:
