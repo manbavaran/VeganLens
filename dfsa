@@ -1,9 +1,0 @@
-[33mcommit 4b1b892c8f3ee198e3fcfd1dc6ab35647a17f1b1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mocr_module[m[33m)[m
-Author: Sucy <hybaek807@naver.com>
-Date:   Tue Jul 22 18:05:20 2025 +0900
-
-    Add .gitkeep to preserve empty frontend directory structure
-
- .gitignore        | 25 [32m++++++++++++++++++++++++[m[31m-[m
- frontend/.gitkeep |  0
- 2 files changed, 24 insertions(+), 1 deletion(-)
