@@ -1,4 +1,4 @@
-추가예정/
+.env
 
 venv310/
 
@@ -6,3 +6,26 @@ backend/__pycache__/
 
 backend/app/__pycache__/
 
+**/__pycache__/
+
+.ipynb_checkpoints/
+
+.vscode/
+
+.idea/
+
+*.py[cod]
+
+*$py.class
+
+추가예정/
+
+img/
+
+**/logs/*
+
+!**/logs/.gitkeep
+
+**/preprocessed/*
+
+!**/preprocessed/.gitkeep
