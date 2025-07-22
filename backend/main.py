@@ -17,7 +17,7 @@ http://localhost:8000/docs 점속
 Swagger UI 확인하기
 """
 
-base_dir = os.path.abspath(os.getcwd())
+base_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일 기준
 
 data_dir = os.path.abspath(os.path.join(base_dir, "..", "data"))
 

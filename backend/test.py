@@ -13,7 +13,7 @@ from app import extract_text, check_keywords
 테스트 하는 용도의 파일
 """
 
-base_dir = os.path.abspath(os.getcwd())
+base_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일 기준
 
 data_dir = os.path.abspath(os.path.join(base_dir, "..", "data"))
 
@@ -33,7 +33,7 @@ image_files = [f for f in os.listdir(pictures_dir)
                 if f.lower().endswith((".jpg", ".jpeg", ".png"))]
 
 # 상위 30개만 선택
-selected_images = image_files[:30]
+selected_images = image_files[:100]
 
 
 # OCR 수행
