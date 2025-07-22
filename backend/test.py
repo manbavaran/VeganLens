@@ -6,8 +6,7 @@ from PIL import Image
 import io
 import json
 import os
-from app.veganLens import extract_text, check_keywords
-
+from app import extract_text, check_keywords
 """
 클라이언트에게 이미지를 받는게 아니라
 서버내에서 이미지를 불러와서
