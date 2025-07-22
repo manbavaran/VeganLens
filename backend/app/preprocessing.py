@@ -4,7 +4,7 @@ from PIL import Image
 import os
 import uuid
 
-base_dir = os.path.abspath(os.getcwd())
+base_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일 기준
 
 preprocessed_dir = os.path.abspath(os.path.join(base_dir, 'preprocessed'))
 # 전처리한 이미지를 디버깅용으로 저장할 폴더

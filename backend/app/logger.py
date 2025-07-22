@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 def get_logger(name: str = "app") -> logging.Logger:
-    base_dir = os.path.abspath(os.getcwd())
+    base_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일 기준
     log_dir = os.path.abspath(os.path.join(base_dir, "logs"))
 
     os.makedirs(log_dir, exist_ok=True)
