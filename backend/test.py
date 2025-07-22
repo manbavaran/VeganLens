@@ -1,4 +1,4 @@
-# backend/main.py
+# backend/test.py
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -41,7 +41,7 @@ for idx, filename in enumerate(selected_images, start=1):
     img_path = os.path.join(pictures_dir, filename)
     try:
         image = Image.open(img_path)
-        text = extract_text(image)
+        text = extract_text(image, True)
         found = check_keywords(text, ban_list)
         print(f"\n[{idx}] 파일명: {filename}")
         print("  🔍 OCR 결과:", text)

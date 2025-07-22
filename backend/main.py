@@ -77,7 +77,7 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     image = Image.open(io.BytesIO(contents))
 
     # 2. OCR 수행
-    text = extract_text(image)
+    text = extract_text(image, True)
     # veganLens.py 에서 정의한 함수
 
     # 3. 비건 여부 판단

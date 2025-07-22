@@ -18,12 +18,13 @@ print("CUDA 지원:", torch.version.cuda)
 print("GPU 사용 가능:", torch.cuda.is_available())
 print("GPU 이름:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A")
 
-def extract_text(image: Image.Image) -> str:
+def extract_text(image: Image.Image, debug : bool = False) -> str:
     try:
         logger.info("OCR started.")  # 1️⃣ OCR 시작 로그
         
         # 1. 이미지 전처리
-        img_array = preprocess(image)
+        img_array = preprocess(image, debug)
+        
         
         if img_array is None:
             logger.warning("preprocessing returned None.")
