@@ -1,6 +1,6 @@
 from PIL import Image, ImageFont
 import easyocr
-from paddleocr import PaddleOCR, draw_ocr
+from paddleocr import PaddleOCR
 import torch
 import numpy as np
 from .preprocessing import preprocess, save_debug_image
@@ -71,6 +71,19 @@ def check_keywords(text: str, keywords: list[str]) -> list[str]:
     # kw in text → text 안에 kw라는 단어가 부분 문자열로 포함되면 그 키워드를 리턴
     
 
+def draw_ocr_boxes(np_img: np.ndarray, boxes: List, txts: List[str], scores: List[float], font_path: str = "") -> np.ndarray:
+    img_draw = np_img.copy()
+
+    for box, text in zip(boxes, txts):
+        box = np.array(box).astype(np.int32)
+        cv2.polylines(img_draw, [box], isClosed=True, color=(0, 255, 0), thickness=2)
+
+        # 텍스트 좌표 설정 (좌상단)
+        x, y = box[0]
+        cv2.putText(img_draw, text, (int(x), int(y) - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5, (255, 0, 0), 1, cv2.LINE_AA)
+
+    return img_draw
 
 def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "debug") -> str:
     try:
@@ -91,7 +104,6 @@ def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "deb
             return ""
 
         # 4. 텍스트 추출
-        lines = []
         boxes = []
         txts = []
         scores = []
@@ -101,7 +113,7 @@ def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "deb
             boxes.append(box)
             txts.append(text)
             scores.append(score)
-            lines.append(text)
+            score.append(text)
 
         # 5. 시각화된 이미지 저장 (디버깅용)
         if debug:
@@ -110,16 +122,13 @@ def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "deb
             if not os.path.exists(font_path):
                 logger.warning("Font file for draw_ocr not found, skipping visual debug image.")
             else:
-                img_vis = draw_ocr(np_img, boxes, txts, scores, font_path=font_path)
+                img_vis = draw_ocr_boxes(np_img, boxes, txts, scores, font_path=font_path)
                 debug_vis_path = os.path.join("preprocessed", f"{base_filename}_ocr_box.jpg")
                 cv2.imwrite(debug_vis_path, img_vis)
                 logger.info(f"OCR box image saved: {debug_vis_path}")
             
-
-        
-        
         # 6. 결과 문자열 결합
-        text = " ".join(lines).lower()
+        text = " ".join(txt.lower() for txt in txts)
         logger.info(f"OCR completed [{base_filename}]: {text}")
         return text
 
