@@ -1,7 +1,7 @@
 from .veganLens import extract_text
 # 이곳에 각자 만든 ocr 추출 함수 임포트 하기
 
-def choice(image, debug=True, base_filename=None, who='BHY', version = 1):
+def choice(image, debug=True, base_filename=None, version = 1, who='BHY'):
     if (who == 'BHY' & version == 1):
         return extract_text(image, debug=True, base_filename=base_filename)
     elif (who == 'HSK' & version == 1):

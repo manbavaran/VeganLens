@@ -81,7 +81,7 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     base_filename = os.path.splitext(os.path.basename(original_filename))[0]
     
     # 2. OCR 수행
-    text = choice(image, debug=True, base_filename=base_filename, who='BHY', version = 1)
+    text = choice(image, debug=True, base_filename=base_filename, version = 1, who='BHY')
     # veganLens.py 에서 정의한 함수
 
     # 3. 비건 여부 판단
