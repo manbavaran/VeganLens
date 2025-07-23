@@ -106,7 +106,7 @@ def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "deb
         # 5. 시각화된 이미지 저장 (디버깅용)
         if debug:
             # 한글 폰트 지정 (경로는 실제 시스템에 맞게 설정 필요)
-            font_path = "assets/NanumGothic.ttf"  # 또는 절대경로
+            font_path = "../../data/NanumGothic.ttf"  # 또는 절대경로
             if not os.path.exists(font_path):
                 logger.warning("Font file for draw_ocr not found, skipping visual debug image.")
             else:
