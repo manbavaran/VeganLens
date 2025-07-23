@@ -18,7 +18,7 @@ print("CUDA 지원:", torch.version.cuda)
 print("GPU 사용 가능:", torch.cuda.is_available())
 print("GPU 이름:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A")
 
-def extract_text(image: Image.Image, debug : bool = False, base_filename: str = "debug") -> str:
+def easy_ocr(image: Image.Image, debug : bool = False, base_filename: str = "debug") -> str:
     try:
         logger.info(f"OCR started: {base_filename}")  # 1️⃣ OCR 시작 로그
         
@@ -64,3 +64,7 @@ def check_keywords(text: str, keywords: list[str]) -> list[str]:
     # 리스트 컴프리헨션 (리스트 만들기)
     # kw in text → text 안에 kw라는 단어가 부분 문자열로 포함되면 그 키워드를 리턴
     
+
+def extract_text(image, debug=True, base_filename=None, version = 1):
+    if (version  == 1):
+        easy_ocr(image, debug=True, base_filename=base_filename)

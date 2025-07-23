@@ -42,7 +42,7 @@ for idx, filename in enumerate(selected_images, start=1):
     base_filename = os.path.splitext(filename)[0]
     try:
         image = Image.open(img_path)
-        text = choice(image, debug=True, base_filename=base_filename, who='BHY', version = 1)
+        text = choice(image, debug=True, base_filename=base_filename, version = 1, who='BHY')
         found = check_keywords(text, ban_list)
         print(f"\n[{idx}] 파일명: {filename}")
         print("  🔍 OCR 결과:", text)
