@@ -95,10 +95,10 @@ def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "deb
 
         # 2. 디버깅용 원본 저장
         if debug:
-            save_debug_image(np_img, prefix=f"{base_filename}_paddle_debug")
+            save_debug_image(np_img, base_filename)
 
         # 3. PaddleOCR 수행
-        result = paddle.predict(np_img)
+        result = paddle.ocr(np_img)
 
         if not result or not result[0]:
             logger.warning(f"OCR result is empty: {base_filename}")
@@ -114,7 +114,6 @@ def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "deb
             boxes.append(box)
             txts.append(text)
             scores.append(score)
-            score.append(text)
 
         # 5. 시각화된 이미지 저장 (디버깅용)
         if debug:
@@ -139,6 +138,8 @@ def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "deb
 
 def extract_text(image, debug=True, base_filename=None, version = 1):
     if (version  == 1):
-        easy_ocr(image, debug, base_filename=base_filename)
+        return easy_ocr(image, debug, base_filename=base_filename)
     elif (version == 2):
-        paddle_ocr(image, debug, base_filename=base_filename)
+        return paddle_ocr(image, debug, base_filename=base_filename)
+    else:
+        return ""
