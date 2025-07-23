@@ -6,7 +6,7 @@ from PIL import Image
 import io
 import json
 import os
-from app import extract_text, check_keywords
+from app import check_keywords, choice
 """
 클라이언트에게 이미지를 받는게 아니라
 서버내에서 이미지를 불러와서
@@ -42,7 +42,7 @@ for idx, filename in enumerate(selected_images, start=1):
     base_filename = os.path.splitext(filename)[0]
     try:
         image = Image.open(img_path)
-        text = extract_text(image, debug=True, base_filename=base_filename)
+        text = choice(image, debug=True, base_filename=base_filename, who='BHY', version = 1)
         found = check_keywords(text, ban_list)
         print(f"\n[{idx}] 파일명: {filename}")
         print("  🔍 OCR 결과:", text)
