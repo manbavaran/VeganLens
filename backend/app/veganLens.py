@@ -1,14 +1,20 @@
-from PIL import Image
+from PIL import Image, ImageFont
 import easyocr
+from paddleocr import PaddleOCR, draw_ocr
 import torch
-from .preprocessing import preprocess
+import numpy as np
+from .preprocessing import preprocess, save_debug_image
 from .logger import get_logger
+import cv2
+import os
 
 # OCR 모델은 전역에서 미리 로딩해두는 게 성능에 좋음
 
 
 reader = easyocr.Reader(['en', 'ko'], gpu=True)  # 영어, 한국어 지원
 
+# PaddleOCR 객체 생성 (한 번만)
+paddle = PaddleOCR(use_angle_cls=True, lang='korean')  # 언어: 한국어 / 방향 자동 보정 켜짐
 
 logger = get_logger("ocr")
 
@@ -65,6 +71,64 @@ def check_keywords(text: str, keywords: list[str]) -> list[str]:
     # kw in text → text 안에 kw라는 단어가 부분 문자열로 포함되면 그 키워드를 리턴
     
 
+
+def paddle_ocr(image: Image.Image, debug: bool = True, base_filename: str = "debug") -> str:
+    try:
+        logger.info(f"OCR started: {base_filename}")  # 1️⃣ OCR 시작 로그
+
+        # 1. PIL → numpy 변환 (PaddleOCR는 numpy 이미지 사용)
+        np_img = np.array(image)
+
+        # 2. 디버깅용 원본 저장
+        if debug:
+            save_debug_image(np_img, prefix=f"{base_filename}_paddle_debug")
+
+        # 3. PaddleOCR 수행
+        result = paddle.predict(np_img)
+
+        if not result or not result[0]:
+            logger.warning(f"OCR result is empty: {base_filename}")
+            return ""
+
+        # 4. 텍스트 추출
+        lines = []
+        boxes = []
+        txts = []
+        scores = []
+        
+        for line in result[0]:  # result[0] 은 텍스트 인식 결과 리스트
+            box, (text, score) = line
+            boxes.append(box)
+            txts.append(text)
+            scores.append(score)
+            lines.append(text)
+
+        # 5. 시각화된 이미지 저장 (디버깅용)
+        if debug:
+            # 한글 폰트 지정 (경로는 실제 시스템에 맞게 설정 필요)
+            font_path = "assets/NanumGothic.ttf"  # 또는 절대경로
+            if not os.path.exists(font_path):
+                logger.warning("Font file for draw_ocr not found, skipping visual debug image.")
+            else:
+                img_vis = draw_ocr(np_img, boxes, txts, scores, font_path=font_path)
+                debug_vis_path = os.path.join("preprocessed", f"{base_filename}_ocr_box.jpg")
+                cv2.imwrite(debug_vis_path, img_vis)
+                logger.info(f"OCR box image saved: {debug_vis_path}")
+            
+
+        
+        
+        # 6. 결과 문자열 결합
+        text = " ".join(lines).lower()
+        logger.info(f"OCR completed [{base_filename}]: {text}")
+        return text
+
+    except Exception as e:
+        logger.error(f"OCR failed [{base_filename}]: {str(e)}")
+        return ""
+
 def extract_text(image, debug=True, base_filename=None, version = 1):
     if (version  == 1):
-        easy_ocr(image, debug=True, base_filename=base_filename)
+        easy_ocr(image, debug, base_filename=base_filename)
+    elif (version == 2):
+        paddle_ocr(image, debug, base_filename=base_filename)
