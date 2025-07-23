@@ -7,6 +7,7 @@ from .preprocessing import preprocess, save_debug_image
 from .logger import get_logger
 import cv2
 import os
+from typing import List
 
 # OCR 모델은 전역에서 미리 로딩해두는 게 성능에 좋음
 
