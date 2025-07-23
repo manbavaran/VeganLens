@@ -6,7 +6,7 @@ from PIL import Image
 import io
 import json
 import os
-from app import extract_text, check_keywords
+from app import check_keywords, choice
 from datetime import datetime
 
 """
@@ -81,7 +81,7 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     base_filename = os.path.splitext(os.path.basename(original_filename))[0]
     
     # 2. OCR 수행
-    text = extract_text(image, debug=True, base_filename=base_filename)
+    text = choice(image, debug=True, base_filename=base_filename, who='BHY', version = 1)
     # veganLens.py 에서 정의한 함수
 
     # 3. 비건 여부 판단
