@@ -6,7 +6,7 @@ from PIL import Image
 import io
 import json
 import os
-from app import extract_text, check_keywords
+from app import check_keywords, choice, get_logger_by_name
 from datetime import datetime
 
 """
@@ -81,17 +81,25 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     base_filename = os.path.splitext(os.path.basename(original_filename))[0]
     
     # 2. OCR 수행
-    text = extract_text(image, debug=True, base_filename=base_filename)
+    text = choice(image, debug=True, base_filename=base_filename, version = 1, who='IMY')
     # veganLens.py 에서 정의한 함수
 
     # 3. 비건 여부 판단
     found = check_keywords(text, ban_list)
     # veganLens.py 에서 정의한 함수
 
-    now = datetime.now()
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    logger = get_logger_by_name('IMY')
+        
+    logger.info(f"\n 파일명: {base_filename}")
+    logger.info(f"  📅 처리 시각: {now_str}")
+    logger.info(f"  🚫 감지된 금지 성분: {found if found else '없음'}")
+    logger.info(f"  {'✅ 비건 OK' if not found else '❌ 비건 아님'}")
+    logger.info(f"  🔍 OCR 결과: {text}")
+    
     return JSONResponse(
         content={
-            "Date": now.strftime("%Y-%m-%d %H:%M:%S"),
+            "Date": now_str,
             "user_type": user_type,
             "is_vegan": len(found) == 0,
             "detected_non_vegan_ingredients": found,
