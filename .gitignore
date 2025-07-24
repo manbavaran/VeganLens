@@ -29,3 +29,5 @@ img/
 **/preprocessed/*
 
 !**/preprocessed/.gitkeep
+
+data/veganlens_API_Key.json

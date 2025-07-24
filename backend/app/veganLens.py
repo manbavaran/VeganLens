@@ -55,7 +55,7 @@ def easy_ocr(image: Image.Image, debug : bool = False, base_filename: str = "deb
         
         # 4. 문자열로 안전하게 변환 후 합치기
         text = " ".join(str(r) for r in result).lower()
-        logger.info(f"OCR completed [{base_filename}]: {text}")
+        logger.info(f"OCR completed [{base_filename}]")
         return text
     
     except Exception as e:
