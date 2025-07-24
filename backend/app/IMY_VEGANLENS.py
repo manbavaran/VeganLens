@@ -8,7 +8,7 @@ from datetime import datetime
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-API_PATH = os.path.abspath(os.path.join("..", "data", "veganlens-466902-a2052386ea8a.json"))
+API_PATH = os.path.abspath(os.path.join("..", "data", "veganlens_API_Key.json"))
 
 # JSON 키 경로 등록
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = API_PATH
