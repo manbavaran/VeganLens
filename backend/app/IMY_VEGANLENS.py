@@ -6,9 +6,9 @@ import os
 from datetime import datetime
 # :흰색_확인_표시: IMY 전용 Google Vision 기반 OCR 함수
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+base_dir = os.path.abspath(os.path.dirname(__file__))
 
-API_PATH = os.path.abspath(os.path.join("..", "data", "veganlens_API_Key.json"))
+API_PATH = os.path.abspath(os.path.join(base_dir, "..", "..","data", "veganlens_API_Key.json"))
 
 # JSON 키 경로 등록
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = API_PATH
