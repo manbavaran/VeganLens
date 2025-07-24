@@ -17,7 +17,10 @@ def get_logger(name: str = "app") -> logging.Logger:
     logger = logging.getLogger(name)  # 로거 객체 생성
 
     # 중복 핸들러 방지
-    if not logger.hasHandlers():
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    if not logger.handlers:
         logger.setLevel(logging.INFO)  # 로깅 수준 설정 (INFO 이상만 기록)
 
         # 일반 로그 핸들러
@@ -41,3 +44,16 @@ def get_logger(name: str = "app") -> logging.Logger:
         logger.addHandler(error_handler)
 
     return logger
+
+def get_logger_by_name(name: str) -> logging.Logger:
+    return get_logger(name)
+
+def log_result(logger: logging.Logger, idx: int, filename: str, text: str, found) -> None:
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    logger.info(f"\n[{idx}] 파일명: {filename}")
+    logger.info(f"  📅 처리 시각: {now_str}")
+    logger.info(f"  🔍 OCR 결과: {text}")
+    logger.info(f"  🚫 감지된 금지 성분: {found if found else '없음'}")
+    logger.info(f"  {'✅ 비건 OK' if not found else '❌ 비건 아님'}")
+
