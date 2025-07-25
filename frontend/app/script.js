@@ -1,3 +1,5 @@
+
+// 허서경의 주석
 document.addEventListener("DOMContentLoaded", () => {
   const profileInput = document.getElementById("profileInput");
   const profileImage = document.getElementById("profileImage");
