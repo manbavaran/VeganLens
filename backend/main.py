@@ -3,6 +3,7 @@ from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from PIL import Image
+import pillow_heif
 import io
 import json
 import os
@@ -43,6 +44,8 @@ app.add_middleware(
 with open(user_rules_path, "r", encoding="utf-8") as f:
     USER_RULES = json.load(f)  # ["milk", "egg", "honey", "gelatin", ...]
 
+# 등록 (한 번만 해두면 PIL이 HEIC도 열 수 있게 됨)
+pillow_heif.register_heif_opener()
 
 # 이미지 업로드 API
 @app.post("/Check_Vegan")
@@ -101,7 +104,7 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
         content={
             "Date": now_str,
             "user_type": user_type,
-            "is_vegan": len(found) == 0,
+            "is_vegan": len(found) == 0, # True : 비건,  False : 비건 아님
             "detected_non_vegan_ingredients": found,
             "ban_list": ban_list,
             "ocr_text": text,

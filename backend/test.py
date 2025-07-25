@@ -1,5 +1,6 @@
 # backend/test.py
 from PIL import Image
+import pillow_heif
 import json
 import os
 from app import check_keywords, choice, get_logger_by_name
@@ -26,6 +27,9 @@ with open(user_rules_path, "r", encoding="utf-8") as f:
 
 user_type = "Strict Vegan"  # 직접 지정
 ban_list = USER_RULES.get(user_type, [])
+
+# 등록 (한 번만 해두면 PIL이 HEIC도 열 수 있게 됨)
+pillow_heif.register_heif_opener()
 
 # 이미지 목록 가져오기
 image_files = [f for f in os.listdir(pictures_dir) 
