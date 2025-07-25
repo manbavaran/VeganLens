@@ -3,7 +3,7 @@ from PIL import Image
 from io import BytesIO
 from .logger import get_logger
 import os
-from datetime import datetime
+
 # :흰색_확인_표시: IMY 전용 Google Vision 기반 OCR 함수
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
