@@ -1,9 +1,5 @@
 # backend/test.py
-from fastapi import FastAPI, File, UploadFile, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from PIL import Image
-import io
 import json
 import os
 from app import check_keywords, choice, get_logger_by_name
@@ -35,7 +31,7 @@ ban_list = USER_RULES.get(user_type, [])
 image_files = [f for f in os.listdir(pictures_dir) 
                 if f.lower().endswith((".jpg", ".jpeg", ".png"))]
 
-# 상위 30개만 선택
+# 전체 이미지 선택
 selected_images = image_files[:]
 
 
@@ -47,7 +43,13 @@ for idx, filename in enumerate(selected_images, start=1):
     base_filename = os.path.splitext(filename)[0]
     try:
         image = Image.open(img_path)
-        text = choice(image, debug=True, base_filename=base_filename, version = 1, who='IMY')
+        
+        text = choice(  image, 
+                        debug=True, 
+                        base_filename=base_filename, 
+                        version = 1,
+                        who='IMY')
+        
         found = check_keywords(text, ban_list)
         
         print(f"\n[{idx}] 파일명: {filename}")
