@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vegan Lens - 설정</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 상단 로고 -->
+    <header class="header">
+      <h1><span class="logo-green">Vegan</span> <span class="logo-tag">Lens</span></h1>
+      <p class="sub-title">OPTION</p>
+    </header>
+
+    <!-- 설정 내용 -->
+    <main class="settings-container">
+
+      <!-- 프로필 이미지 -->
+      <div class="profile">
+        <input type="file" id="profileInput" accept="image/*" capture hidden />
+        <div class="profile-image" id="profileImage"></div>
+        <div class="profile-name">
+          <span id="userName">사용자 이름</span>
+          <button id="editNameBtn">
+            <span class="material-symbols-outlined">edit</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Vegetarian 유형 선택 -->
+      <div class="type-selector">
+        <div id="selectedType">Vegan</div>
+        <button id="toggleSelector">
+          <span class="material-symbols-outlined">check</span>
+        </button>
+        <div id="typePopup" class="hidden">
+          <label><input type="radio" name="vegtype" value="Vegan" /> Vegan</label>
+          <label><input type="radio" name="vegtype" value="Lacto vegetarian" /> Lacto vegetarian</label>
+          <label><input type="radio" name="vegtype" value="Ovo vegetarian" /> Ovo vegetarian</label>
+          <label><input type="radio" name="vegtype" value="Lacto-ovo vegetarian" /> Lacto-ovo vegetarian</label>
+          <label><input type="radio" name="vegtype" value="Pesco-vegetarian" /> Pesco-vegetarian</label>
+          <label><input type="radio" name="vegtype" value="Pollo-vegetarian" /> Pollo-vegetarian</label>
+        </div>
+      </div>
+
+      <!-- 식품군 아이콘 -->
+      <div class="icons">
+        <span class="material-symbols-outlined icon active" id="fruit">nutrition</span>
+        <span class="material-symbols-outlined icon" id="vegetable">eco</span>
+        <span class="material-symbols-outlined icon" id="dairy">local_mall</span>
+        <span class="material-symbols-outlined icon" id="egg">egg</span>
+        <span class="material-symbols-outlined icon" id="fish">set_meal</span>
+        <span class="material-symbols-outlined icon" id="chicken">restaurant</span>
+      </div>
+    </main>
+
+    <!-- 하단 바 (tail) -->
+    <footer class="bottom-nav">
+      <div class="nav-icon" onclick="changeTab(this)">
+        <i data-lucide="layout-grid"></i>
+      </div>
+      <div class="nav-icon" onclick="changeTab(this)">
+        <i data-lucide="home"></i>
+      </div>
+      <div class="nav-icon active" onclick="changeTab(this)">
+        <i data-lucide="settings"></i>
+      </div>
+    </footer>
+
+    <!-- 닉네임 수정 모달 -->
+    <div id="nameModal" class="modal hidden">
+      <input type="text" id="nameInput" placeholder="닉네임 입력" />
+      <button id="saveName">저장</button>
+      <button id="cancelName">취소</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    lucide.createIcons(); // 아이콘 렌더링
+  </script>
+</body>
+</html>

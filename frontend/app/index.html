@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vegan Lens</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="container">
+
+    <!-- 헤더 -->
+    <header class="logo">
+      <img src="https://placehold.co/150x40?text=Logo" alt="Vegan Lens Logo" />
+    </header>
+
+    <!-- 중앙 콘텐츠: 버튼 3개 -->
+    <main class="button-area">
+      <div class="card blue" onclick="triggerCameraInput()">
+        <img src="https://placehold.co/100x100?text=Camera" alt="Take a picture" />
+        <p>TAKE A PICTURE</p>
+      </div>
+
+      <div class="card yellow" onclick="triggerGalleryInput()">
+        <img src="https://placehold.co/100x100?text=Gallery" alt="Select photo" />
+        <p>SELECT A PHOTO</p>
+      </div>
+
+      <div class="card green" onclick="openLiveCamera()">
+        <img src="https://placehold.co/100x100?text=Live+Camera" alt="Live Camera" />
+        <p>SELECT A PHOTO</p>
+      </div>
+
+      <!-- 숨겨진 input -->
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" />
+      <input type="file" id="galleryInput" accept="image/*" style="display: none;" />
+    </main>
+
+    </main>
+
+    <!-- 하단 탭 -->
+    <nav class="bottom-nav">
+      <div class="nav-icon" onclick="changeTab(this)">
+        <i data-lucide="layout-grid"></i>
+      </div>
+      <div class="nav-icon active" onclick="changeTab(this)">
+        <i data-lucide="home"></i>
+      </div>
+      <div class="nav-icon" onclick="changeTab(this)">
+        <i data-lucide="settings"></i>
+      </div>
+    </nav>
+
+  </div>
+</body>
+</html>
