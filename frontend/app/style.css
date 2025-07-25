@@ -1,0 +1,127 @@
+:root {
+  --green: #4caf50;
+  --blue-bg: #e6f3fc;
+  --blue-border: #b8e0f8;
+  --yellow-bg: #fff6e5;
+  --yellow-border: #ffe0b2;
+  --green-bg: #e7f8ef;
+  --green-border: #b2e8c4;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+body {
+  background: white;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* 헤더 */
+.logo {
+  text-align: center;
+  padding: 16px 16px 10px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.logo img {
+  height: 40px;
+}
+
+/* 메인 콘텐츠: 유동적 중앙 정렬 */
+.button-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+
+  /* ✅ bottom_nav 높이만큼 여유 공간 확보 */
+  padding-bottom: 70px;  /* 또는 bottom_nav의 높이보다 살짝 큰 값 */
+}
+
+.card {
+  width: 90%;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: scale(1.02);
+}
+
+.card img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.card p {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+}
+
+.card.blue {
+  background: var(--blue-bg);
+  border: 1.5px solid var(--blue-border);
+}
+
+.card.yellow {
+  background: var(--yellow-bg);
+  border: 1.5px solid var(--yellow-border);
+}
+
+.card.green {
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-border);
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 430px;
+  height: 60px; /* ✅ 명시적으로 높이 지정 */
+  background: #f3f3f3;
+  border-top: 1px solid #ddd;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.nav-icon {
+  color: #999;
+  transition: color 0.2s;
+  font-size: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+}
+
+.nav-icon.active {
+  color: var(--green);
+}
