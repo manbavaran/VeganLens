@@ -10,49 +10,40 @@
 </head>
 <body>
   <div class="container">
-
-    <!-- 헤더 -->
     <header class="logo">
       <img src="https://placehold.co/150x40?text=Logo" alt="Vegan Lens Logo" />
+      <p class="sub-title">　</p>
     </header>
 
-    <!-- 중앙 콘텐츠: 버튼 3개 -->
     <main class="button-area">
-      <div class="card blue" onclick="triggerCameraInput()">
+      <div class="card blue" id="cameraBtn">
         <img src="https://placehold.co/100x100?text=Camera" alt="Take a picture" />
         <p>TAKE A PICTURE</p>
       </div>
-
-      <div class="card yellow" onclick="triggerGalleryInput()">
+      <div class="card yellow" id="galleryBtn">
         <img src="https://placehold.co/100x100?text=Gallery" alt="Select photo" />
         <p>SELECT A PHOTO</p>
       </div>
-
-      <div class="card green" onclick="openLiveCamera()">
+      <div class="card green" id="liveCameraBtn">
         <img src="https://placehold.co/100x100?text=Live+Camera" alt="Live Camera" />
         <p>SELECT A PHOTO</p>
       </div>
 
-      <!-- 숨겨진 input -->
-      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" />
-      <input type="file" id="galleryInput" accept="image/*" style="display: none;" />
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden />
+      <input type="file" id="galleryInput" accept="image/*" hidden />
     </main>
 
-    </main>
-
-    <!-- 하단 탭 -->
     <nav class="bottom-nav">
-      <div class="nav-icon" onclick="changeTab(this)">
+      <div class="nav-icon" data-tab="grid">
         <i data-lucide="layout-grid"></i>
       </div>
-      <div class="nav-icon active" onclick="changeTab(this)">
+      <div class="nav-icon active" data-tab="home">
         <i data-lucide="home"></i>
       </div>
-      <div class="nav-icon" onclick="changeTab(this)">
+      <div class="nav-icon" data-tab="settings">
         <i data-lucide="settings"></i>
       </div>
     </nav>
-
   </div>
 </body>
 </html>

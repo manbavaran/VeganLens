@@ -50,7 +50,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 16px;
-  padding: 16px;
+  padding: 0px 16px 16px 16px;
 
   /* ✅ bottom_nav 높이만큼 여유 공간 확보 */
   padding-bottom: 70px;  /* 또는 bottom_nav의 높이보다 살짝 큰 값 */
@@ -124,4 +124,120 @@ body {
 
 .nav-icon.active {
   color: var(--green);
+}
+
+/* settings.html용 스타일 */
+.settings-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  padding-top: 80vh;
+  transform: translateY(-52%);
+}
+
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #ccc;
+  background-size: cover;
+  background-position: center;
+}
+
+.profile-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.type-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#typePopup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  padding: 8px;
+  margin-top: 6px;
+}
+
+#typePopup.hidden {
+  display: none;
+}
+
+.icons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.icon {
+  width: 85px;
+  height: 85px;
+  object-fit: contain;
+}
+
+
+.icon.active {
+  color: var(--green);
+}
+
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  row-gap: 25px;
+  column-gap: 26px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.icon-grid .icon {
+  width: 85px;
+  height: 85px;
+  object-fit: contain;
+}
+
+
+.modal {
+  position: fixed;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: flex;
+  gap: 10px;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+/* 타이틀 */
+.sub-title {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin: -4px;
 }
