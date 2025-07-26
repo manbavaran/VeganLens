@@ -24,7 +24,7 @@ models_dir = os.path.abspath(os.path.join(base_dir,
 
 os.makedirs(models_dir, exist_ok=True)
 
-config_path = os.path.join(models_dir, 'dbnet_resnet50-dcnv2_fpnc_1200e_icdar2015.py')
+config_path = os.path.join(models_dir, 'dbnet','dbnet_resnet50-dcnv2_fpnc_1200e_icdar2015.py')
 weights_path = os.path.join(models_dir, 'dbnet_resnet50-dcnv2_fpnc_1200e_icdar2015_20220828_124917-452c443c.pth')
 
 # MMOCR 모델은 한 번만 로드해서 재사용
