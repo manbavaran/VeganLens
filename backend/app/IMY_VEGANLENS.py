@@ -4,7 +4,6 @@ from io import BytesIO
 from .logger import get_logger
 import os
 from concurrent.futures import ThreadPoolExecutor
-from .detectBlock import detect_text_blocks, flatten_crops
 from functools import partial
 
 # :흰색_확인_표시: IMY 전용 Google Vision 기반 OCR 함수
@@ -33,10 +32,11 @@ def google_ocr(image: Image.Image, debug: bool = True, base_filename: str = None
         # Google Vision용 이미지 객체 생성
         image = vision.Image(content=content)
         # OCR 요청
-        response = client.text_detection(image=image)
-        texts = response.text_annotations[0].description
+        response = client.document_text_detection(image=image)
+        
+        texts = response.full_text_annotation.text.strip()
         if texts:
-            result = texts[0].description
+            result = texts
             if debug:
                 logger.info(f"OCR completed [{base_filename}]")  # ✅ 성공 로그
             return result
@@ -50,18 +50,12 @@ def google_ocr(image: Image.Image, debug: bool = True, base_filename: str = None
 
 def extract_text_imy(image, debug=True, base_filename=None, version=1):
     if (version == 1):
-        # 텍스트 블록 추출
-        cropped_blocks = detect_text_blocks(image, debug=debug, base_filename=base_filename)
-        blocks = flatten_crops(cropped_blocks)
         
         # Google OCR 병렬 처리
-        ocr_with_args = partial(google_ocr, debug=debug, base_filename=base_filename)
-        
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            texts = list(executor.map(ocr_with_args, blocks))
+        texts = google_ocr(image=image, debug=debug, base_filename=base_filename)
             
         # 3. 텍스트 결합
-        return "\n".join(texts)
+        return texts
     
     else:
         return print("버전을 다시 확인해 주세요.")
