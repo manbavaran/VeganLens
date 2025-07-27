@@ -24,6 +24,9 @@ data_dir = os.path.abspath(os.path.join(base_dir, "..", "data"))
 
 user_rules_path = os.path.abspath(os.path.join(data_dir, "user_rules.json"))
 
+
+
+
 app = FastAPI(
     title="VeganLens API",
     description="Upload food label image and check if it's vegan",
