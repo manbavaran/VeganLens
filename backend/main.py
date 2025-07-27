@@ -1,7 +1,8 @@
 # backend/main.py
 from fastapi import FastAPI, File, UploadFile, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from PIL import Image
 import pillow_heif
 import io
@@ -24,7 +25,15 @@ data_dir = os.path.abspath(os.path.join(base_dir, "..", "data"))
 
 user_rules_path = os.path.abspath(os.path.join(data_dir, "user_rules.json"))
 
+frontend_dir = os.path.abspath(os.path.join(base_dir, "..", "frontend", "app"))
 
+
+# 비건 불허 성분 키워드
+with open(user_rules_path, "r", encoding="utf-8") as f:
+    USER_RULES = json.load(f)  # ["milk", "egg", "honey", "gelatin", ...]
+
+# 등록 (한 번만 해두면 PIL이 HEIC도 열 수 있게 됨)
+pillow_heif.register_heif_opener()
 
 
 app = FastAPI(
@@ -43,12 +52,15 @@ app.add_middleware(
 )
 
 
-# 비건 불허 성분 키워드
-with open(user_rules_path, "r", encoding="utf-8") as f:
-    USER_RULES = json.load(f)  # ["milk", "egg", "honey", "gelatin", ...]
+# 정적 파일(css, js 등) mount
+app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
 
-# 등록 (한 번만 해두면 PIL이 HEIC도 열 수 있게 됨)
-pillow_heif.register_heif_opener()
+
+# index.html 렌더링
+@app.get("/")
+async def serve_index():
+    return FileResponse(os.path.join(frontend_dir, "index.html"))
+
 
 # 이미지 업로드 API
 @app.post("/Check_Vegan")
