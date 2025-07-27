@@ -27,6 +27,7 @@ user_rules_path = os.path.abspath(os.path.join(data_dir, "user_rules.json"))
 
 frontend_dir = os.path.abspath(os.path.join(base_dir, "..", "frontend", "app"))
 
+static_dir = os.path.abspath(os.path.join(frontend_dir, "static"))
 
 # 비건 불허 성분 키워드
 with open(user_rules_path, "r", encoding="utf-8") as f:
@@ -54,7 +55,7 @@ app.add_middleware(
 
 
 # 정적 파일(css, js 등) mount
-app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
 # index.html 렌더링
