@@ -1,49 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
+  <!-- 메타 정보 및 외부 리소스 링크 -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>Vegan Lens</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <link rel="stylesheet" href="/static/style.css" />
+
   <script src="https://unpkg.com/lucide@latest" defer></script>
-  <script src="script.js" defer></script>
+  <script src="/static/script.js" defer></script>
+
 </head>
+
 <body>
+
   <div class="container">
+    <!-- 상단 로고 영역 -->
     <header class="logo">
       <img src="https://placehold.co/150x40?text=Logo" alt="Vegan Lens Logo" />
       <p class="sub-title">　</p>
     </header>
 
+    <!-- 메인 버튼 카드 영역 -->
     <main class="button-area">
       <div class="card blue" id="cameraBtn">
         <img src="https://placehold.co/100x100?text=Camera" alt="Take a picture" />
         <p>TAKE A PICTURE</p>
       </div>
+
       <div class="card yellow" id="galleryBtn">
         <img src="https://placehold.co/100x100?text=Gallery" alt="Select photo" />
         <p>SELECT A PHOTO</p>
       </div>
+
       <div class="card green" id="liveCameraBtn">
         <img src="https://placehold.co/100x100?text=Live+Camera" alt="Live Camera" />
         <p>SELECT A PHOTO</p>
       </div>
 
+      <!-- 카메라 및 갤러리 입력 필드 (숨김 처리) -->
       <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden />
       <input type="file" id="galleryInput" accept="image/*" hidden />
     </main>
 
     <nav class="bottom-nav">
+      <!-- 하단 내비게이션 영역 -->
       <div class="nav-icon" data-tab="grid">
         <i data-lucide="layout-grid"></i>
       </div>
+
       <div class="nav-icon active" data-tab="home">
         <i data-lucide="home"></i>
       </div>
+
       <div class="nav-icon" data-tab="settings">
         <i data-lucide="settings"></i>
       </div>
     </nav>
+
+    <!-- 최초 1회 선택지 입력용 팝업 -->
+    <div id="onboardingPopup" class="modal hidden">
+      <div class="modal-content">
+        
+        <h2>당신의 식단 유형을 선택해주세요</h2>
+        <form id="popupForm" style="margin-top: 20px;">
+          <!-- 다양한 채식 유형 선택 -->
+          <label><input type="radio" name="vegtype" value="Vegan" required /> Vegan</label><br>
+          <label><input type="radio" name="vegtype" value="Lacto vegetarian" /> Lacto vegetarian</label><br>
+          <label><input type="radio" name="vegtype" value="Ovo vegetarian" /> Ovo vegetarian</label><br>
+          <label><input type="radio" name="vegtype" value="Lacto-ovo vegetarian" /> Lacto-ovo vegetarian</label><br>
+          <label><input type="radio" name="vegtype" value="Pesco-vegetarian" /> Pesco-vegetarian</label><br>
+          <label><input type="radio" name="vegtype" value="Pollo-vegetarian" /> Pollo-vegetarian</label><br><br>
+          <button type="submit">확인</button>
+        </form>
+      </div>
+    </div>
+    
   </div>
+  
 </body>
 </html>
