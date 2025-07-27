@@ -43,6 +43,7 @@ app = FastAPI(
 )
 
 # CORS 설정
+# 다른 도메인에서 API나 정적 리소스 요청 가능하게 해주는 보안 설정
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # 프론트 주소만 넣어도 됨 ex. ["http://localhost:3000"]
