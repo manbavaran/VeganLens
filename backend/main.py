@@ -61,7 +61,15 @@ app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
 @app.get("/")
 async def serve_index():
     return FileResponse(os.path.join(frontend_dir, "index.html"))
+# 이건  ' /로 들어오면 index.html을 보내줘 ' 라는 의미이다. 
+# http://IP주소:8000/ 이렇게 들어오면 index.html 로 가는 것.
 
+
+# settings.html 요청 대응
+@app.get("/settings.html")
+async def serve_settings():
+    return FileResponse(os.path.join(frontend_dir, "settings.html"))
+# http://IP주소:8000/settings.html 이렇게 들어오면 settings.html 로 간다.
 
 # 이미지 업로드 API
 @app.post("/Check_Vegan")
