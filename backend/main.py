@@ -56,6 +56,7 @@ app.add_middleware(
 
 # 정적 파일(css, js 등) mount
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+# static 파일들은 url 의 /static 경로로 연결
 
 
 # index.html 렌더링
@@ -66,11 +67,22 @@ async def serve_index():
 # http://IP주소:8000/ 이렇게 들어오면 index.html 로 가는 것.
 
 
+@app.get("/index.html")
+async def serve_index_file():
+    return FileResponse(os.path.join(frontend_dir, "index.html"))
+# 웹앱에서 라우팅 방식과 정적 파일 처리 방식의 충돌 방지
+# /는 FastAPI가 index.html을 FileResponse로 직접 제공하므로 정상 출력됨
+# 그런데 설정 탭을 눌렀다가 다시 홈으로 돌아오면
+# 브라우저가 실제로 /index.html이라는 경로로 접근하게 되는데,
+# FastAPI에는 @app.get("/index.html") 라우트가 없으면 404가 납니다.
+
+
 # settings.html 요청 대응
 @app.get("/settings.html")
 async def serve_settings():
     return FileResponse(os.path.join(frontend_dir, "settings.html"))
 # http://IP주소:8000/settings.html 이렇게 들어오면 settings.html 로 간다.
+
 
 # 이미지 업로드 API
 @app.post("/Check_Vegan")
