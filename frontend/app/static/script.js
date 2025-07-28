@@ -10,19 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const selected = document.querySelector("input[name='vegtype']:checked").value;
       localStorage.setItem("vegType", selected);
-
-      // 서버에 사용자 식단 유형을 등록
-      fetch('/api/register-user-type', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-type': selected
-        },
-        body: JSON.stringify({ type: selected })
-      }).then(() => {
-        onboardingPopup.classList.add("hidden");
-        location.reload();
-      });
+      onboardingPopup.classList.add("hidden"); // 07 28 팝업 닫히게끔 수정
     });
   }
 
@@ -94,22 +82,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // 식단 선택 시 저장 및 UI/서버 반영
-    typePopup.addEventListener("change", (e) => {
-      const selected = e.target.value;
-      selectedType.textContent = selected;
-      typePopup.classList.add("hidden");
-      localStorage.setItem("vegType", selected);
-      updateIcons(selected);
+    // 07 28 이벤트 동작 방식 수정 (전송 양식은 이전과 동일)
+    document.querySelectorAll("#typePopup input[name='vegtype']").forEach((radio) => {
+      radio.addEventListener("change", (e) => {
+        const selected = e.target.value;
+        selectedType.textContent = selected;
+        typePopup.classList.add("hidden");
+        localStorage.setItem("vegType", selected);
+        updateIcons(selected);
 
-      fetch('/api/update-user-type', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-type': selected
-        },
-        body: JSON.stringify({ type: selected })
+        fetch('/api/update-user-type', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-type': selected
+          },
+          body: JSON.stringify({ type: selected })
+        });
       });
     });
+
 
     // 저장된 식단 불러오기
     const savedType = localStorage.getItem("vegType");
@@ -194,13 +186,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const file = e.target.files[0];
       if (file) {
         selectedGalleryImage = file;
-        const confirmSend = confirm("이 이미지를 서버로 전송하시겠습니까?");
-        if (confirmSend) {
-          sendImageToBackend(file);
-          selectedGalleryImage = null;
-        } else {
-          galleryInput.value = "";
-        }
+        sendImageToBackend(file);
+        selectedGalleryImage = null;
       }
     });
   }
@@ -209,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function sendImageToBackend(imageFile) {
     const vegType = localStorage.getItem("vegType") || "Vegan";
     const formData = new FormData();
-    formData.append("image", imageFile);
+    formData.append("file", imageFile);
 
     fetch("http://192.168.22.22:8000/Check_Vegan", {
       method: "POST",
