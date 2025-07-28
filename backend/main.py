@@ -8,12 +8,12 @@ import pillow_heif
 import io
 import json
 import os
-from app import check_keywords, choice, get_logger_by_name
+from app import check_keywords, choice, get_logger_by_name, ban_List
 from datetime import datetime
 
 """
 cd backend 로 main.py가 있는 폴더로 이동
-uvicorn main:app --reload
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 이거 실행하고 
 http://localhost:8000/docs 점속
 Swagger UI 확인하기
@@ -21,17 +21,10 @@ Swagger UI 확인하기
 
 base_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일 기준
 
-data_dir = os.path.abspath(os.path.join(base_dir, "..", "data"))
-
-user_rules_path = os.path.abspath(os.path.join(data_dir, "user_rules.json"))
-
 frontend_dir = os.path.abspath(os.path.join(base_dir, "..", "frontend", "app"))
 
 static_dir = os.path.abspath(os.path.join(frontend_dir, "static"))
 
-# 비건 불허 성분 키워드
-with open(user_rules_path, "r", encoding="utf-8") as f:
-    USER_RULES = json.load(f)  # ["milk", "egg", "honey", "gelatin", ...]
 
 # 등록 (한 번만 해두면 PIL이 HEIC도 열 수 있게 됨)
 pillow_heif.register_heif_opener()
@@ -103,14 +96,8 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     # 에러가 날 수 있다. 결과가 None 이 되거나 에러가 날 수 있다.
     # 그래서 그걸 방지하기 위해 기본값으로 Strict Vegan 을 준다.
     print(f"사용자 유형: {user_type}")
-    ban_list = USER_RULES.get(user_type, [])
-    # dict.get(key, default)는 딕셔너리에 key가 없을 때
-    # 기본값을 반환해주는 안전한 방식
-    # 프론트엔드에서 전달받은 user_type 에 해당하는
-    # key 값이 USER_RULES 에 없다면 KeyError 가 난다.
-    # 그걸 방지하기 위해 기본값 [] 를 넣은 것.
-    # 즉, 실수로 이상한 user_type이 들어와도
-    # 빈 리스트로 처리해서 안전하게 넘어가도록 만든 것.
+    
+    ban_list = ban_List(user_type)
 
     # 1. 이미지 읽기
     contents = await file.read()
