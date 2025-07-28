@@ -214,7 +214,8 @@ def process_image_with_google_vision_only(image_path: str, user_type: str = "Str
             final_refined_text = final_ingredient_text_raw
             lines = final_ingredient_text_raw.split('\n')
             
-            # 텍스트의 마지막 부분에 불필요한 내용이 포함되지 않도록, 마지막 '유효한' 줄을 찾습니다.
+            # 텍스트의 마지막 부분에 불필요한 내용이 포함되지 않도록,
+            # 마지막 '유효한' 줄을 찾습니다.
             last_valid_line_index = -1
             for i in range(len(lines) - 1, -1, -1): # 마지막 줄부터 역순으로 탐색
                 if contains_keyword(lines[i], INGREDIENT_END_KEYWORDS):
@@ -222,8 +223,11 @@ def process_image_with_google_vision_only(image_path: str, user_type: str = "Str
                     break # 가장 마지막에 발견된 종료 키워드가 있는 줄까지가 유효하다고 판단
             
             if last_valid_line_index != -1: # 종료 키워드를 찾았다면
-                final_refined_text = "\n".join(lines[:last_valid_line_index + 1]) # 해당 줄까지 포함하여 잘라냄
-            else: # 종료 키워드를 찾지 못했다면, 시작점부터 수집된 모든 텍스트를 사용
+                final_refined_text = "\n".join(lines[:last_valid_line_index + 1]) 
+                # 해당 줄까지 포함하여 잘라냄
+            else:
+                # 종료 키워드를 찾지 못했다면,
+                # 시작점부터 수집된 모든 텍스트를 사용
                 final_refined_text = final_ingredient_text_raw 
 
             print(final_refined_text)
