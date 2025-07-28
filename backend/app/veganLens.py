@@ -33,15 +33,18 @@ def google_ocr(image: Image.Image, debug: bool = True, base_filename: str = None
         image = vision.Image(content=content)
         # OCR 요청
         response = client.document_text_detection(image=image)
+        # document_text_detection은 이미지 전체의 텍스트와 그 구조(블록, 문단 등)를 분석하여 반환합니다.
         
-        texts = response.full_text_annotation.text.strip()
-        if texts:
-            result = texts
+        
+        # texts = response.full_text_annotation.text.strip()
+        # 이건 전체 블록에서 추출한걸 한줄 문자열로 만들어서 리턴함
+        if response:
+            result = response
             if debug:
-                logger.info(f"OCR completed [{base_filename}]")  # ✅ 성공 로그
+                logger.info(f"OCR Response completed [{base_filename}]")  # ✅ 성공 로그
             return result
         else:
-            logger.warning(f"OCR returned no text: {base_filename}")  # ✅ 빈 결과 로그
+            logger.warning(f"OCR returned no Response: {base_filename}")  # ✅ 빈 결과 로그
             return "텍스트를 인식할 수 없습니다."
     except Exception as e:
         logger.error(f"OCR failed {base_filename} : {str(e)}")

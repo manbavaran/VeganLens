@@ -1,4 +1,4 @@
-from .IMY_VEGANLENS import extract_text_imy
+from .veganLens import extract_text_imy
 # 이곳에 각자 만든 ocr 추출 함수 임포트 하기
 
 def choice(image, debug=True, base_filename=None, version = 1, who='BHY'):
