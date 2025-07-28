@@ -51,7 +51,7 @@ def ban_List(user_type='Strict Vegan'):
         return ban_list
     
     elif (user_type == 'pesco'):
-        user_rules_path = os.path.abspath(os.path.join(data_dir, "user_rules.json"))
+        user_rules_path = os.path.abspath(os.path.join(data_dir, "pesco_noneExp.json"))
         # pesco Path 나중에 수정
         
         # 페스코 불허 성분 키워드
@@ -118,7 +118,7 @@ def where_section(ingredient=True, factory=False):
         return
 
 
-def section_text(response, banList, debug=True, ing=True, fac=False):
+def section_text(response, debug=True, ing=True, fac=False):
     
     ing_start, ing_end = where_section(ingredient=ing, factory=fac)
     # 섹션의 시작과 끝을 판단할 키워드
@@ -254,8 +254,8 @@ def section_text(response, banList, debug=True, ing=True, fac=False):
             # 명시적으로 표현
             # 빼도 되는 코드.
         
-        
-        print("\n--- '원재료명'으로 추정되는 섹션에서 추출된 텍스트 ---")
-        print(result_txt)
+        if debug:            
+            print("\n--- '원재료명'으로 추정되는 섹션에서 추출된 텍스트 ---")
+            print(result_txt)
         
         return result_txt

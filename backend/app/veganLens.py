@@ -51,14 +51,14 @@ def google_ocr(image: Image.Image, debug: bool = True, base_filename: str = None
         return ""
 
 
-def extract_text_imy(image, debug=True, base_filename=None, version=1):
+def extract_section(image, debug=True, base_filename=None, version=1):
     if (version == 1):
         
         # Google OCR 병렬 처리
-        texts = google_ocr(image=image, debug=debug, base_filename=base_filename)
+        response = google_ocr(image=image, debug=debug, base_filename=base_filename)
             
         # 3. 텍스트 결합
-        return texts
+        return response
     
     else:
         return print("버전을 다시 확인해 주세요.")

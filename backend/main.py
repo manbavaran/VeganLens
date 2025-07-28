@@ -8,7 +8,7 @@ import pillow_heif
 import io
 import json
 import os
-from app import check_keywords, choice, get_logger_by_name, ban_List
+from app import choice, get_logger_by_name, ban_List, section_text, check_forbidden_ingredients
 from datetime import datetime
 
 """
@@ -108,28 +108,30 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     base_filename = os.path.splitext(os.path.basename(original_filename))[0]
     
     # 2. OCR 수행
-    text = choice(image, debug=True, base_filename=base_filename, version = 1, who='IMY')
-    # veganLens.py 에서 정의한 함수
+    response = choice(image, debug=True, base_filename=base_filename, version = 1, who='IMY')
+    
 
     # 3. 비건 여부 판단
-    found = check_keywords(text, ban_list)
-    # veganLens.py 에서 정의한 함수
+    text = section_text(response, debug=True, ing=True, fac=False)
+    
+    found_forbidden = check_forbidden_ingredients(text, ban_list)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     logger = get_logger_by_name('IMY')
         
     logger.info(f"\n 파일명: {base_filename}")
     logger.info(f"  📅 처리 시각: {now_str}")
-    logger.info(f"  🚫 감지된 금지 성분: {found if found else '없음'}")
-    logger.info(f"  {'✅ 비건 OK' if not found else '❌ 비건 아님'}")
+    logger.info(f"  🚫 감지된 금지 성분: {found_forbidden if found_forbidden else '없음'}")
+    logger.info(f"  {'✅ 비건 OK' if not found_forbidden else '❌ 비건 아님'}")
     logger.info(f"  🔍 OCR 결과: {text}")
     
     return JSONResponse(
         content={
             "Date": now_str,
             "user_type": user_type,
-            "is_vegan": len(found) == 0, # True : 비건,  False : 비건 아님
-            "detected_non_vegan_ingredients": found,
+            "is_vegan": len(found_forbidden) == 0, # True : 비건,  False : 비건 아님
+            "number_forbidden": len(found_forbidden),
             "ban_list": ban_list,
             "ocr_text": text,
         },
