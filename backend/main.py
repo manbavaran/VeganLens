@@ -112,13 +112,13 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     
 
     # 3. 비건 여부 판단
-    text = section_text(response, debug=True, ing=True, fac=False)
+    text = section_text(response, debug=True, section='ing')
     
     found_forbidden = check_forbidden_ingredients(text, ban_list)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    logger = get_logger_by_name('IMY')
+    logger = get_logger_by_name('google')
         
     logger.info(f"\n 파일명: {base_filename}")
     logger.info(f"  📅 처리 시각: {now_str}")
@@ -132,7 +132,7 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
             "user_type": user_type,
             "is_vegan": len(found_forbidden) == 0, # True : 비건,  False : 비건 아님
             "number_forbidden": len(found_forbidden),
-            "ban_list": ban_list,
+            "found_forbidden": found_forbidden,
             "ocr_text": text,
         },
         status_code=200,  # OK 정상 응답 (모든 게 잘 처리됨)

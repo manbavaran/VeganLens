@@ -105,27 +105,26 @@ def check_forbidden_ingredients(text: str, ban_list: list[dict]) -> list[str]:
                 continue
             if kw.upper().replace(" ", "") in text_clean:
                 # 키워드를 대문자/공백 제거 후 텍스트에 포함되는지 확인
-                found_forbidden.append(kw["keyword"]) # 발견되면 리스트에 추가
+                found_forbidden.append(keyword["keyword"]) # 발견되면 리스트에 추가
                 break # 같은 항목 중복 방지
             
     return sorted(list(set(found_forbidden))) # 중복 제거 후 알파벳 순으로 정렬하여 반환
 
 
 
-def where_section(ingredient=True, factory=False):
-    if (ingredient):
+def where_section(section='ing'):
+    if (section == 'ing'):
         return ingredient_Start_Keywords, ingredient_End_Keywords
     # 원재료와 제조시설이 둘다 트루면, 하나만 트루면 이런식으로 조건 분기 가능
-    if (factory):
+    if (section == 'fac'):
         # 나중에 factory return 구현
         # 이것도 스타트 키워드, 엔드 키워드 리턴
-        # 둘 다 트루면 총 4개의 키워드를 리턴하는 것.
         return
 
 
-def section_text(response, debug=True, ing=True, fac=False):
+def section_text(response, debug=True, section='ing'):
     
-    ing_start, ing_end = where_section(ingredient=ing, factory=fac)
+    start_kw, end_kw = where_section(section=section)
     # 섹션의 시작과 끝을 판단할 키워드
     
     ext_ing_sect_txts = []
@@ -171,7 +170,7 @@ def section_text(response, debug=True, ing=True, fac=False):
                 
                 # 1. 성분표 시작점 탐지 (아직 '원재료명' 섹션에 진입하지 않은 상태)
                 if not in_ingredient_section:
-                    if contains_keyword(block_text, ing_start):
+                    if contains_keyword(block_text, start_kw):
                         in_ingredient_section = True # 성분표 섹션 진입 플래그를 True로 설정
                         
                         # 시작 키워드 이후부터 텍스트를 수집하여 정확한 시작점을 잡습니다.
@@ -179,7 +178,7 @@ def section_text(response, debug=True, ing=True, fac=False):
                         start_idx_block = -1
                         block_txt_no_space = block_text.upper().replace(" ", "")
                         
-                        for keyword in ing_start:
+                        for keyword in start_kw:
                             keyword_upper_no_space = keyword.upper().replace(" ", "")
                             if keyword_upper_no_space in block_txt_no_space:
                                 # 원본 블록 텍스트에서 해당 키워드의 시작 인덱스를 찾습니다.
@@ -204,7 +203,7 @@ def section_text(response, debug=True, ing=True, fac=False):
                             ext_ing_sect_txts.append(block_text)
                         
                         # (매우 드묾) 시작 블록에 이미 종료 키워드가 포함되어 있다면 즉시 섹션 종료
-                        if contains_keyword(ext_ing_sect_txts[-1], ing_end):
+                        if contains_keyword(ext_ing_sect_txts[-1], end_kw):
                             in_ingredient_section = False
                             break # 현재 페이지의 블록 순회 종료
                         continue # 시작점을 찾았으니 다음 블록으로 이동하여 계속 수집
@@ -214,7 +213,7 @@ def section_text(response, debug=True, ing=True, fac=False):
                 if in_ingredient_section:
                     # 현재 블록이 종료 키워드를 포함하는지 확인합니다.
                     # (이 키워드가 나오면 성분표 끝으로 판단)
-                    if contains_keyword(block_text, ing_end):
+                    if contains_keyword(block_text, end_kw):
                         ext_ing_sect_txts.append(block_text)
                         # 종료 키워드가 있는 블록도 포함
                         
@@ -242,7 +241,7 @@ def section_text(response, debug=True, ing=True, fac=False):
         
         for i in range(len(lines) - 1, -1, -1): 
             # 마지막 줄부터 역순으로 탐색
-            if contains_keyword(lines[i], ing_end):
+            if contains_keyword(lines[i], end_kw):
                 last_valid_line_idx = i 
                 # 종료 키워드가 포함된 줄의 인덱스 저장
                 break 

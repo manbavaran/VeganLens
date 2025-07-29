@@ -18,7 +18,7 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = API_PATH
 # Vision 클라이언트 생성
 client = vision.ImageAnnotatorClient()
 
-logger = get_logger("IMY")
+logger = get_logger("google")
 
 def google_ocr(image: Image.Image, debug: bool = True, base_filename: str = None) -> str:
     try:
