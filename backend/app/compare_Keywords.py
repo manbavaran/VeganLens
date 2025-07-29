@@ -33,7 +33,7 @@ data_dir = os.path.abspath(os.path.join(base_dir, "..", "data"))
 
 def ban_List(user_type='Strict Vegan'):
     if (user_type == 'Strict Vegan'):
-        user_rules_path = os.path.abspath(os.path.join(data_dir, "user_rules.json"))
+        user_rules_path = os.path.abspath(os.path.join(data_dir, "strict_vegan_forbidden.json"))
         # Strict Vegan Path
         
         # 비건 불허 성분 키워드
@@ -51,7 +51,7 @@ def ban_List(user_type='Strict Vegan'):
         return ban_list
     
     elif (user_type == 'pesco'):
-        user_rules_path = os.path.abspath(os.path.join(data_dir, "pesco_noneExp.json"))
+        user_rules_path = os.path.abspath(os.path.join(data_dir, "pesco_forbidden.json"))
         # pesco Path 나중에 수정
         
         # 페스코 불허 성분 키워드
@@ -80,11 +80,12 @@ def contains_keyword(text_content: str, keywords: list) -> bool:
     return False
 
 
-def check_forbidden_ingredients(text: str, ban_list: list[str]) -> list[str]:
+def check_forbidden_ingredients(text: str, ban_list: list[dict]) -> list[str]:
     """
     OCR로 추출된 전체 텍스트(text) 내에서 주어진 금지 키워드 리스트(ban_list)를 찾아 반환합니다.
     - 발견된 금지 성분들을 중복 없이 정렬된 리스트로 반환합니다.
-    - 이 함수는 카테고리(확실한 금지, 주의 필요 등) 분류는 하지 않고, 단순히 ban_list에 있는 성분이 텍스트에 포함되었는지 여부만 확인합니다.
+    - 이 함수는 카테고리(확실한 금지, 주의 필요 등) 분류는 하지 않고,
+    - 단순히 ban_list에 있는 성분이 텍스트에 포함되었는지 여부만 확인합니다.
     """
     if not text or not ban_list: # 텍스트나 금지 리스트가 비어있으면 빈 리스트 반환
         return []
@@ -95,13 +96,17 @@ def check_forbidden_ingredients(text: str, ban_list: list[str]) -> list[str]:
     found_forbidden = []
 
     for keyword in ban_list: 
-        if len(keyword.strip()) < 2: 
-            # 검색할 키워드가 너무 짧으면 오탐(잘못된 탐지) 방지를 위해 건너뜁니다.
-            continue
+        search_kw = keyword.get("korean", []) + keyword.get("e_code", [])
         
-        if keyword.upper().replace(" ", "") in text_clean: 
-            # 키워드를 대문자/공백 제거 후 텍스트에 포함되는지 확인
-            found_forbidden.append(keyword) # 발견되면 리스트에 추가
+        for kw in search_kw:
+            kw = kw.strip()
+            if len(kw) < 2:
+                # 검색할 키워드가 너무 짧으면 오탐(잘못된 탐지) 방지를 위해 건너뜁니다.
+                continue
+            if kw.upper().replace(" ", "") in text_clean:
+                # 키워드를 대문자/공백 제거 후 텍스트에 포함되는지 확인
+                found_forbidden.append(kw["keyword"]) # 발견되면 리스트에 추가
+                break # 같은 항목 중복 방지
             
     return sorted(list(set(found_forbidden))) # 중복 제거 후 알파벳 순으로 정렬하여 반환
 
