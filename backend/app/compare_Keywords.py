@@ -1,6 +1,7 @@
 import torch
 import os
 import json
+import re
 
 # print("버전:", torch.__version__)
 # print("GPU 사용 가능:", torch.cuda.is_available())
@@ -28,44 +29,29 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 
 data_dir = os.path.abspath(os.path.join(base_dir, "..", "data"))
 
-# strict vegan path
-# pesco path
+
 
 def ban_List(user_type='Strict Vegan'):
-    if (user_type == 'Strict Vegan'):
+    if user_type == 'Strict Vegan':
         user_rules_path = os.path.abspath(os.path.join(data_dir, "strict_vegan_forbidden.json"))
         # Strict Vegan Path
-        
-        # 비건 불허 성분 키워드
-        with open(user_rules_path, "r", encoding="utf-8") as f:
-            USER_RULES = json.load(f)  # ["milk", "egg", "honey", "gelatin", ...]
-        
-        ban_list = USER_RULES.get(user_type, [])
-        # dict.get(key, default)는 딕셔너리에 key가 없을 때
-        # 기본값을 반환해주는 안전한 방식
-        # 프론트엔드에서 전달받은 user_type 에 해당하는
-        # key 값이 USER_RULES 에 없다면 KeyError 가 난다.
-        # 그걸 방지하기 위해 기본값 [] 를 넣은 것.
-        # 즉, 실수로 이상한 user_type이 들어와도
-        # 빈 리스트로 처리해서 안전하게 넘어가도록 만든 것.
-        return ban_list
-    
-    elif (user_type == 'pesco'):
+    elif user_type == 'pesco':
         user_rules_path = os.path.abspath(os.path.join(data_dir, "pesco_forbidden.json"))
-        # pesco Path 나중에 수정
-        
-        # 페스코 불허 성분 키워드
-        with open(user_rules_path, "r", encoding="utf-8") as f:
-            USER_RULES = json.load(f)  # ["milk", "egg", "honey", "gelatin", ...]
-        
-        ban_list = USER_RULES.get(user_type, [])
-        
-        return ban_list
-
-    
+        # pesco Path
     else:
         return []
-        # 빈 리스트 반환
+
+    # 비건 불허 성분 키워드
+    with open(user_rules_path, "r", encoding="utf-8") as f:
+        USER_RULES = json.load(f)
+    
+    print(f"[DEBUG] Loaded {len(USER_RULES)} entries from {user_rules_path}")
+    print(f"[DEBUG] Sample entry: {USER_RULES[0] if USER_RULES else 'None'}")
+    # USER_RULES는 리스트이므로 바로 리턴
+    return USER_RULES
+
+
+
 
 
 def contains_keyword(text_content: str, keywords: list) -> bool:
@@ -90,25 +76,29 @@ def check_forbidden_ingredients(text: str, ban_list: list[dict]) -> list[str]:
     if not text or not ban_list: # 텍스트나 금지 리스트가 비어있으면 빈 리스트 반환
         return []
     
-    text_clean = text.upper().replace(" ", "").replace("\n", "") 
+    text_clean = re.sub(r"[^가-힣a-zA-Z0-9]", "", text)
     # 텍스트에서 공백과 줄바꿈 제거하여 검색 효율 높임
-    
+    print(text_clean)
     found_forbidden = []
 
-    for keyword in ban_list: 
-        search_kw = keyword.get("korean", []) + keyword.get("e_code", [])
+    for entry in ban_list:
+        keyword = entry.get("keyword", "")
         
-        for kw in search_kw:
-            kw = kw.strip()
-            if len(kw) < 2:
+        for kw in entry.get("korean", []) + entry.get("e_code", []):
+            if len(kw.strip()) < 2:
                 # 검색할 키워드가 너무 짧으면 오탐(잘못된 탐지) 방지를 위해 건너뜁니다.
                 continue
-            if kw.upper().replace(" ", "") in text_clean:
-                # 키워드를 대문자/공백 제거 후 텍스트에 포함되는지 확인
-                found_forbidden.append(keyword["keyword"]) # 발견되면 리스트에 추가
-                break # 같은 항목 중복 방지
-            
-    return sorted(list(set(found_forbidden))) # 중복 제거 후 알파벳 순으로 정렬하여 반환
+            kw_clean = kw.replace(" ", "")
+            if kw_clean in text_clean:
+                # 키워드를 공백 제거 후 텍스트에 포함되는지 확인
+                found_forbidden.append(keyword)
+                # 발견되면 리스트에 추가
+                
+                
+                
+    print(f"found_forbidden: {found_forbidden}")
+    return sorted(list(set(found_forbidden)))
+    # 중복 제거 후 알파벳 순으로 정렬하여 반환
 
 
 
@@ -137,97 +127,100 @@ def section_text(response, debug=True, section='ing'):
     
     # Google Vision API가 탐지한 페이지 내의 블록들을 순회합니다.
     full = response.full_text_annotation
+    
+    # full이 None이거나 pages 속성이 없으면 빈 문자열 반환
+    if not full or not hasattr(full, "pages") or not full.pages:
+        return ''
+
+    # full이 존재하고 pages도 존재하는 경우
     pages = full.pages
     
-    if ( not full and not pages):
-        return ''
     
-    elif (full and pages):
-        for page in pages:
-            for block_idx, block in enumerate(page.blocks):
-                # 현재 블록의 모든 텍스트를 합쳐 하나의 문자열로 만듭니다.
-                block_text = ""
-                for paragraph in block.paragraphs:
-                    para_text = ""
-                    for word in paragraph.words:
-                        word_text = ''.join([symbol.text for symbol in word.symbols])
-                        para_text += word_text
-                    if para_text:
-                        block_text += para_text + " " # 단락 사이에 공백 추가
-                        
-                    if debug:
-                        print(f"Block {block_idx} content: {block_text}")
-                block_text = block_text.strip() # 최종 공백 제거
-                
-                
-                # 빈 블록이나 매우 짧은 블록은 유효한 내용으로 간주하지 않습니다.
-                if not block_text or len(block_text) < 3:
-                    if not in_ingredient_section: # 아직 성분표 시작 전이면 이런 블록은 건너뜁니다.
-                        continue
-                    # 성분표 섹션에 진입했다면,
-                    # 짧은 블록도 포함할 수 있도록 함 (줄바꿈 등으로 인해 분리된 경우)
-                
-                
-                # 1. 성분표 시작점 탐지 (아직 '원재료명' 섹션에 진입하지 않은 상태)
-                if not in_ingredient_section:
-                    if contains_keyword(block_text, start_kw):
-                        in_ingredient_section = True # 성분표 섹션 진입 플래그를 True로 설정
-                        
-                        # 시작 키워드 이후부터 텍스트를 수집하여 정확한 시작점을 잡습니다.
-                        # 예: "총 내용량 100g 원재료명: 설탕, 밀가루" 에서 "원재료명:" 이후부터 가져옴
-                        start_idx_block = -1
-                        block_txt_no_space = block_text.upper().replace(" ", "")
-                        
-                        for keyword in start_kw:
-                            keyword_upper_no_space = keyword.upper().replace(" ", "")
-                            if keyword_upper_no_space in block_txt_no_space:
-                                # 원본 블록 텍스트에서 해당 키워드의 시작 인덱스를 찾습니다.
-                                current_found_index = block_text.upper().replace(" ", "").find(keyword_upper_no_space)
-                                if start_idx_block == -1 or current_found_index < start_idx_block:
-                                    start_idx_block = current_found_index
-                                    
-                        if start_idx_block != -1:
-                            # 시작 키워드 이후부터 블록 텍스트를 잘라냅니다.
-                            sliced_block_text = block_text[start_idx_block:].strip()
-                            # 잘라낸 텍스트가 콜론으로 시작하면 콜론을 제거합니다.
-                            # (예: "원재료명:설탕" -> "설탕")
-                            if sliced_block_text.startswith(':'):
-                                sliced_block_text = sliced_block_text[1:].strip()
-                                
-                            ext_ing_sect_txts.append(sliced_block_text)
-                            # extracted_ingredient_section_texts
-                            
-                        else: 
-                            # 시작 키워드를 찾았으나 슬라이싱 인덱스 문제 발생 시
-                            # 전체 블록 추가 (예외 처리)
-                            ext_ing_sect_txts.append(block_text)
-                        
-                        # (매우 드묾) 시작 블록에 이미 종료 키워드가 포함되어 있다면 즉시 섹션 종료
-                        if contains_keyword(ext_ing_sect_txts[-1], end_kw):
-                            in_ingredient_section = False
-                            break # 현재 페이지의 블록 순회 종료
-                        continue # 시작점을 찾았으니 다음 블록으로 이동하여 계속 수집
-                
-                
-                # 2. 성분표 섹션 내에서 텍스트 블록 수집 및 종료 조건 확인 (이미 섹션에 진입한 상태)
-                if in_ingredient_section:
-                    # 현재 블록이 종료 키워드를 포함하는지 확인합니다.
-                    # (이 키워드가 나오면 성분표 끝으로 판단)
-                    if contains_keyword(block_text, end_kw):
-                        ext_ing_sect_txts.append(block_text)
-                        # 종료 키워드가 있는 블록도 포함
-                        
-                        in_ingredient_section = False # 성분표 섹션 종료 플래그 설정
-                        break # 현재 페이지의 블록 순회 종료
+    for page in pages:
+        for block_idx, block in enumerate(page.blocks):
+            # 현재 블록의 모든 텍스트를 합쳐 하나의 문자열로 만듭니다.
+            block_text = ""
+            for paragraph in block.paragraphs:
+                para_text = ""
+                for word in paragraph.words:
+                    word_text = ''.join([symbol.text for symbol in word.symbols])
+                    para_text += word_text
+                if para_text:
+                    block_text += para_text + " " # 단락 사이에 공백 추가
                     
-                    # 종료 키워드가 없으면 현재 블록을 성분표의 일부로 간주하고 추가합니다.
-                    ext_ing_sect_txts.append(block_text)
+                if debug:
+                    print(f"Block {block_idx} content: {block_text}")
+            block_text = block_text.strip() # 최종 공백 제거
             
-            # 현재 페이지에서 성분표 섹션이 종료되었거나(in_ingredient_section = False)
-            # 또는 성분표 섹션을 찾지 못했으나 이미 추출된 텍스트가 있다면, 
-            # 다음 페이지는 더 이상 검사하지 않습니다.
-            if not in_ingredient_section and ext_ing_sect_txts: 
-                break 
+            
+            # 빈 블록이나 매우 짧은 블록은 유효한 내용으로 간주하지 않습니다.
+            if not block_text or len(block_text) < 3:
+                if not in_ingredient_section: # 아직 성분표 시작 전이면 이런 블록은 건너뜁니다.
+                    continue
+                # 성분표 섹션에 진입했다면,
+                # 짧은 블록도 포함할 수 있도록 함 (줄바꿈 등으로 인해 분리된 경우)
+            
+            
+            # 1. 성분표 시작점 탐지 (아직 '원재료명' 섹션에 진입하지 않은 상태)
+            if not in_ingredient_section:
+                if contains_keyword(block_text, start_kw):
+                    in_ingredient_section = True # 성분표 섹션 진입 플래그를 True로 설정
+                    
+                    # 시작 키워드 이후부터 텍스트를 수집하여 정확한 시작점을 잡습니다.
+                    # 예: "총 내용량 100g 원재료명: 설탕, 밀가루" 에서 "원재료명:" 이후부터 가져옴
+                    start_idx_block = -1
+                    block_txt_no_space = block_text.upper().replace(" ", "")
+                    
+                    for keyword in start_kw:
+                        keyword_upper_no_space = keyword.upper().replace(" ", "")
+                        if keyword_upper_no_space in block_txt_no_space:
+                            # 원본 블록 텍스트에서 해당 키워드의 시작 인덱스를 찾습니다.
+                            current_found_index = block_text.upper().replace(" ", "").find(keyword_upper_no_space)
+                            if start_idx_block == -1 or current_found_index < start_idx_block:
+                                start_idx_block = current_found_index
+                                
+                    if start_idx_block != -1:
+                        # 시작 키워드 이후부터 블록 텍스트를 잘라냅니다.
+                        sliced_block_text = block_text[start_idx_block:].strip()
+                        # 잘라낸 텍스트가 콜론으로 시작하면 콜론을 제거합니다.
+                        # (예: "원재료명:설탕" -> "설탕")
+                        if sliced_block_text.startswith(':'):
+                            sliced_block_text = sliced_block_text[1:].strip()
+                            
+                        ext_ing_sect_txts.append(sliced_block_text)
+                        # extracted_ingredient_section_texts
+                        
+                    else: 
+                        # 시작 키워드를 찾았으나 슬라이싱 인덱스 문제 발생 시
+                        # 전체 블록 추가 (예외 처리)
+                        ext_ing_sect_txts.append(block_text)
+                    
+                    # (매우 드묾) 시작 블록에 이미 종료 키워드가 포함되어 있다면 즉시 섹션 종료
+                    if contains_keyword(ext_ing_sect_txts[-1], end_kw):
+                        in_ingredient_section = False
+                        break # 현재 페이지의 블록 순회 종료
+                    continue # 시작점을 찾았으니 다음 블록으로 이동하여 계속 수집
+            
+            
+            # 2. 성분표 섹션 내에서 텍스트 블록 수집 및 종료 조건 확인 (이미 섹션에 진입한 상태)
+            if in_ingredient_section:
+                # 현재 블록이 종료 키워드를 포함하는지 확인합니다.
+                # (이 키워드가 나오면 성분표 끝으로 판단)
+                if contains_keyword(block_text, end_kw):
+                    ext_ing_sect_txts.append(block_text)
+                    # 종료 키워드가 있는 블록도 포함
+                    
+                    in_ingredient_section = False # 성분표 섹션 종료 플래그 설정
+                    break # 현재 페이지의 블록 순회 종료
+                
+                # 종료 키워드가 없으면 현재 블록을 성분표의 일부로 간주하고 추가합니다.
+                ext_ing_sect_txts.append(block_text)
+        
+        # 현재 페이지에서 성분표 섹션이 종료되었거나(in_ingredient_section = False)
+        # 또는 성분표 섹션을 찾지 못했으나 이미 추출된 텍스트가 있다면, 
+        # 다음 페이지는 더 이상 검사하지 않습니다.
+        if not in_ingredient_section and ext_ing_sect_txts: 
+            break 
         
     # --- 3단계: 최종 '원재료명' 섹션 텍스트 조합 및 후처리 ---
     if ext_ing_sect_txts:
