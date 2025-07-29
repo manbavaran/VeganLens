@@ -131,11 +131,10 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: flex-start;
-
-  padding-top: 80vh;
-  transform: translateY(-52%);
+  padding: 16px;
+  margin-top: -230px;
 }
 
 
@@ -207,12 +206,12 @@ body {
   row-gap: 25px;
   column-gap: 26px;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 .icon-grid .icon {
-  width: 85px;
-  height: 85px;
+  width: 75px;
+  height: 75px;
   object-fit: contain;
 }
 

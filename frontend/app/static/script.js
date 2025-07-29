@@ -117,17 +117,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 식품군 아이콘 활성화 처리
   function updateIcons(type) {
-    const activeSet = new Set(["fruit"]);
-    if (["Vegan", "Lacto vegetarian", "Lacto-ovo vegetarian", "Ovo vegetarian"].includes(type)) {
+    const activeSet = new Set();
+    if (["Vegan", "Lacto vegetarian", "Lacto-ovo vegetarian", "Ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(type)) {
       activeSet.add("vegetable");
     }
-    if (["Lacto vegetarian", "Lacto-ovo vegetarian"].includes(type)) {
+    if (["Lacto vegetarian", "Lacto-ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(type)) {
       activeSet.add("dairy");
     }
-    if (["Ovo vegetarian", "Lacto-ovo vegetarian"].includes(type)) {
+    if (["Ovo vegetarian", "Lacto-ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(type)) {
       activeSet.add("egg");
     }
-    if (type === "Pesco-vegetarian") {
+    if (["Pesco-vegetarian", "Pollo-vegetarian"].includes(type)) {
       activeSet.add("fish");
     }
     if (type === "Pollo-vegetarian") {
@@ -137,12 +137,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // 하단 탭 내비게이션 기능
     document.querySelectorAll(".icon").forEach((icon) => {
       const id = icon.id;
+
+      // meat 항상 비활성화
+      if (id === "meat") {
+        icon.classList.remove("active");
+        icon.src = `/static/images/icons/meat_gray.png`;
+        return;
+      }
+      
       if (activeSet.has(id)) {
         icon.classList.add("active");
-        icon.src = `images/icons/${id}.png`;
+        icon.src = `/static/images/icons/${id}.png`;
       } else {
         icon.classList.remove("active");
-        icon.src = `images/icons/${id}_gray.png`;
+        icon.src = `/static/images/icons/${id}_gray.png`;
       }
     });
   }
@@ -192,11 +200,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 백엔드로 이미지 전송
   function sendImageToBackend(imageFile) {
     const vegType = localStorage.getItem("vegType") || "Vegan";
     const formData = new FormData();
     formData.append("file", imageFile);
+
+    // ✅ fetch 시작 시간 기록
+    const fetchStart = Date.now();
+
+    // ✅ 로딩 페이지 먼저 이동
+    window.location.href = "loading.html";
 
     fetch("http://192.168.22.22:8000/Check_Vegan", {
       method: "POST",
@@ -207,12 +220,32 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        alert("✅ 서버 응답: " + JSON.stringify(data));
+        const elapsed = Date.now() - fetchStart;
+        const waitTime = 1000 - elapsed;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          data.imageUrl = reader.result;
+          localStorage.setItem("resultData", JSON.stringify(data));
+
+          const goToResult = () => {
+            window.location.href = "result.html";
+          };
+
+          if (waitTime > 0) {
+            setTimeout(goToResult, waitTime);
+          } else {
+            goToResult();
+          }
+        };
+        reader.readAsDataURL(imageFile);
       })
       .catch((err) => {
         alert("❌ 전송 실패: " + err.message);
+        window.location.href = "index.html";
       });
   }
+
 
   // 구현되지 않은 기능 알림
   const liveCameraBtn= document.getElementById("liveCameraBtn");
@@ -224,4 +257,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 아이콘 생성 라이브러리를 초기화
   lucide.createIcons();
+
 });

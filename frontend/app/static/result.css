@@ -1,0 +1,176 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: white;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* 세로 전체 */
+}
+
+.result-container {
+  max-width: 430px;
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+}
+
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.image-preview {
+  width: 160px;
+  height: 200px;
+  background-color: #ddd;
+  margin: 0 auto 12px;
+  background-size: cover;
+  background-position: center;
+}
+
+.result-message {
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.notice-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: 6px;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.info-icon {
+  cursor: pointer;
+  font-size: 16px;
+  color: #999;
+}
+
+.box-list {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.result-box {
+  width: 380px;
+  height: 80px;
+  line-height: 80px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  position: relative;
+  cursor: default;
+}
+
+.result-box.folded::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-left: 2px solid #aaa;
+  border-top: 2px solid #aaa;
+  transform: rotate(-45deg);
+}
+
+.result-box.danger {
+  background: #FCEDED;
+  border: 2px solid #F4AFB0;
+  cursor: pointer;
+}
+
+.result-box.caution {
+  background: #FFF8E5;
+  border: 2px solid #FFD0C2;
+  cursor: pointer;
+}
+
+.result-box.safe {
+  background: #EEF7F1;
+  border: 2px solid #AFDABE;
+  cursor: pointer;
+}
+
+.result-box.disabled {
+  background: #efefef;
+  border: none;
+  cursor: default;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip {
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #555;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #555 transparent;
+}
+
+.tooltip.hidden {
+  display: none;
+}
+
+.fixed-close {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: #f3f3f3;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
