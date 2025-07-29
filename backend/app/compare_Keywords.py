@@ -27,17 +27,25 @@ ingredient_End_Keywords = [
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
-data_dir = os.path.abspath(os.path.join(base_dir, "..", "data"))
+data_dir = os.path.abspath(os.path.join(base_dir, "..", "..", "data"))
 
 
 
-def ban_List(user_type='Strict Vegan'):
-    if user_type == 'Strict Vegan':
+def ban_List(user_type='Vegan'):
+    if user_type == 'Vegan':
         user_rules_path = os.path.abspath(os.path.join(data_dir, "strict_vegan_forbidden.json"))
         # Strict Vegan Path
-    elif user_type == 'pesco':
+    elif user_type == 'Pesco-vegetarian':
         user_rules_path = os.path.abspath(os.path.join(data_dir, "pesco_forbidden.json"))
         # pesco Path
+    elif user_type == "Lacto vegetarian":
+        return []
+    elif user_type == "Lacto-ovo vegetarian":
+        return []
+    elif user_type == "Ovo vegetarian":
+        return []
+    elif user_type == "Pollo-vegetarian":
+        return []
     else:
         return []
 
