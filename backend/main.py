@@ -114,6 +114,9 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     # 3. 비건 여부 판단
     text = section_text(response, debug=True, section='ing')
     
+    print(f"[DEBUG] OCR로부터 받은 text: {text!r}")
+    print(f"[DEBUG] 금지 목록: {ban_list}")
+    
     found_forbidden = check_forbidden_ingredients(text, ban_list)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
