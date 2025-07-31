@@ -241,7 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
         reader.readAsDataURL(imageFile);
       })
       .catch((err) => {
-        alert("❌ 전송 실패: " + err.message);
+        alert("Upload failed. Please try again.\n" + err.message); // 전송 실패 문구를 영문으로 수정, 메시지만 출력할지 에러 메시지까지 출력할지 협의가 필요함
         window.location.href = "index.html";
       });
   }

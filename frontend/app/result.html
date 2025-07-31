@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>결과</title>
+  <title>result</title>
   <link rel="stylesheet" href="/static/result.css" />
   <script src="/static/result.js" defer></script>
 </head>
 <body>
-  <button id="closeBtn">닫기</button>
+  <button id="closeBtn">close</button>
   <div class="result-container">
     <header class="result-header">
       <span></span>
     </header>
 
     <div class="image-preview" id="imagePreview"></div>
-    <p class="result-message" id="resultMessage">섭취 가능 여부 결과 출력</p>
+    <p class="result-message" id="resultMessage">Your food compatibility check is ready!</p>
 
     <div class="notice-row">
-      <span class="notice-title">주의 필요 항목</span>
+      <span class="notice-title">Cautionary Ingredients</span>
       <div class="tooltip-wrapper">
         <span class="info-icon" id="infoIcon">ⓘ</span>
         <div class="tooltip hidden" id="tooltip">경고 문구 표시 테스트</div>
@@ -26,14 +26,14 @@
     </div>
 
     <div class="box-list">
-      <div class="result-box" id="dangerBox">위험</div>
-      <div class="result-box" id="cautionBox">주의</div>
-      <div class="result-box" id="safeBox">안전</div>
+      <div class="result-box" id="dangerBox">Unsafe</div>
+      <div class="result-box" id="cautionBox">Caution</div>
+      <div class="result-box" id="safeBox">Safe</div>
     </div>
 
     <div class="modal hidden" id="ingredientModal">
-      <p id="modalContent">성분 정보</p>
-      <button id="closeModal">확인</button>
+      <p id="modalContent">Ingredients</p>
+      <button id="closeModal">confirm</button>
     </div>
   </div>
 </body>
