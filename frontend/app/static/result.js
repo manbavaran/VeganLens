@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const stored = localStorage.getItem("resultData");
   if (!stored) {
-    alert("분석 결과가 없습니다.");
+    alert("No results found.");
     window.location.href = "index.html";
     return;
   }
@@ -15,11 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // 결과 메시지
   const messageEl = document.getElementById("resultMessage");
   if (analysisResult.danger?.length > 0) {
-    messageEl.textContent = "섭취가 불가능합니다.";
+    messageEl.textContent = "Not suitable for consumption.";
   } else if (analysisResult.caution?.length > 0) {
-    messageEl.textContent = "섭취에 주의가 필요합니다.";
+    messageEl.textContent = "Consume with caution.";
   } else {
-    messageEl.textContent = "섭취가 가능합니다.";
+    messageEl.textContent = "Safe to consume.";
   }
 
   const setupBox = (id, type, ingredients) => {
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     el.classList.add(type, "folded");
     el.addEventListener("click", () => {
-      showModal(`${type.toUpperCase()} 성분:\n${ingredients.join(", ")}`);
+      showModal(`${type.toUpperCase()} Ingredients:\n${ingredients.join(", ")}`);
     });
   };
 
