@@ -77,6 +77,15 @@ async def serve_settings():
 # http://IP주소:8000/settings.html 이렇게 들어오면 settings.html 로 간다.
 
 
+@app.get("/loading.html")
+async def serve_settings():
+    return FileResponse(os.path.join(frontend_dir, "loading.html"))
+
+
+@app.get("/result.html")
+async def serve_settings():
+    return FileResponse(os.path.join(frontend_dir, "result.html"))
+
 # 이미지 업로드 API
 @app.post("/Check_Vegan")
 async def analyze_image(request: Request, file: UploadFile = File(...)):
