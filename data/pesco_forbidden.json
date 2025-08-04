@@ -1,0 +1,948 @@
+[
+  {
+    "keyword": "beef",
+    "korean": [
+      "쇠고기"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "beef extract",
+    "korean": [
+      "쇠고기 추출물"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "beef tallow",
+    "korean": [
+      "쇠고기 지방"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "pork",
+    "korean": [
+      "돼지고기"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "pork extract",
+    "korean": [
+      "돼지고기 추출물"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "lard",
+    "korean": [
+      "돼지기름"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "lamb",
+    "korean": [
+      "양고기"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "mutton",
+    "korean": [
+      "양고기 (성양)"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "venison",
+    "korean": [
+      "사슴고기"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "rabbit",
+    "korean": [
+      "토끼고기"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "game meat",
+    "korean": [
+      "야생동물고기"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "organ meat",
+    "korean": [
+      "내장"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "meat meal",
+    "korean": [
+      "육분"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "meat and bone meal",
+    "korean": [
+      "육골분"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "meat stock",
+    "korean": [
+      "육수"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "liver",
+    "korean": [
+      "간"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "kidney",
+    "korean": [
+      "신장"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "heart",
+    "korean": [
+      "심장"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "brain",
+    "korean": [
+      "뇌"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "tongue",
+    "korean": [
+      "혀"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "blood",
+    "korean": [
+      "혈액"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "plasma",
+    "korean": [
+      "혈장"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "serum",
+    "korean": [
+      "혈청"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "liver oil",
+    "korean": [
+      "간유"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bone marrow",
+    "korean": [
+      "골수"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "suet",
+    "korean": [
+      "지방조직"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "adrenaline",
+    "korean": [
+      "아드레날린"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "insulin",
+    "korean": [
+      "인슐린"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bile",
+    "korean": [
+      "담즙"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "gall",
+    "korean": [
+      "쓸개"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "gelatin",
+    "korean": [
+      "젤라틴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "animal gelatin",
+    "korean": [
+      "동물성젤라틴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "beef gelatin",
+    "korean": [
+      "쇠고기젤라틴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "pork gelatin",
+    "korean": [
+      "돼지젤라틴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "collagen",
+    "korean": [
+      "콜라겐"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "collagen peptides",
+    "korean": [
+      "콜라겐펩타이드"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bovine collagen",
+    "korean": [
+      "소콜라겐"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "porcine collagen",
+    "korean": [
+      "돼지콜라겐"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "elastin",
+    "korean": [
+      "엘라스틴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "keratin",
+    "korean": [
+      "케라틴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "silk protein",
+    "korean": [
+      "실크단백질"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bone powder",
+    "korean": [
+      "분골"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bone meal",
+    "korean": [
+      "골분"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "blood meal",
+    "korean": [
+      "혈분"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "cartilage extract",
+    "korean": [
+      "연골추출물"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "chondroitin",
+    "korean": [
+      "콘드로이틴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "placenta extract",
+    "korean": [
+      "태반추출물"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "animal rennet",
+    "korean": [
+      "동물성렌넷"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "pepsin",
+    "korean": [
+      "펩신"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "trypsin",
+    "korean": [
+      "트립신"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "chymotrypsin",
+    "korean": [
+      "키모트립신"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "pancreatin",
+    "korean": [
+      "판크레아틴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "honey",
+    "korean": [
+      "꿀"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "honey",
+    "korean": [
+      "벌꿀"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "raw honey",
+    "korean": [
+      "생꿀"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "manuka honey",
+    "korean": [
+      "마누카꿀"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "honeycomb",
+    "korean": [
+      "벌집"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "beeswax",
+    "korean": [
+      "밀랍"
+    ],
+    "category": "meat",
+    "e_code": [
+      "E901"
+    ]
+  },
+  {
+    "keyword": "white beeswax",
+    "korean": [
+      "백밀랍"
+    ],
+    "category": "meat",
+    "e_code": [
+      "E901"
+    ]
+  },
+  {
+    "keyword": "yellow beeswax",
+    "korean": [
+      "황밀랍"
+    ],
+    "category": "meat",
+    "e_code": [
+      "E901"
+    ]
+  },
+  {
+    "keyword": "propolis",
+    "korean": [
+      "프로폴리스"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "royal jelly",
+    "korean": [
+      "로열젤리"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bee pollen",
+    "korean": [
+      "비폴렌"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bee bread",
+    "korean": [
+      "비브레드"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "hive extract",
+    "korean": [
+      "벌집추출물"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "carmine",
+    "korean": [
+      "카르민"
+    ],
+    "category": "meat",
+    "e_code": [
+      "E120"
+    ]
+  },
+  {
+    "keyword": "cochineal",
+    "korean": [
+      "코치닐"
+    ],
+    "category": "meat",
+    "e_code": [
+      "E120"
+    ]
+  },
+  {
+    "keyword": "crimson lake",
+    "korean": [
+      "크림슨레이크"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "animal glycerin",
+    "korean": [
+      "동물성글리세린"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "animal fatty acids",
+    "korean": [
+      "동물성지방산"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "lanolin",
+    "korean": [
+      "라놀린"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "shellac",
+    "korean": [
+      "세락"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "animal flavoring",
+    "korean": [
+      "동물성향료"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "castoreum",
+    "korean": [
+      "캐스토륨"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "musk",
+    "korean": [
+      "사향"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "civet",
+    "korean": [
+      "시벳"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "meat extract",
+    "korean": [
+      "육류엑기스"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bone broth",
+    "korean": [
+      "사골육수"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "beef bone soup",
+    "korean": [
+      "곰탕"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "ox bone soup",
+    "korean": [
+      "설렁탕"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "cartilage",
+    "korean": [
+      "연골"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bone",
+    "korean": [
+      "뼈"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "horn",
+    "korean": [
+      "뿔"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "horn",
+    "korean": [
+      "녹용"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "horn",
+    "korean": [
+      "녹각"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "horn",
+    "korean": [
+      "우각"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "snail",
+    "korean": [
+      "달팽이"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "escargot",
+    "korean": [
+      "에스카르고"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "frog",
+    "korean": [
+      "개구리"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "turtle",
+    "korean": [
+      "거북이"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "snake",
+    "korean": [
+      "뱀"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "crocodile",
+    "korean": [
+      "악어"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "kangaroo",
+    "korean": [
+      "캥거루"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "horse",
+    "korean": [
+      "말"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "goat",
+    "korean": [
+      "염소"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "buffalo",
+    "korean": [
+      "버팔로"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "camel",
+    "korean": [
+      "낙타"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "deer",
+    "korean": [
+      "사슴"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "wild boar",
+    "korean": [
+      "멧돼지"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "mountain goat",
+    "korean": [
+      "산양"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "roe deer",
+    "korean": [
+      "노루"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "bear",
+    "korean": [
+      "곰"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "tiger",
+    "korean": [
+      "호랑이"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "leopard",
+    "korean": [
+      "표범"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "lion",
+    "korean": [
+      "사자"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "wolf",
+    "korean": [
+      "늑대"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "fox",
+    "korean": [
+      "여우"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "monkey",
+    "korean": [
+      "원숭이"
+    ],
+    "category": "meat",
+    "e_code": []
+  },
+  {
+    "keyword": "chicken",
+    "korean": [
+      "닭고기"
+    ],
+    "category": "poultry",
+    "e_code": []
+  },
+  {
+    "keyword": "chicken extract",
+    "korean": [
+      "닭고기 추출물"
+    ],
+    "category": "poultry",
+    "e_code": []
+  },
+  {
+    "keyword": "chicken fat",
+    "korean": [
+      "닭기름"
+    ],
+    "category": "poultry",
+    "e_code": []
+  },
+  {
+    "keyword": "duck",
+    "korean": [
+      "오리고기"
+    ],
+    "category": "poultry",
+    "e_code": []
+  },
+  {
+    "keyword": "turkey",
+    "korean": [
+      "칠면조"
+    ],
+    "category": "poultry",
+    "e_code": []
+  },
+  {
+    "keyword": "chicken broth",
+    "korean": [
+      "닭육수"
+    ],
+    "category": "poultry",
+    "e_code": []
+  },
+  {
+    "keyword": "ginseng chicken soup",
+    "korean": [
+      "삼계탕"
+    ],
+    "category": "poultry",
+    "e_code": []
+  },
+  {
+    "keyword": "ostrich",
+    "korean": [
+      "타조"
+    ],
+    "category": "poultry",
+    "e_code": []
+  },
+  {
+    "keyword": "feather",
+    "korean": [
+      "깃털"
+    ],
+    "category": "poultry",
+    "e_code": []
+  }
+]

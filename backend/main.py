@@ -91,10 +91,10 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
 
     # 사용자 비건 단계를 프론트엔드에서 넘겨받는다.
     # FastAPI (main.py)에서 읽기
-    user_type = request.headers.get("x-user-type", "Strict Vegan")
+    user_type = request.headers.get("x-user-type", "Vegan")
     # 클라이언트(프론트엔드)에서 x-user-type 헤더를 안 보내면,
     # 에러가 날 수 있다. 결과가 None 이 되거나 에러가 날 수 있다.
-    # 그래서 그걸 방지하기 위해 기본값으로 Strict Vegan 을 준다.
+    # 그래서 그걸 방지하기 위해 기본값으로 Vegan 을 준다.
     print(f"사용자 유형: {user_type}")
     
     ban_list = ban_List(user_type)
