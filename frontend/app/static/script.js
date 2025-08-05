@@ -102,7 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-
     // 저장된 식단 불러오기
     const savedType = localStorage.getItem("vegType");
     if (savedType) {
@@ -200,17 +199,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  /**
+   * 이미지를 백엔드 서버로 전송하여 비건 호환성 분석을 요청하는 함수
+   * 
+   * 주요 변경사항 (2024.08.05):
+   * - fetch 요청 취소 문제 해결: 페이지 이동을 fetch 성공 후로 변경
+   * - 상세한 에러 처리 및 로깅 추가
+   * - 네트워크 연결 상태 확인 기능 강화
+   * - FileReader 에러 처리 추가
+   * 
+   * @param {File} imageFile - 업로드할 이미지 파일
+   */
   function sendImageToBackend(imageFile) {
+    // 사용자의 채식 유형 가져오기 (기본값: Vegan)
     const vegType = localStorage.getItem("vegType") || "Vegan";
     const formData = new FormData();
     formData.append("file", imageFile);
 
-    // ✅ fetch 시작 시간 기록
+    // 디버깅용: 전송할 데이터 정보 로깅
+    console.log("Sending image to backend:", {
+      vegType,
+      fileSize: imageFile.size,
+      fileName: imageFile.name,
+      fileType: imageFile.type
+    });
+
+    // 응답 시간 측정을 위한 시작 시간 기록
     const fetchStart = Date.now();
 
-    // ✅ 로딩 페이지 먼저 이동
-    window.location.href = "loading.html";
-
+    // 수정: fetch 요청을 먼저 시작하고, 성공 시에만 로딩 페이지로 이동
+    // (이전에는 로딩 페이지로 먼저 이동해서 fetch 요청이 취소되는 문제가 있었음)
     fetch("http://192.168.22.22:8000/Check_Vegan", {
       method: "POST",
       headers: {
@@ -218,13 +236,32 @@ document.addEventListener("DOMContentLoaded", () => {
       },
       body: formData
     })
-      .then((res) => res.json())
+      .then((res) => {
+        // 응답 상태 및 헤더 로깅 (디버깅용)
+        console.log("Response status:", res.status);
+        console.log("Response headers:", res.headers);
+        
+        // HTTP 에러 상태 확인
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        
+        // fetch가 성공적으로 시작되면 로딩 페이지로 이동
+        window.location.href = "loading.html";
+        
+        return res.json();
+      })
       .then((data) => {
+        console.log("Received data:", data);
+        
+        // 최소 1초간 로딩 화면 표시를 위한 대기 시간 계산
         const elapsed = Date.now() - fetchStart;
-        const waitTime = 1000 - elapsed;
+        const waitTime = Math.max(1000 - elapsed, 0);
 
+        // 이미지 파일을 Base64로 변환하여 결과 페이지에서 표시
         const reader = new FileReader();
         reader.onload = () => {
+          // 분석 결과와 이미지 URL을 localStorage에 저장
           data.imageUrl = reader.result;
           localStorage.setItem("resultData", JSON.stringify(data));
 
@@ -232,28 +269,50 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "result.html";
           };
 
+          // 최소 로딩 시간 보장
           if (waitTime > 0) {
             setTimeout(goToResult, waitTime);
           } else {
             goToResult();
           }
         };
+        
+        // FileReader 에러 처리 추가
+        reader.onerror = () => {
+          console.error("FileReader error");
+          alert("Failed to process image. Please try again.");
+          window.location.href = "index.html";
+        };
+        
         reader.readAsDataURL(imageFile);
       })
       .catch((err) => {
-        alert("Upload failed. Please try again.\n" + err.message); // 전송 실패 문구를 영문으로 수정, 메시지만 출력할지 에러 메시지까지 출력할지 협의가 필요함
+        console.error("Upload error:", err);
+        
+        // 에러 유형별로 구체적인 메시지 제공
+        let errorMessage = "Upload failed. ";
+        
+        if (err.name === 'TypeError' && err.message.includes('fetch')) {
+          errorMessage += "Cannot connect to server. Please check your internet connection.";
+        } else if (err.message.includes('HTTP error')) {
+          errorMessage += `Server error: ${err.message}`;
+        } else {
+          errorMessage += "Please try again.";
+        }
+        
+        alert(errorMessage);
+        // 에러 발생 시 메인 페이지로 돌아가기
         window.location.href = "index.html";
       });
   }
 
-
   // 구현되지 않은 기능 알림
-  const liveCameraBtn= document.getElementById("liveCameraBtn");
-    if (liveCameraBtn) {
-      liveCameraBtn.addEventListener("click", () => {
-        alert("This feature is coming soon.");
-      });
-    }
+  const liveCameraBtn = document.getElementById("liveCameraBtn");
+  if (liveCameraBtn) {
+    liveCameraBtn.addEventListener("click", () => {
+      alert("This feature is coming soon.");
+    });
+  }
 
   // 아이콘 생성 라이브러리를 초기화
   lucide.createIcons();
