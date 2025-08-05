@@ -203,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
    * 이미지를 백엔드 서버로 전송하여 비건 호환성 분석을 요청하는 함수
    * 
    * 주요 변경사항 (2024.08.05):
+   * - 백엔드 데이터 형식 변환 로직 추가
    * - fetch 요청 취소 문제 해결: 페이지 이동을 fetch 성공 후로 변경
    * - 상세한 에러 처리 및 로깅 추가
    * - 네트워크 연결 상태 확인 기능 강화
@@ -251,8 +252,12 @@ document.addEventListener("DOMContentLoaded", () => {
         
         return res.json();
       })
-      .then((data) => {
-        console.log("Received data:", data);
+      .then((backendData) => {
+        console.log("Received backend data:", backendData);
+        
+        // 🔄 백엔드 데이터를 프론트엔드 형식으로 변환
+        const transformedData = transformBackendData(backendData);
+        console.log("Transformed data:", transformedData);
         
         // 최소 1초간 로딩 화면 표시를 위한 대기 시간 계산
         const elapsed = Date.now() - fetchStart;
@@ -261,9 +266,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // 이미지 파일을 Base64로 변환하여 결과 페이지에서 표시
         const reader = new FileReader();
         reader.onload = () => {
-          // 분석 결과와 이미지 URL을 localStorage에 저장
-          data.imageUrl = reader.result;
-          localStorage.setItem("resultData", JSON.stringify(data));
+          // 변환된 데이터에 이미지 URL 추가
+          transformedData.imageUrl = reader.result;
+          localStorage.setItem("resultData", JSON.stringify(transformedData));
 
           const goToResult = () => {
             window.location.href = "result.html";
@@ -304,6 +309,100 @@ document.addEventListener("DOMContentLoaded", () => {
         // 에러 발생 시 메인 페이지로 돌아가기
         window.location.href = "index.html";
       });
+  }
+
+  /**
+   * 백엔드 데이터를 프론트엔드 형식으로 변환
+   */
+  function transformBackendData(backendData) {
+    try {
+      // 백엔드 데이터 구조 검증
+      if (!backendData || typeof backendData !== 'object') {
+        throw new Error('Invalid backend data structure');
+      }
+
+      // found_forbidden 배열을 안전하게 처리
+      const forbiddenIngredients = Array.isArray(backendData.found_forbidden) 
+        ? backendData.found_forbidden 
+        : [];
+
+      // OCR 텍스트에서 전체 재료 목록 추출 (옵션)
+      const allIngredients = extractIngredientsFromOCR(backendData.ocr_text || '');
+      
+      // 금지된 재료와 안전한 재료 분류
+      const safeIngredients = allIngredients.filter(ingredient => 
+        !forbiddenIngredients.some(forbidden => 
+          ingredient.toLowerCase().includes(forbidden.toLowerCase())
+        )
+      );
+
+      // 프론트엔드 형식으로 변환
+      const transformedData = {
+        // 현재는 모든 금지 재료를 danger로 분류
+        // 필요시 사용자 타입에 따라 caution으로 분류하는 로직 추가 가능
+        danger: forbiddenIngredients,
+        caution: [], // 현재는 빈 배열, 필요시 로직 추가
+        safe: safeIngredients,
+        
+        // 추가 메타데이터 (디버깅용)
+        _metadata: {
+          date: backendData.Date,
+          userType: backendData.user_type,
+          isVegan: backendData.is_vegan,
+          numberForbidden: backendData.number_forbidden,
+          ocrText: backendData.ocr_text
+        }
+      };
+
+      return transformedData;
+      
+    } catch (error) {
+      console.error('Error transforming backend data:', error);
+      
+      // 변환 실패 시 기본 구조 반환
+      return {
+        danger: [],
+        caution: [],
+        safe: [],
+        _error: 'Data transformation failed',
+        _originalData: backendData
+      };
+    }
+  }
+
+  /**
+   * OCR 텍스트에서 재료 목록 추출 (간단한 버전)
+   */
+  function extractIngredientsFromOCR(ocrText) {
+    if (!ocrText || typeof ocrText !== 'string') {
+      return [];
+    }
+
+    try {
+      // "ingredients:" 또는 "성분:" 다음의 텍스트를 찾아서 재료 추출
+      const ingredientsMatch = ocrText.match(/(?:ingredients?|성분)[:\s]([^.]*)/i);
+      
+      if (!ingredientsMatch || !ingredientsMatch[1]) {
+        return [];
+      }
+
+      // 쉼표, 세미콜론, 괄호 등으로 분리하고 정리
+      const ingredients = ingredientsMatch[1]
+        .split(/[,;()]/g)
+        .map(ingredient => ingredient.trim())
+        .filter(ingredient => 
+          ingredient.length > 1 && 
+          !/^\d+%?$/.test(ingredient) && // 숫자만 있는 것 제외
+          ingredient.length < 30 // 너무 긴 것 제외
+        )
+        .slice(0, 20); // 최대 20개까지만
+
+      return ingredients;
+      
+    } catch (error) {
+      console.warn('Error extracting ingredients from OCR:', error);
+      return [];
+    }
   }
 
   // 구현되지 않은 기능 알림
