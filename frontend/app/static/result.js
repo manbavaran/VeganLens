@@ -57,45 +57,49 @@ async function loadResultData() {
 }
 
 /**
- * 결과 데이터 유효성 검증
+ * 결과 데이터 유효성 검증 (개선된 버전)
  */
 function validateResultData(data) {
   if (!data || typeof data !== 'object') {
+    console.error("Data is not an object:", data);
     return false;
   }
 
-  // 필수 필드 확인
+  // 필수 필드 확인 및 기본값 설정
   const requiredFields = ['imageUrl', 'danger', 'caution', 'safe'];
   for (const field of requiredFields) {
     if (!(field in data)) {
-      console.error(`Missing required field: ${field}`);
-      return false;
+      console.warn(`Missing required field: ${field}, setting default empty array`);
+      if (field === 'imageUrl') {
+        data[field] = '';
+      } else {
+        data[field] = [];
+      }
     }
   }
 
-  // 배열 필드 검증
+// 배열 필드 검증 및 수정
   const arrayFields = ['danger', 'caution', 'safe'];
   for (const field of arrayFields) {
     if (!Array.isArray(data[field])) {
-      console.error(`Field ${field} must be an array`);
-      return false;
+      console.warn(`Field ${field} is not an array, converting:`, data[field]);
+      data[field] = data[field] ? [data[field].toString()] : [];
     }
   }
 
   // 이미지 URL 기본 검증
-  if (typeof data.imageUrl !== 'string' || !data.imageUrl.trim()) {
-    console.error("Invalid imageUrl");
-    return false;
+  if (typeof data.imageUrl !== 'string') {
+    console.warn("Invalid imageUrl, setting empty string");
+    data.imageUrl = '';
   }
 
   // 백엔드 분석 실패 감지
   const totalIngredients = data.danger.length + data.caution.length + data.safe.length;
   if (totalIngredients === 0) {
     console.warn("No ingredients found in analysis result");
-    // 빈 결과도 유효하다고 간주하지만 로그로 기록
   }
 
-  // 백엔드 에러 필드 확인 (있다면)
+  // 백엔드 에러 필드 확인
   if (data.error || data.status === 'error') {
     console.error("Backend analysis error:", data.error || data.message);
     return false;
@@ -241,7 +245,8 @@ function setupBox(element, type, ingredients) {
   // 기존 클래스 초기화
   element.className = "result-box";
   
-  if (!ingredients || ingredients.length === 0) {
+  // ingredients가 undefined이거나 빈 배열인 경우 처리
+  if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
     element.classList.add("disabled");
     element.removeEventListener("click", element._clickHandler);
     return;
