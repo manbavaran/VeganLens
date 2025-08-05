@@ -88,6 +88,19 @@ function validateResultData(data) {
     return false;
   }
 
+  // 백엔드 분석 실패 감지
+  const totalIngredients = data.danger.length + data.caution.length + data.safe.length;
+  if (totalIngredients === 0) {
+    console.warn("No ingredients found in analysis result");
+    // 빈 결과도 유효하다고 간주하지만 로그로 기록
+  }
+
+  // 백엔드 에러 필드 확인 (있다면)
+  if (data.error || data.status === 'error') {
+    console.error("Backend analysis error:", data.error || data.message);
+    return false;
+  }
+
   return true;
 }
 
@@ -178,7 +191,14 @@ function renderMessage(analysisResult) {
   let message = "Check your analysis results.";
   let messageClass = "info";
 
-  if (analysisResult.danger?.length > 0) {
+  const totalIngredients = (analysisResult.danger?.length || 0) + 
+                          (analysisResult.caution?.length || 0) + 
+                          (analysisResult.safe?.length || 0);
+
+  if (totalIngredients === 0) {
+    message = "No ingredients detected in the analysis.";
+    messageClass = "warning";
+  } else if (analysisResult.danger?.length > 0) {
     message = "Not suitable for consumption.";
     messageClass = "danger";
   } else if (analysisResult.caution?.length > 0) {
