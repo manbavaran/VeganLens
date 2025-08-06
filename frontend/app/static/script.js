@@ -426,6 +426,21 @@ function sendImageToBackend(imageFile) {
   }, 500); // 초기 딜레이
 }
 
+
+// 누락된 함수 추가
+function resetUploadState() {
+  console.log("resetUploadState 실행");
+  isUploading = false;
+  if (uploadController) {
+    try {
+      uploadController.abort();
+    } catch (e) {
+      console.warn("uploadController.abort 실패:", e);
+    }
+    uploadController = null;
+  }
+}
+
 // ========== Settings 페이지 전용 JavaScript ==========
 
 document.addEventListener("DOMContentLoaded", () => {
