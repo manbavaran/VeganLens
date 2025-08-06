@@ -1,35 +1,159 @@
+/* 메인 페이지와 통일된 디자인 */
 body {
   margin: 0;
   padding: 0;
-  background: white;
+  background: white; /* 메인과 동일한 흰색 배경 */
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: sans-serif;
+  color: #333;
 }
 
 .loading-container {
+  width: 100%;
+  max-width: 430px; /* 메인과 동일한 컨테이너 너비 */
   text-align: center;
-  color: #4caf50;
+  padding: 2rem 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 메인 페이지 카드 스타일과 일치 */
+.loading-card {
+  width: 90%;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  background: #e6f3fc; /* 메인의 blue-bg와 동일 */
+  border: 1.5px solid #b8e0f8; /* 메인의 blue-border와 동일 */
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  margin: 0 auto 16px;
-  border: 4px solid #a8d5a2;
-  border-top: 4px solid #4caf50;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 20px;
+  border: 4px solid #b8e0f8;
+  border-top: 4px solid #4caf50; /* 메인의 green 색상 */
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 .text {
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  font-weight: bold;
+  color: #333;
 }
 
+.status-text {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+  min-height: 20px;
+}
+
+/* 타임아웃 경고 - 메인 카드 스타일 적용 */
+.timeout-warning {
+  width: 90%;
+  background: #fff6e5; /* 메인의 yellow-bg */
+  border: 1.5px solid #ffe0b2; /* 메인의 yellow-border */
+  border-radius: 16px;
+  padding: 16px;
+  display: none;
+  font-size: 14px;
+  color: #333;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.timeout-warning.show {
+  display: block;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.timeout-warning p {
+  margin: 0;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.timeout-warning p:last-child {
+  margin-bottom: 0;
+}
+
+/* 액션 버튼 - 메인 스타일과 일치 */
+.action-buttons {
+  width: 90%;
+  display: none;
+  gap: 12px;
+  flex-direction: column;
+}
+
+.action-buttons.show {
+  display: flex;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.btn {
+  width: 100%;
+  background: #e7f8ef; /* 메인의 green-bg */
+  border: 1.5px solid #b2e8c4; /* 메인의 green-border */
+  color: #333;
+  padding: 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.btn.primary {
+  background: #4caf50; /* 메인의 green 색상 */
+  border-color: #4caf50;
+  color: white;
+}
+
+.btn.primary:hover {
+  background: #45a049;
+  border-color: #45a049;
+}
+
+/* 애니메이션 */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .loading-container {
+    padding: 1.5rem 12px;
+  }
+  
+  .btn {
+    padding: 14px;
+    font-size: 13px;
+  }
 }

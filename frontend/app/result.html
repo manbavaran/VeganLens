@@ -1,40 +1,47 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>result</title>
+  <title>Analysis Result</title>
   <link rel="stylesheet" href="/static/result.css" />
   <script src="/static/result.js" defer></script>
 </head>
 <body>
-  <button id="closeBtn">close</button>
   <div class="result-container">
+    <!-- 헤더 - 자연스러운 닫기 버튼 배치 -->
     <header class="result-header">
-      <span></span>
+      <h1 class="header-title">Analysis Result</h1>
+      <button id="closeBtn">Close</button>
     </header>
 
-    <div class="image-preview" id="imagePreview"></div>
-    <p class="result-message" id="resultMessage">Your food compatibility check is ready!</p>
+    <!-- 이미지 섹션 -->
+    <section class="image-section">
+      <div class="image-preview" id="imagePreview"></div>
+      <p class="result-message" id="resultMessage">Checking your analysis results...</p>
+    </section>
 
+    <!-- 안내 섹션 -->
     <div class="notice-row">
-      <span class="notice-title">Cautionary Ingredients</span>
+      <span class="notice-title">Ingredient Categories</span>
       <div class="tooltip-wrapper">
         <span class="info-icon" id="infoIcon">ⓘ</span>
-        <div class="tooltip hidden" id="tooltip">경고 문구 표시 테스트</div>
-        </div>
+        <div class="tooltip hidden" id="tooltip">Tap each category to see detailed ingredients</div>
+      </div>
     </div>
 
+    <!-- 결과 박스 리스트 -->
     <div class="box-list">
-      <div class="result-box" id="dangerBox">Unsafe</div>
-      <div class="result-box" id="cautionBox">Caution</div>
-      <div class="result-box" id="safeBox">Safe</div>
+      <div class="result-box" id="dangerBox">🚫 Unsafe Ingredients</div>
+      <div class="result-box" id="cautionBox">⚠️ Caution Required</div>
+      <div class="result-box" id="safeBox">✅ Safe Ingredients</div>
     </div>
 
+    <!-- 모달 -->
     <div class="modal hidden" id="ingredientModal">
-      <p id="modalContent">Ingredients</p>
-      <button id="closeModal">confirm</button>
+      <div>
+        <p id="modalContent">Ingredients will be shown here</p>
+        <button id="closeModal">Confirm</button>
+      </div>
     </div>
   </div>
-</body>
-</html>

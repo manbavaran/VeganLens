@@ -8,8 +8,121 @@
 </head>
 <body>
   <div class="loading-container">
-    <div class="spinner"></div>
-    <p class="text">Analyzing ingredients...<br/>Do not shut down the application.</p>
+    <!-- 메인 페이지 카드 스타일과 일치하는 로딩 카드 -->
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <div class="status-text" id="statusText">Connecting to server...</div>
+      <p class="text">Analyzing ingredients...<br/>Please do not close the application.</p>
+    </div>
+    
+    <!-- 타임아웃 경고 메시지 - 카드 스타일 -->
+    <div class="timeout-warning" id="timeoutWarning">
+      <p>⚠️ Taking longer than expected...</p>
+      <p>Please check your internet connection.</p>
+    </div>
+
+    <!-- 액션 버튼 - 메인 스타일과 일치 -->
+    <div class="action-buttons" id="actionButtons">
+      <button class="btn" onclick="goBackHome()">Go Back</button>
+      <button class="btn primary" onclick="retryAnalysis()">Retry</button>
+    </div>
   </div>
+
+  <script>
+    // 로딩 페이지 타임아웃 및 상태 관리
+    let loadingStartTime = Date.now();
+    let statusUpdateInterval;
+    let timeoutWarningTimer;
+    let forceRedirectTimer;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("로딩 페이지 시작");
+      
+      // 상태 텍스트 업데이트
+      updateStatusText();
+      
+      // 15초 후 경고 메시지 표시
+      timeoutWarningTimer = setTimeout(showTimeoutWarning, 15000);
+      
+      // 45초 후 강제로 홈으로 리다이렉트
+      forceRedirectTimer = setTimeout(forceRedirectToHome, 45000);
+      
+      // 뒤로 가기 방지
+      window.addEventListener('popstate', handleBackButton);
+      
+      // 페이지 이탈 감지
+      window.addEventListener('beforeunload', cleanup);
+    });
+
+    function updateStatusText() {
+      const statusEl = document.getElementById('statusText');
+      const elapsed = Date.now() - loadingStartTime;
+      
+      if (elapsed < 3000) {
+        statusEl.textContent = 'Connecting to server...';
+      } else if (elapsed < 8000) {
+        statusEl.textContent = 'Processing image...';
+      } else if (elapsed < 15000) {
+        statusEl.textContent = 'Analyzing ingredients...';
+      } else {
+        statusEl.textContent = 'Almost done...';
+      }
+      
+      statusUpdateInterval = setTimeout(updateStatusText, 2000);
+    }
+
+    function showTimeoutWarning() {
+      console.log("타임아웃 경고 표시");
+      const warning = document.getElementById('timeoutWarning');
+      const buttons = document.getElementById('actionButtons');
+      
+      if (warning && buttons) {
+        warning.classList.add('show');
+        buttons.classList.add('show');
+      }
+    }
+
+    function forceRedirectToHome() {
+      console.log("강제 홈 리다이렉트");
+      cleanup();
+      alert('Analysis is taking too long. Please try again with a clearer image.');
+      window.location.href = 'index.html';
+    }
+
+    function goBackHome() {
+      console.log("사용자가 홈으로 돌아가기 선택");
+      cleanup();
+      window.location.href = 'index.html';
+    }
+
+    function retryAnalysis() {
+      console.log("사용자가 재시도 선택");
+      cleanup();
+      window.location.href = 'index.html';
+    }
+
+    function handleBackButton(event) {
+      console.log("뒤로 가기 감지");
+      event.preventDefault();
+      cleanup();
+      window.location.href = 'index.html';
+    }
+
+    function cleanup() {
+      console.log("로딩 페이지 정리");
+      if (statusUpdateInterval) clearTimeout(statusUpdateInterval);
+      if (timeoutWarningTimer) clearTimeout(timeoutWarningTimer);
+      if (forceRedirectTimer) clearTimeout(forceRedirectTimer);
+      
+      // 업로드 상태 초기화 (전역 함수가 있다면)
+      if (typeof resetUploadState === 'function') {
+        resetUploadState();
+      }
+    }
+
+    // 전역 함수로 노출
+    window.goBackHome = goBackHome;
+    window.retryAnalysis = retryAnalysis;
+  </script>
 </body>
 </html>
