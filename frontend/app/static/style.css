@@ -38,8 +38,50 @@ body {
   border-bottom: 1px solid #eee;
 }
 
-.logo img {
-  height: 40px;
+.vegan-lens-logo {
+  font-family: 'Bebas Kai', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  letter-spacing: 1px;
+  transform: skew(-10deg);  /* 전체 기울어짐 */
+}
+
+.vegan-part {
+  color: #4caf50;
+}
+
+.lens-part {
+  background-color: #4caf50;
+  color: transparent;
+  padding: 0px 6px 0px 6px;
+  border-radius: 3px;
+  margin-left: 2px;
+  font-size: 0.9em;
+  transform: skew(10deg) translateY(2px);  /* 기존 skew에 translateY 추가 */
+  display: inline-block;
+  position: relative;
+}
+
+.lens-part::after {
+  content: 'Lens';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) skew(-10deg) translateY(-1px);  /* 글자만 다시 기울이기 */
+  color: white;
+}
+
+.sub-title {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin: 4px 0 0 0;
+  font-family: 'Bebas Kai', sans-serif; 
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
 /* 메인 콘텐츠: 유동적 중앙 정렬 */
@@ -126,120 +168,80 @@ body {
   color: var(--green);
 }
 
-/* settings.html용 스타일 */
-.settings-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 16px;
-  margin-top: -230px;
-}
-
-
-.profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.profile-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: #ccc;
-  background-size: cover;
-  background-position: center;
-}
-
-.profile-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.type-selector {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#typePopup {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: #f8f8f8;
-  border: 1px solid #ddd;
-  padding: 8px;
-  margin-top: 6px;
-}
-
-#typePopup.hidden {
-  display: none;
-}
-
-.icons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.icon {
-  width: 85px;
-  height: 85px;
-  object-fit: contain;
-}
-
-
-.icon.active {
-  color: var(--green);
-}
-
-
-.icon-grid {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  row-gap: 25px;
-  column-gap: 26px;
-  justify-content: center;
-  margin-top: 40px;
-}
-
-.icon-grid .icon {
-  width: 75px;
-  height: 75px;
-  object-fit: contain;
-}
-
-
 .modal {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
-  max-width: 90%;
 }
 
 .modal.hidden {
-  display: none;
+  display: none !important;
 }
 
-/* 타이틀 */
-.sub-title {
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px;
+  max-width: 350px;
+  width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.modal-content h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
   text-align: center;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-content label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
-  color: #666;
-  margin: -4px;
+  color: #333;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.modal-content label:hover {
+  background-color: #f8f9fa;
+}
+
+.modal-content input[type="radio"] {
+  accent-color: var(--green);
+}
+
+.modal-content button[type="submit"] {
+  background: var(--green);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.modal-content button[type="submit"]:hover {
+  background: #45a049;
 }

@@ -3,59 +3,101 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vegan Lens - settings</title>
+  <title>Vegan Lens - Settings</title>
+  
+  <!-- 기본 스타일 (로고, 네비게이션 등) -->
   <link rel="stylesheet" href="/static/style.css" />
+  <!-- Settings 전용 스타일 -->
+  <link rel="stylesheet" href="/static/settings.css" />
+  
   <script src="https://unpkg.com/lucide@latest" defer></script>
   <script src="/static/script.js" defer></script>
+
+  <!-- 폰트 로드 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Kai&display=swap" rel="stylesheet">
 </head>
+
 <body>
   <div class="container">
+    <!-- 헤더 (기본 style.css 사용) -->
     <header class="logo">
-      <img src="https://placehold.co/150x40?text=Logo" alt="Vegan Lens Logo" />
-      <p class="sub-title">OPTION</p>
+      <div class="vegan-lens-logo">
+        <span class="vegan-part">Vegan</span>
+        <span class="lens-part">Lens</span>
+      </div>
+      <p class="sub-title">Settings</p>
     </header>
 
+    <!-- 메인 설정 내용 (settings.css 사용) -->
     <main class="settings-container">
-      <div class="profile">
-        <input type="file" id="profileInput" accept="image/*" hidden />
-        <div class="profile-image" id="profileImage"></div>
-        <div class="profile-name">
-          <span id="userName">User Name</span>
-          <button id="editNameBtn">
-            <span class="material-symbols-outlined">edit</span>
+      <!-- 프로필 섹션 -->
+      <div class="setting-card profile-section">
+        <div class="setting-card-title">
+          <i data-lucide="user"></i>
+          Profile
+        </div>
+        <input type="file" id="settingsProfileInput" accept="image/*" hidden />
+        <div class="settings-profile-image" id="settingsProfileImage">
+          <i data-lucide="camera"></i>
+        </div>
+        <div class="profile-name-container">
+          <span class="settings-user-name" id="settingsUserName">User Name</span>
+          <button class="settings-edit-btn" id="settingsEditNameBtn">
+            <i data-lucide="edit-2"></i>
           </button>
         </div>
       </div>
 
-      <div class="type-selector">
-        <div id="selectedType">Vegan</div>
-        <button id="toggleSelector">
-          <span class="material-symbols-outlined">check</span>
-        </button>
-        <div id="typePopup" class="hidden">
-          <label><input type="radio" name="vegtype" value="Vegan" /> Vegan</label>
-          <label><input type="radio" name="vegtype" value="Lacto vegetarian" /> Lacto vegetarian</label>
-          <label><input type="radio" name="vegtype" value="Ovo vegetarian" /> Ovo vegetarian</label>
-          <label><input type="radio" name="vegtype" value="Lacto-ovo vegetarian" /> Lacto-ovo vegetarian</label>
-          <label><input type="radio" name="vegtype" value="Pesco-vegetarian" /> Pesco-vegetarian</label>
-          <label><input type="radio" name="vegtype" value="Pollo-vegetarian" /> Pollo-vegetarian</label>
+      <!-- 식단 타입 선택 섹션 -->
+      <div class="setting-card diet-type-section">
+        <div class="setting-card-title">
+          <i data-lucide="leaf"></i>
+          Dietary Preference
+        </div>
+        <div class="diet-type-selector" id="settingsDietTypeSelector">
+          <span class="selected-type" id="settingsSelectedType">Vegan</span>
+          <i class="dropdown-arrow" data-lucide="chevron-down"></i>
         </div>
       </div>
 
-      <!-- 식품군 아이콘 -->
-      <div class="icon-grid">
-        <img id="vegetable" class="icon" src="/static/images/icons/vegetable_gray.png" alt="vegetable" />
-        <img id="dairy" class="icon" src="/static/images/icons/dairy_gray.png" alt="dairy" />
-        <img id="egg" class="icon" src="/static/images/icons/egg_gray.png" alt="egg" />
-        <img id="fish" class="icon" src="/static/images/icons/fish_gray.png" alt="fish" />
-        <img id="chicken" class="icon" src="/static/images/icons/chicken_gray.png" alt="chicken" />
-        <img id="meat" class="icon" src="/static/images/icons/meat.png" alt="meat" />
+      <!-- 식품군 섹션 -->
+      <div class="setting-card food-groups-section">
+        <div class="setting-card-title">
+          <i data-lucide="utensils"></i>
+          Allowed Food Groups
+        </div>
+        <div class="settings-icon-grid">
+          <div class="settings-icon-item" data-food="vegetable">
+            <img class="settings-food-icon" src="/static/images/icons/vegetable_gray.png" alt="vegetable" />
+            <span class="settings-icon-label">Vegetable</span>
+          </div>
+          <div class="settings-icon-item" data-food="dairy">
+            <img class="settings-food-icon" src="/static/images/icons/dairy_gray.png" alt="dairy" />
+            <span class="settings-icon-label">Dairy</span>
+          </div>
+          <div class="settings-icon-item" data-food="egg">
+            <img class="settings-food-icon" src="/static/images/icons/egg_gray.png" alt="egg" />
+            <span class="settings-icon-label">Egg</span>
+          </div>
+          <div class="settings-icon-item" data-food="fish">
+            <img class="settings-food-icon" src="/static/images/icons/fish_gray.png" alt="fish" />
+            <span class="settings-icon-label">Fish</span>
+          </div>
+          <div class="settings-icon-item" data-food="chicken">
+            <img class="settings-food-icon" src="/static/images/icons/chicken_gray.png" alt="chicken" />
+            <span class="settings-icon-label">Chicken</span>
+          </div>
+          <div class="settings-icon-item" data-food="meat">
+            <img class="settings-food-icon" src="/static/images/icons/meat_gray.png" alt="meat" />
+            <span class="settings-icon-label">Meat</span>
+          </div>
+        </div>
       </div>
-
-
-
     </main>
 
+    <!-- 하단 네비게이션 (기본 style.css 사용) -->
     <footer class="bottom-nav">
       <div class="nav-icon" data-tab="grid">
         <i data-lucide="layout-grid"></i>
@@ -68,13 +110,54 @@
       </div>
     </footer>
 
+    <!-- 식단 타입 선택 모달 -->
+    <div id="settingsDietTypeModal" class="settings-modal">
+      <div class="settings-modal-content">
+        <div class="settings-modal-title">Choose Your Dietary Style</div>
+        <div class="settings-diet-options">
+          <label class="settings-diet-option">
+            <input type="radio" name="settingsVegtype" value="Vegan" />
+            <span class="settings-diet-option-label">Vegan</span>
+          </label>
+          <label class="settings-diet-option">
+            <input type="radio" name="settingsVegtype" value="Lacto vegetarian" />
+            <span class="settings-diet-option-label">Lacto Vegetarian</span>
+          </label>
+          <label class="settings-diet-option">
+            <input type="radio" name="settingsVegtype" value="Ovo vegetarian" />
+            <span class="settings-diet-option-label">Ovo Vegetarian</span>
+          </label>
+          <label class="settings-diet-option">
+            <input type="radio" name="settingsVegtype" value="Lacto-ovo vegetarian" />
+            <span class="settings-diet-option-label">Lacto-Ovo Vegetarian</span>
+          </label>
+          <label class="settings-diet-option">
+            <input type="radio" name="settingsVegtype" value="Pesco-vegetarian" />
+            <span class="settings-diet-option-label">Pesco-Vegetarian</span>
+          </label>
+          <label class="settings-diet-option">
+            <input type="radio" name="settingsVegtype" value="Pollo-vegetarian" />
+            <span class="settings-diet-option-label">Pollo-Vegetarian</span>
+          </label>
+        </div>
+        <div class="settings-modal-actions">
+          <button class="settings-btn settings-btn-secondary" id="settingsCancelDietType">Cancel</button>
+          <button class="settings-btn settings-btn-primary" id="settingsConfirmDietType">Confirm</button>
+        </div>
+      </div>
+    </div>
 
-    <div id="nameModal" class="modal hidden">
-      <input type="text" id="nameInput" placeholder="Enter your nickname" />
-      <button id="saveName">save</button>
-      <button id="cancelName">cancel</button>
+    <!-- 이름 수정 모달 -->
+    <div id="settingsNameModal" class="settings-modal">
+      <div class="settings-modal-content">
+        <div class="settings-modal-title">Edit Name</div>
+        <input type="text" class="settings-name-input" id="settingsNameInput" placeholder="Enter your name" />
+        <div class="settings-modal-actions">
+          <button class="settings-btn settings-btn-secondary" id="settingsCancelName">Cancel</button>
+          <button class="settings-btn settings-btn-primary" id="settingsSaveName">Save</button>
+        </div>
+      </div>
     </div>
   </div>
-
 </body>
 </html>

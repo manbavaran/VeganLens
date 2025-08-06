@@ -1,0 +1,383 @@
+/* 공통 변수 (style.css와 동일) */
+:root {
+  --green: #4caf50;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e9ecef;
+  --dark-gray: #666;
+  --border-color: #dee2e6;
+}
+
+/* Settings 메인 컨테이너 */
+.settings-container {
+  flex: 1;
+  padding: 20px 16px 80px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 설정 카드 공통 스타일 */
+.setting-card {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.setting-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.setting-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setting-card-title i {
+  color: var(--green);
+  font-size: 20px;
+}
+
+/* ========== 프로필 섹션 ========== */
+.profile-section {
+  text-align: center;
+}
+
+.settings-profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--medium-gray), var(--light-gray));
+  background-size: cover;
+  background-position: center;
+  margin: 0 auto 12px auto;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-profile-image:hover {
+  transform: scale(1.05);
+}
+
+.settings-profile-image i {
+  color: var(--dark-gray);
+  font-size: 24px;
+  transition: opacity 0.2s ease;
+}
+
+.settings-profile-image.has-image i {
+  opacity: 0;
+}
+
+.profile-name-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.settings-user-name {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.settings-edit-btn {
+  background: none;
+  border: none;
+  color: var(--dark-gray);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-edit-btn:hover {
+  background-color: var(--light-gray);
+  color: var(--green);
+}
+
+/* ========== 식단 타입 선택 ========== */
+.diet-type-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--light-gray);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.diet-type-selector:hover {
+  background: var(--medium-gray);
+  border-color: var(--green);
+}
+
+.selected-type {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.dropdown-arrow {
+  color: var(--dark-gray);
+  transition: transform 0.2s ease;
+}
+
+.diet-type-selector:hover .dropdown-arrow {
+  color: var(--green);
+  transform: rotate(180deg);
+}
+
+/* ========== 식품군 아이콘 ========== */
+.settings-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.settings-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.settings-icon-item:hover {
+  background: rgba(76, 175, 80, 0.05);
+  transform: translateY(-2px);
+}
+
+.settings-icon-item.active {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: var(--green);
+}
+
+.settings-food-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  transition: all 0.2s ease;
+}
+
+.settings-icon-item:hover .settings-food-icon {
+  transform: scale(1.1);
+}
+
+.settings-icon-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--dark-gray);
+  text-transform: capitalize;
+  transition: color 0.2s ease;
+}
+
+.settings-icon-item.active .settings-icon-label {
+  color: var(--green);
+  font-weight: 600;
+}
+
+/* ========== 모달 스타일 ========== */
+.settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.settings-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.settings-modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px;
+  max-width: 320px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(20px) scale(0.95);
+  transition: transform 0.3s ease;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.settings-modal.active .settings-modal-content {
+  transform: translateY(0) scale(1);
+}
+
+.settings-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ========== 식단 선택 옵션 ========== */
+.settings-diet-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-diet-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.settings-diet-option:hover {
+  background: var(--light-gray);
+  border-color: var(--green);
+}
+
+.settings-diet-option input[type="radio"] {
+  accent-color: var(--green);
+  transform: scale(1.2);
+}
+
+.settings-diet-option-label {
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.settings-diet-option:hover .settings-diet-option-label {
+  color: var(--green);
+}
+
+/* ========== 모달 액션 버튼 ========== */
+.settings-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.settings-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-btn:active {
+  transform: translateY(1px);
+}
+
+.settings-btn-primary {
+  background: var(--green);
+  color: white;
+}
+
+.settings-btn-primary:hover {
+  background: #45a049;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.settings-btn-secondary {
+  background: var(--light-gray);
+  color: var(--dark-gray);
+  border: 1px solid var(--border-color);
+}
+
+.settings-btn-secondary:hover {
+  background: var(--medium-gray);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* ========== 이름 입력 필드 ========== */
+.settings-name-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.settings-name-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.settings-name-input::placeholder {
+  color: #aaa;
+}
+
+/* ========== 반응형 디자인 ========== */
+@media (max-width: 380px) {
+  .settings-container {
+    padding: 16px 12px 80px 12px;
+    gap: 20px;
+  }
+  
+  .setting-card {
+    padding: 16px;
+  }
+  
+  .settings-icon-grid {
+    gap: 12px;
+  }
+  
+  .settings-food-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .settings-modal-content {
+    margin: 16px;
+    padding: 20px;
+  }
+}
