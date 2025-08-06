@@ -531,3 +531,266 @@ if (window.location.pathname.includes('loading.html')) {
 
 // 전역 함수로 노출 (loading.html에서 사용)
 window.resetUploadState = resetUploadState;
+
+// ========== Settings 페이지 전용 JavaScript ==========
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Settings 페이지에서만 실행
+  if (window.location.pathname.includes('settings.html')) {
+    initializeSettingsPage();
+  }
+});
+
+function initializeSettingsPage() {
+  console.log("Settings 페이지 초기화 시작");
+
+  // Settings 전용 요소들 참조 (충돌 방지를 위해 고유한 ID 사용)
+  const dietTypeSelector = document.getElementById('settingsDietTypeSelector');
+  const dietTypeModal = document.getElementById('settingsDietTypeModal');
+  const cancelDietType = document.getElementById('settingsCancelDietType');
+  const confirmDietType = document.getElementById('settingsConfirmDietType');
+  const selectedType = document.getElementById('settingsSelectedType');
+  
+  const editNameBtn = document.getElementById('settingsEditNameBtn');
+  const nameModal = document.getElementById('settingsNameModal');
+  const nameInput = document.getElementById('settingsNameInput');
+  const saveName = document.getElementById('settingsSaveName');
+  const cancelName = document.getElementById('settingsCancelName');
+  const userName = document.getElementById('settingsUserName');
+  
+  const profileInput = document.getElementById('settingsProfileInput');
+  const profileImage = document.getElementById('settingsProfileImage');
+
+  // ========== 식단 타입 모달 처리 ==========
+  if (dietTypeSelector && dietTypeModal) {
+    dietTypeSelector.addEventListener('click', () => {
+      dietTypeModal.classList.add('active');
+      // 현재 선택된 값 체크
+      const currentType = selectedType.textContent;
+      const radio = document.querySelector(`input[name="settingsVegtype"][value="${currentType}"]`);
+      if (radio) radio.checked = true;
+    });
+
+    if (cancelDietType) {
+      cancelDietType.addEventListener('click', () => {
+        dietTypeModal.classList.remove('active');
+      });
+    }
+
+    if (confirmDietType) {
+      confirmDietType.addEventListener('click', () => {
+        const selected = document.querySelector('input[name="settingsVegtype"]:checked');
+        if (selected) {
+          selectedType.textContent = selected.value;
+          localStorage.setItem("vegType", selected.value);
+          updateSettingsFoodGroups(selected.value);
+          
+          // 백엔드에 업데이트 전송
+          fetch('/api/update-user-type', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-user-type': selected.value
+            },
+            body: JSON.stringify({ type: selected.value })
+          }).catch(err => console.warn("Failed to update user type:", err));
+        }
+        dietTypeModal.classList.remove('active');
+      });
+    }
+
+    // 모달 바깥 클릭시 닫기
+    dietTypeModal.addEventListener('click', (e) => {
+      if (e.target === dietTypeModal) {
+        dietTypeModal.classList.remove('active');
+      }
+    });
+  }
+
+  // ========== 이름 수정 모달 처리 ==========
+  if (editNameBtn && nameModal && nameInput && userName) {
+    editNameBtn.addEventListener('click', () => {
+      nameInput.value = userName.textContent;
+      nameModal.classList.add('active');
+      // 입력 필드에 포커스
+      setTimeout(() => nameInput.focus(), 100);
+    });
+
+    if (saveName) {
+      saveName.addEventListener('click', () => {
+        const newName = nameInput.value.trim();
+        if (newName) {
+          userName.textContent = newName;
+          localStorage.setItem("userName", newName);
+        }
+        nameModal.classList.remove('active');
+      });
+    }
+
+    if (cancelName) {
+      cancelName.addEventListener('click', () => {
+        nameModal.classList.remove('active');
+      });
+    }
+
+    // Enter 키로 저장
+    nameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        saveName.click();
+      }
+    });
+
+    // 모달 바깥 클릭시 닫기
+    nameModal.addEventListener('click', (e) => {
+      if (e.target === nameModal) {
+        nameModal.classList.remove('active');
+      }
+    });
+  }
+
+  // ========== 프로필 이미지 처리 ==========
+  if (profileImage && profileInput) {
+    profileImage.addEventListener('click', () => {
+      profileInput.click();
+    });
+    
+    profileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result;
+        profileImage.style.backgroundImage = `url(${imageUrl})`;
+        profileImage.classList.add('has-image');
+        localStorage.setItem("profileImage", imageUrl);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ========== 저장된 데이터 불러오기 ==========
+  loadSettingsData();
+}
+
+// Settings 데이터 불러오기 함수
+function loadSettingsData() {
+  const savedType = localStorage.getItem("vegType");
+  const savedName = localStorage.getItem("userName");
+  const savedImage = localStorage.getItem("profileImage");
+
+  const selectedType = document.getElementById('settingsSelectedType');
+  const userName = document.getElementById('settingsUserName');
+  const profileImage = document.getElementById('settingsProfileImage');
+
+  // 식단 타입 설정
+  if (savedType && selectedType) {
+    selectedType.textContent = savedType;
+    updateSettingsFoodGroups(savedType);
+  } else {
+    // 기본값으로 Vegan 설정
+    updateSettingsFoodGroups('Vegan');
+  }
+
+  // 사용자 이름 설정
+  if (savedName && userName) {
+    userName.textContent = savedName;
+  }
+
+  // 프로필 이미지 설정
+  if (savedImage && profileImage) {
+    profileImage.style.backgroundImage = `url(${savedImage})`;
+    profileImage.classList.add('has-image');
+  }
+}
+
+// Settings 전용 식품군 아이콘 업데이트 함수
+function updateSettingsFoodGroups(dietType) {
+  const allItems = document.querySelectorAll('.settings-icon-item');
+  
+  // 모든 아이템 비활성화
+  allItems.forEach(item => {
+    item.classList.remove('active');
+    const icon = item.querySelector('.settings-food-icon');
+    const foodType = item.dataset.food;
+    if (icon && foodType) {
+      icon.src = `/static/images/icons/${foodType}_gray.png`;
+    }
+  });
+
+  // 허용된 식품군 활성화
+  const allowedFoods = getSettingsAllowedFoods(dietType);
+  allowedFoods.forEach(food => {
+    const item = document.querySelector(`.settings-icon-item[data-food="${food}"]`);
+    if (item) {
+      item.classList.add('active');
+      const icon = item.querySelector('.settings-food-icon');
+      if (icon) {
+        if (food === 'meat') {
+          // 고기는 항상 비활성화 상태 유지
+          icon.src = `/static/images/icons/meat_gray.png`;
+        } else {
+          icon.src = `/static/images/icons/${food}.png`;
+        }
+      }
+    }
+  });
+
+  console.log(`식품군 업데이트 완료: ${dietType}`, allowedFoods);
+}
+
+// Settings 전용 허용 식품군 가져오기 함수
+function getSettingsAllowedFoods(dietType) {
+  const allowedFoods = [];
+  
+  // 모든 채식 유형은 채소 포함
+  if (["Vegan", "Lacto vegetarian", "Lacto-ovo vegetarian", "Ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(dietType)) {
+    allowedFoods.push("vegetable");
+  }
+  
+  // 유제품 허용 유형
+  if (["Lacto vegetarian", "Lacto-ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(dietType)) {
+    allowedFoods.push("dairy");
+  }
+  
+  // 달걀 허용 유형
+  if (["Ovo vegetarian", "Lacto-ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(dietType)) {
+    allowedFoods.push("egg");
+  }
+  
+  // 생선 허용 유형
+  if (["Pesco-vegetarian", "Pollo-vegetarian"].includes(dietType)) {
+    allowedFoods.push("fish");
+  }
+  
+  // 가금류 허용 유형
+  if (dietType === "Pollo-vegetarian") {
+    allowedFoods.push("chicken");
+  }
+  
+  // 고기는 모든 채식 유형에서 제외 (표시만 하고 활성화하지 않음)
+  
+  return allowedFoods;
+}
+
+// ========== ESC 키로 모달 닫기 ==========
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && window.location.pathname.includes('settings.html')) {
+    // 열린 모달들 찾아서 닫기
+    const activeModals = document.querySelectorAll('.settings-modal.active');
+    activeModals.forEach(modal => {
+      modal.classList.remove('active');
+    });
+  }
+});
+
+// ========== 디버깅용 로그 함수 ==========
+function logSettingsState() {
+  console.log('=== Settings 상태 확인 ===');
+  console.log('저장된 식단 타입:', localStorage.getItem("vegType"));
+  console.log('저장된 사용자 이름:', localStorage.getItem("userName"));
+  console.log('저장된 프로필 이미지:', localStorage.getItem("profileImage") ? '있음' : '없음');
+  
+  const activeItems = document.querySelectorAll('.settings-icon-item.active');
+  console.log('활성화된 식품군:', Array.from(activeItems).map(item => item.dataset.food));
+}
