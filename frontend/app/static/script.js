@@ -293,7 +293,7 @@ function sendImageToBackend(imageFile) {
   }
 
   // 핵심: fetch 성공 후에만 로딩 페이지로 이동
-  fetch("http://192.168.22.22:8000/Check_Vegan", {
+  fetch("http://localhost:8000/Check_Vegan", {
     method: "POST",
     headers: {
       "x-user-type": vegType
@@ -541,6 +541,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+/**
+ * 식단 타입 표시명 변환 함수
+ * value 값을 하이픈 없는 깔끔한 표시명으로 변환
+ */
+function formatDietTypeDisplay(value) {
+  const displayMap = {
+    "Vegan": "Vegan",
+    "Lacto vegetarian": "Lacto Vegetarian", 
+    "Ovo vegetarian": "Ovo Vegetarian",
+    "Lacto-ovo vegetarian": "Lacto Ovo Vegetarian",
+    "Pesco-vegetarian": "Pesco Vegetarian", 
+    "Pollo-vegetarian": "Pollo Vegetarian"
+  };
+  return displayMap[value] || value;
+}
+
 function initializeSettingsPage() {
   console.log("Settings 페이지 초기화 시작");
 
@@ -565,9 +581,9 @@ function initializeSettingsPage() {
   if (dietTypeSelector && dietTypeModal) {
     dietTypeSelector.addEventListener('click', () => {
       dietTypeModal.classList.add('active');
-      // 현재 선택된 값 체크
-      const currentType = selectedType.textContent;
-      const radio = document.querySelector(`input[name="settingsVegtype"][value="${currentType}"]`);
+      // 현재 선택된 값 체크 - 표시명이 아닌 실제 저장된 value로 체크
+      const currentValue = localStorage.getItem("vegType") || "Vegan";
+      const radio = document.querySelector(`input[name="settingsVegtype"][value="${currentValue}"]`);
       if (radio) radio.checked = true;
     });
 
@@ -581,7 +597,8 @@ function initializeSettingsPage() {
       confirmDietType.addEventListener('click', () => {
         const selected = document.querySelector('input[name="settingsVegtype"]:checked');
         if (selected) {
-          selectedType.textContent = selected.value;
+          // 수정된 부분: formatDietTypeDisplay 사용하여 하이픈 없는 표시명으로 변환
+          selectedType.textContent = formatDietTypeDisplay(selected.value);
           localStorage.setItem("vegType", selected.value);
           updateSettingsFoodGroups(selected.value);
           
@@ -685,10 +702,12 @@ function loadSettingsData() {
 
   // 식단 타입 설정
   if (savedType && selectedType) {
-    selectedType.textContent = savedType;
+    // 수정된 부분: formatDietTypeDisplay 사용하여 하이픈 없는 표시명으로 변환
+    selectedType.textContent = formatDietTypeDisplay(savedType);
     updateSettingsFoodGroups(savedType);
   } else {
     // 기본값으로 Vegan 설정
+    selectedType.textContent = "Vegan";
     updateSettingsFoodGroups('Vegan');
   }
 
