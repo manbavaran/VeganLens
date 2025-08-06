@@ -34,12 +34,16 @@
     let statusUpdateInterval;
     let timeoutWarningTimer;
     let forceRedirectTimer;
+    let resultCheckInterval; // 결과 확인 인터벌 추가
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log("로딩 페이지 시작");
       
       // 상태 텍스트 업데이트
       updateStatusText();
+      
+      // 핵심 추가: 결과 데이터 확인 시작
+      startResultCheck();
       
       // 15초 후 경고 메시지 표시
       timeoutWarningTimer = setTimeout(showTimeoutWarning, 15000);
@@ -53,6 +57,34 @@
       // 페이지 이탈 감지
       window.addEventListener('beforeunload', cleanup);
     });
+
+    // 결과 데이터 확인 함수 추가
+    function startResultCheck() {
+      console.log("결과 데이터 확인 시작");
+      
+      resultCheckInterval = setInterval(() => {
+        try {
+          const resultData = localStorage.getItem("resultData");
+          if (resultData) {
+            console.log("결과 데이터 발견!");
+            console.log("데이터 내용:", JSON.parse(resultData));
+            
+            clearInterval(resultCheckInterval);
+            cleanup();
+            
+            setTimeout(() => {
+              console.log("결과 페이지로 이동");
+              window.location.href = "result.html";
+            }, 1000); // 1초 후 이동
+            
+            return;
+          }
+          console.log("결과 데이터 대기 중...");
+        } catch (error) {
+          console.error("결과 데이터 확인 중 에러:", error);
+        }
+      }, 500); // 0.5초마다 확인
+    }
 
     function updateStatusText() {
       const statusEl = document.getElementById('statusText');
@@ -102,7 +134,7 @@
     }
 
     function handleBackButton(event) {
-      console.log("뒤로 가기 감지");
+      console.log("⬅뒤로 가기 감지");
       event.preventDefault();
       cleanup();
       window.location.href = 'index.html';
@@ -113,6 +145,7 @@
       if (statusUpdateInterval) clearTimeout(statusUpdateInterval);
       if (timeoutWarningTimer) clearTimeout(timeoutWarningTimer);
       if (forceRedirectTimer) clearTimeout(forceRedirectTimer);
+      if (resultCheckInterval) clearInterval(resultCheckInterval); // 추가
       
       // 업로드 상태 초기화 (전역 함수가 있다면)
       if (typeof resetUploadState === 'function') {
