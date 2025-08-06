@@ -218,14 +218,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
- * 무한 로딩 문제 해결된 이미지 업로드 함수
+ * 수정된 이미지 업로드 함수 - 동적 서버 URL 및 응답 처리 순서 개선
  * 
  * 주요 개선사항:
+ * - 동적 서버 URL 감지로 하드코딩 문제 해결
+ * - JSON 파싱 완료 후 페이지 이동으로 AbortError 방지
  * - 업로드 상태 추적으로 중복 요청 방지
- * - AbortController로 요청 취소 기능 추가  
  * - 타임아웃 설정으로 무한 대기 방지
- * - 에러 발생 시 확실한 상태 초기화
- * - 백엔드 응답 검증 강화
  * 
  * @param {File} imageFile - 업로드할 이미지 파일
  */
@@ -272,7 +271,7 @@ function sendImageToBackend(imageFile) {
     uploadController.abort();
     resetUploadState();
     alert("Request timeout. Please check your internet connection and try again.");
-  }, 30000); // 30초 타임아웃
+  }, 30000);
 
   console.log("Sending image to backend:", {
     vegType,
@@ -292,14 +291,18 @@ function sendImageToBackend(imageFile) {
     return;
   }
 
-  // 핵심: fetch 성공 후에만 로딩 페이지로 이동
-  fetch("http://localhost:8000/Check_Vegan", {
+  // 동적 서버 URL 감지
+  const currentHost = window.location.hostname;
+  const SERVER_URL = `http://${currentHost}:8000/Check_Vegan`;
+  console.log("동적 서버 URL:", SERVER_URL);
+
+  fetch(SERVER_URL, {
     method: "POST",
     headers: {
       "x-user-type": vegType
     },
     body: formData,
-    signal: uploadController.signal // AbortController 신호 추가
+    signal: uploadController.signal
   })
     .then((res) => {
       clearTimeout(timeoutId);
@@ -314,21 +317,17 @@ function sendImageToBackend(imageFile) {
         throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
       }
 
-      // ✅ fetch가 성공하면 즉시 로딩 페이지로 이동
-      console.log("로딩 페이지로 이동");
-      window.location.href = "loading.html";
-      
+      // JSON 파싱을 먼저 완료
       return res.json();
     })
     .then((backendData) => {
       console.log("백엔드 응답 데이터:", backendData);
       
-      // 백엔드 에러 체크 강화
+      // 백엔드 에러 체크
       if (backendData.error || backendData.status === 'error') {
         throw new Error(backendData.message || backendData.error || "Backend processing failed");
       }
 
-      // 백엔드 응답이 빈 객체인지 확인
       if (!backendData || Object.keys(backendData).length === 0) {
         throw new Error("Empty response from backend");
       }
@@ -336,11 +335,7 @@ function sendImageToBackend(imageFile) {
       const transformedData = transformBackendData(backendData);
       console.log("변환된 데이터:", transformedData);
       
-      // 최소 로딩 시간 보장
-      const elapsed = Date.now() - fetchStart;
-      const waitTime = Math.max(1500 - elapsed, 0); // 1.5초 최소 로딩
-
-      // 이미지를 Base64로 변환
+      // 🔥 핵심 개선: 이미지 처리도 완료한 후 페이지 이동
       const reader = new FileReader();
       reader.onload = () => {
         transformedData.imageUrl = reader.result;
@@ -350,19 +345,22 @@ function sendImageToBackend(imageFile) {
           console.log("localStorage에 데이터 저장 완료");
         } catch (storageError) {
           console.error("localStorage 저장 실패:", storageError);
-          // localStorage 실패해도 계속 진행
         }
 
-        const goToResult = () => {
-          console.log("결과 페이지로 이동");
+        // 최소 로딩 시간 보장
+        const elapsed = Date.now() - fetchStart;
+        const waitTime = Math.max(1500 - elapsed, 0);
+
+        const goToLoading = () => {
+          console.log("모든 처리 완료, 로딩 페이지로 이동");
           resetUploadState();
-          window.location.href = "result.html";
+          window.location.href = "loading.html";
         };
 
         if (waitTime > 0) {
-          setTimeout(goToResult, waitTime);
+          setTimeout(goToLoading, waitTime);
         } else {
-          goToResult();
+          goToLoading();
         }
       };
       
@@ -370,7 +368,6 @@ function sendImageToBackend(imageFile) {
         console.error("FileReader 에러:", readerError);
         resetUploadState();
         alert("Failed to process image. Please try again.");
-        // 에러 시 홈으로 리다이렉트하지 않고 현재 페이지 유지
       };
       
       reader.readAsDataURL(imageFile);
@@ -402,12 +399,6 @@ function sendImageToBackend(imageFile) {
       }
       
       alert(errorMessage);
-      
-      // 에러 발생 시 로딩 페이지에 있다면 홈으로 리다이렉트
-      if (window.location.pathname.includes('loading.html')) {
-        console.log("로딩 페이지에서 에러 발생, 홈으로 이동");
-        window.location.href = "index.html";
-      }
     });
 }
 
