@@ -218,6 +218,88 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
+ * OCR 텍스트에서 재료 목록 추출
+ */
+function extractIngredientsFromOCR(ocrText) {
+  if (!ocrText || typeof ocrText !== 'string') return [];
+
+  try {
+    const ingredientsMatch = ocrText.match(/(?:ingredients?|성분|원재료|구성품)[:\s]([^.]*)/i);
+    let textToProcess = ingredientsMatch?.[1] || ocrText;
+
+    return textToProcess
+      .split(/[,;()]/g)
+      .map(i => i.trim())
+      .filter(i =>
+        i.length > 1 &&
+        i.length < 30 &&
+        !/^\d+%?$/.test(i) &&
+        !/^[%\d\s]+$/.test(i)
+      )
+      .slice(0, 15);
+  } catch (e) {
+    console.warn("OCR 성분 추출 실패:", e);
+    return [];
+  }
+}
+
+/**
+ * 백엔드 응답 데이터를 로컬스토리지에 저장할 형식으로 변환
+ */
+function transformBackendData(backendData) {
+  if (!backendData || typeof backendData !== 'object') {
+    console.warn("Invalid backend data:", backendData);
+    return { imageUrl: "", danger: [], caution: [], safe: [], _metadata: {} };
+  }
+
+  const danger = Array.isArray(backendData.found_forbidden) ? backendData.found_forbidden : [];
+  const caution = Array.isArray(backendData.found_caution) ? backendData.found_caution : [];
+  let safe = Array.isArray(backendData.found_safe) ? backendData.found_safe : [];
+
+  // OCR 텍스트 기반 자동 안전 성분 추출
+  if (safe.length === 0 && backendData.ocr_text) {
+    const allIngredients = extractIngredientsFromOCR(backendData.ocr_text);
+    if (allIngredients.length > 0) {
+      safe = allIngredients.filter(ing =>
+        !danger.some(d => ing.toLowerCase().includes(d.toLowerCase())) &&
+        !caution.some(c => ing.toLowerCase().includes(c.toLowerCase()))
+      );
+    }
+  }
+
+  return {
+    imageUrl: "",
+    danger,
+    caution,
+    safe,
+    _metadata: {
+      date: backendData.Date || null,
+      userType: backendData.user_type || null,
+      isVegan: backendData.is_vegan ?? null,
+      numberForbidden: backendData.number_forbidden ?? 0,
+      ocrText: backendData.ocr_text || null,
+      raw: backendData
+    }
+  };
+}
+
+
+// 누락된 함수 추가
+function resetUploadState() {
+  console.log("resetUploadState 실행");
+  isUploading = false;
+  if (uploadController) {
+    try {
+      uploadController.abort();
+    } catch (e) {
+      console.warn("uploadController.abort 실패:", e);
+    }
+    uploadController = null;
+  }
+}
+
+
+/**
  * 수정된 이미지 업로드 함수 - 동적 서버 URL 및 응답 처리 순서 개선
  * 
  * 주요 개선사항:
@@ -424,21 +506,6 @@ function sendImageToBackend(imageFile) {
         alert(errorMessage);
       });
   }, 500); // 초기 딜레이
-}
-
-
-// 누락된 함수 추가
-function resetUploadState() {
-  console.log("resetUploadState 실행");
-  isUploading = false;
-  if (uploadController) {
-    try {
-      uploadController.abort();
-    } catch (e) {
-      console.warn("uploadController.abort 실패:", e);
-    }
-    uploadController = null;
-  }
 }
 
 // ========== Settings 페이지 전용 JavaScript ==========
