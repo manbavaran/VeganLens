@@ -1,132 +1,246 @@
+/* 메인 페이지와 통일된 디자인 시스템 */
+:root {
+  --green: #4caf50;
+  --blue-bg: #e6f3fc;
+  --blue-border: #b8e0f8;
+  --yellow-bg: #fff6e5;
+  --yellow-border: #ffe0b2;
+  --green-bg: #e7f8ef;
+  --green-border: #b2e8c4;
+}
+
 body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  background: white;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* 세로 전체 */
+  background: white; /* 메인과 동일한 흰색 배경 */
+  min-height: 100vh;
 }
 
+/* 메인과 동일한 컨테이너 구조 */
 .result-container {
-  max-width: 430px;
   width: 100%;
+  max-width: 430px; /* 메인과 동일 */
+  margin: 0 auto;
   padding: 16px;
-  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-
+/* 메인 스타일과 일치하는 헤더 */
 .result-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #eee; /* 메인 로고 영역과 동일 */
+  margin-bottom: 20px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 메인 버튼 스타일과 일치하는 닫기 버튼 */
+#closeBtn {
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-border);
+  border-radius: 12px;
+  padding: 8px 16px;
   font-size: 14px;
-  margin-bottom: 12px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+#closeBtn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* 이미지 영역 - 카드 스타일 적용 */
+.image-section {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .image-preview {
-  width: 160px;
-  height: 200px;
-  background-color: #ddd;
-  margin: 0 auto 12px;
+  width: 180px;
+  height: 220px;
+  background-color: #f8f9fa;
+  margin: 0 auto 16px;
   background-size: cover;
   background-position: center;
+  border-radius: 16px; /* 메인 카드와 동일 */
+  border: 1.5px solid #e9ecef;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* 메인 카드와 동일 */
 }
 
+.image-preview.no-image {
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+  background-image: none !important;
+}
+
+/* 메인 색상 시스템을 활용한 결과 메시지 */
 .result-message {
   font-size: 16px;
+  font-weight: bold;
+  text-align: center;
   margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
+.result-message.danger {
+  color: #dc3545;
+  background: #FCEDED;
+  border: 1.5px solid #F4AFB0;
+}
+
+.result-message.caution {
+  color: #ed8936;
+  background: var(--yellow-bg);
+  border: 1.5px solid var(--yellow-border);
+}
+
+.result-message.safe {
+  color: var(--green);
+  background: var(--green-bg);
+  border: 1.5px solid var(--green-border);
+}
+
+.result-message.info {
+  color: #3182ce;
+  background: var(--blue-bg);
+  border: 1.5px solid var(--blue-border);
+}
+
+/* 안내 영역 */
 .notice-row {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  margin-left: 6px;
-  gap: 6px;
-  font-size: 14px;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.notice-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
 }
 
 .info-icon {
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
   color: #999;
+  transition: color 0.2s ease;
 }
 
+.info-icon:hover {
+  color: #666;
+}
+
+/* 메인과 동일한 카드 기반 박스 리스트 */
 .box-list {
-  margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  align-items: center;
+  flex: 1;
+  padding-bottom: 20px;
 }
 
 .result-box {
-  width: 380px;
-  height: 80px;
-  line-height: 80px;
-  border-radius: 6px;
+  width: 100%;
+  padding: 20px;
+  border-radius: 16px; /* 메인 카드와 동일 */
   font-size: 16px;
   font-weight: bold;
+  text-align: center;
   position: relative;
-  cursor: default;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* 메인 카드와 동일 */
+}
+
+.result-box:hover:not(.disabled) {
+  transform: scale(1.02); /* 메인 카드와 동일한 호버 효과 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .result-box.folded::after {
-  content: '';
+  content: '👆';
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-left: 2px solid #aaa;
-  border-top: 2px solid #aaa;
-  transform: rotate(-45deg);
+  bottom: 8px;
+  right: 12px;
+  font-size: 14px;
+  opacity: 0.7;
 }
 
+/* 메인 색상 시스템 적용 */
 .result-box.danger {
   background: #FCEDED;
-  border: 2px solid #F4AFB0;
-  cursor: pointer;
+  border-color: #F4AFB0;
+  color: #dc3545;
 }
 
 .result-box.caution {
-  background: #FFF8E5;
-  border: 2px solid #FFD0C2;
-  cursor: pointer;
+  background: var(--yellow-bg);
+  border-color: var(--yellow-border);
+  color: #ed8936;
 }
 
 .result-box.safe {
-  background: #EEF7F1;
-  border: 2px solid #AFDABE;
-  cursor: pointer;
+  background: var(--green-bg);
+  border-color: var(--green-border);
+  color: var(--green);
+}
+
+/* 안전 성분 강조 - 더 통일감 있게 */
+.result-box.safe.highlighted {
+  background: var(--green);
+  border-color: var(--green);
+  color: white;
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+  animation: pulse-safe 2s infinite;
+}
+
+@keyframes pulse-safe {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.5);
+  }
 }
 
 .result-box.disabled {
-  background: #efefef;
-  border: none;
+  background: #f8f9fa;
+  border-color: #e9ecef;
+  color: #6c757d;
   cursor: default;
+  opacity: 0.6;
 }
 
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  z-index: 999;
-}
-
-.modal.hidden {
+.result-box.disabled::after {
   display: none;
 }
 
+/* 툴팁 스타일 */
 .tooltip-wrapper {
   position: relative;
   display: inline-block;
@@ -161,20 +275,34 @@ body {
   display: none;
 }
 
-.fixed-close {
+/* 메인과 일치하는 모달 스타일 */
+.modal {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
-  background: #f3f3f3;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
 }
 
+.modal.hidden {
+  display: none;
+}
+
+.modal > div {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px; /* 메인 카드와 동일 */
+  max-width: 90%;
+  max-height: 80%;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1.5px solid #eee;
+}
 
 /* 에러 오버레이 스타일 */
 .error-overlay {
@@ -193,13 +321,14 @@ body {
 
 .error-content {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 2rem;
-  max-width: 400px;
-  width: 90%;
+  max-width: 90%;
+  width: 320px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease-out;
+  border: 1.5px solid #eee;
 }
 
 .error-icon {
@@ -221,114 +350,32 @@ body {
 }
 
 .error-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
+  padding: 12px 20px;
+  border: 1.5px solid var(--green-border);
+  border-radius: 12px;
   font-size: 1rem;
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #f0f0f0;
+  background: var(--green-bg);
   color: #333;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
 .error-btn:hover {
-  background: #e0e0e0;
-  transform: translateY(-1px);
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .error-btn.primary {
-  background: #007bff;
+  background: var(--green);
+  border-color: var(--green);
   color: white;
 }
 
 .error-btn.primary:hover {
-  background: #0056b3;
-}
-
-/* 결과 메시지 상태별 스타일 */
-.result-message.danger {
-  color: #dc3545;
-  font-weight: bold;
-}
-
-.result-message.caution {
-  color: #ffc107;
-  font-weight: bold;
-}
-
-.result-message.safe {
-  color: #28a745;
-  font-weight: bold;
-}
-
-.result-message.info {
-  color: #17a2b8;
-}
-
-/* 이미지 로드 실패 시 스타일 */
-.image-preview.no-image {
-  background: #f8f9fa;
-  border: 2px dashed #dee2e6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6c757d;
-  font-size: 0.9rem;
-  background-image: none !important;
-}
-
-/* 모달 개선 */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal.hidden {
-  display: none;
-}
-
-.modal > div {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  max-width: 90%;
-  max-height: 80%;
-  overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-/* 툴팁 개선 */
-.tooltip {
-  position: absolute;
-  background: #333;
-  color: white;
-  padding: 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  white-space: nowrap;
-  z-index: 1000;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 0.5rem;
-}
-
-.tooltip::before {
-  content: '';
-  position: absolute;
-  top: -0.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 0.25rem solid transparent;
-  border-bottom-color: #333;
+  background: #45a049;
+  border-color: #45a049;
 }
 
 /* 애니메이션 */
@@ -350,49 +397,29 @@ body {
 
 /* 반응형 개선 */
 @media (max-width: 768px) {
+  .result-container {
+    padding: 12px;
+  }
+  
+  .image-preview {
+    width: 160px;
+    height: 200px;
+  }
+  
   .error-content {
     padding: 1.5rem;
     margin: 1rem;
   }
   
   .error-btn {
-    padding: 0.6rem 1.2rem;
+    padding: 10px 16px;
     font-size: 0.9rem;
   }
 }
 
 /* 접근성 개선 */
-.result-box:focus {
-  outline: 2px solid #007bff;
-  outline-offset: 2px;
-}
-
+.result-box:focus,
 button:focus {
-  outline: 2px solid #007bff;
+  outline: 2px solid var(--green);
   outline-offset: 2px;
-}
-
-/* 로딩 상태 */
-.loading {
-  position: relative;
-  color: transparent;
-}
-
-.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid #333;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }

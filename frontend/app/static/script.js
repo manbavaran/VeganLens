@@ -1,3 +1,7 @@
+// 전역 변수로 업로드 상태 추적
+let isUploading = false;
+let uploadController = null;
+
 document.addEventListener("DOMContentLoaded", () => {
   // 최초 앱 실행 시 식단 유형 선택 팝업 처리
   const onboardingPopup = document.getElementById("onboardingPopup");
@@ -10,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       const selected = document.querySelector("input[name='vegtype']:checked").value;
       localStorage.setItem("vegType", selected);
-      onboardingPopup.classList.add("hidden"); // 07 28 팝업 닫히게끔 수정
+      onboardingPopup.classList.add("hidden");
     });
   }
 
@@ -81,8 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
       typePopup.classList.toggle("hidden");
     });
 
-    // 식단 선택 시 저장 및 UI/서버 반영
-    // 07 28 이벤트 동작 방식 수정 (전송 양식은 이전과 동일)
     document.querySelectorAll("#typePopup input[name='vegtype']").forEach((radio) => {
       radio.addEventListener("change", (e) => {
         const selected = e.target.value;
@@ -98,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
             'x-user-type': selected
           },
           body: JSON.stringify({ type: selected })
-        });
+        }).catch(err => console.warn("Failed to update user type:", err));
       });
     });
 
@@ -133,11 +135,9 @@ document.addEventListener("DOMContentLoaded", () => {
       activeSet.add("chicken");
     }
 
-    // 하단 탭 내비게이션 기능
     document.querySelectorAll(".icon").forEach((icon) => {
       const id = icon.id;
 
-      // meat 항상 비활성화
       if (id === "meat") {
         icon.classList.remove("active");
         icon.src = `/static/images/icons/meat_gray.png`;
@@ -169,16 +169,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const galleryBtn = document.getElementById("galleryBtn");
   const galleryInput = document.getElementById("galleryInput");
 
-  let selectedGalleryImage = null;
-
   if (cameraBtn && cameraInput) {
     cameraBtn.addEventListener("click", () => {
+      if (isUploading) {
+        alert("Image analysis is already in progress. Please wait.");
+        return;
+      }
       cameraInput.click();
     });
 
     cameraInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
-      if (file) {
+      if (file && !isUploading) {
         sendImageToBackend(file);
       }
     });
@@ -186,223 +188,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (galleryBtn && galleryInput) {
     galleryBtn.addEventListener("click", () => {
+      if (isUploading) {
+        alert("Image analysis is already in progress. Please wait.");
+        return;
+      }
       galleryInput.click();
     });
 
     galleryInput.addEventListener("change", (e) => {
       const file = e.target.files[0];
-      if (file) {
-        selectedGalleryImage = file;
+      if (file && !isUploading) {
         sendImageToBackend(file);
-        selectedGalleryImage = null;
       }
     });
-  }
-
-  /**
-   * 이미지를 백엔드 서버로 전송하여 비건 호환성 분석을 요청하는 함수
-   * 
-   * 주요 변경사항 (2024.08.05):
-   * - 백엔드 데이터 형식 변환 로직 추가
-   * - fetch 요청 취소 문제 해결: 페이지 이동을 fetch 성공 후로 변경
-   * - 상세한 에러 처리 및 로깅 추가
-   * - 네트워크 연결 상태 확인 기능 강화
-   * - FileReader 에러 처리 추가
-   * 
-   * @param {File} imageFile - 업로드할 이미지 파일
-   */
-  function sendImageToBackend(imageFile) {
-    // 사용자의 채식 유형 가져오기 (기본값: Vegan)
-    const vegType = localStorage.getItem("vegType") || "Vegan";
-    const formData = new FormData();
-    formData.append("file", imageFile);
-
-    // 디버깅용: 전송할 데이터 정보 로깅
-    console.log("Sending image to backend:", {
-      vegType,
-      fileSize: imageFile.size,
-      fileName: imageFile.name,
-      fileType: imageFile.type
-    });
-
-    // 응답 시간 측정을 위한 시작 시간 기록
-    const fetchStart = Date.now();
-
-    // 수정: fetch 요청을 먼저 시작하고, 성공 시에만 로딩 페이지로 이동
-    // (이전에는 로딩 페이지로 먼저 이동해서 fetch 요청이 취소되는 문제가 있었음)
-    fetch("http://192.168.22.22:8000/Check_Vegan", {
-      method: "POST",
-      headers: {
-        "x-user-type": vegType
-      },
-      body: formData
-    })
-      .then((res) => {
-        // 응답 상태 및 헤더 로깅 (디버깅용)
-        console.log("Response status:", res.status);
-        console.log("Response headers:", res.headers);
-        
-        // HTTP 에러 상태 확인
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        
-        // fetch가 성공적으로 시작되면 로딩 페이지로 이동
-        window.location.href = "loading.html";
-        
-        return res.json();
-      })
-      .then((backendData) => {
-        console.log("Received backend data:", backendData);
-        
-        // 🔄 백엔드 데이터를 프론트엔드 형식으로 변환
-        const transformedData = transformBackendData(backendData);
-        console.log("Transformed data:", transformedData);
-        
-        // 최소 1초간 로딩 화면 표시를 위한 대기 시간 계산
-        const elapsed = Date.now() - fetchStart;
-        const waitTime = Math.max(1000 - elapsed, 0);
-
-        // 이미지 파일을 Base64로 변환하여 결과 페이지에서 표시
-        const reader = new FileReader();
-        reader.onload = () => {
-          // 변환된 데이터에 이미지 URL 추가
-          transformedData.imageUrl = reader.result;
-          localStorage.setItem("resultData", JSON.stringify(transformedData));
-
-          const goToResult = () => {
-            window.location.href = "result.html";
-          };
-
-          // 최소 로딩 시간 보장
-          if (waitTime > 0) {
-            setTimeout(goToResult, waitTime);
-          } else {
-            goToResult();
-          }
-        };
-        
-        // FileReader 에러 처리 추가
-        reader.onerror = () => {
-          console.error("FileReader error");
-          alert("Failed to process image. Please try again.");
-          window.location.href = "index.html";
-        };
-        
-        reader.readAsDataURL(imageFile);
-      })
-      .catch((err) => {
-        console.error("Upload error:", err);
-        
-        // 에러 유형별로 구체적인 메시지 제공
-        let errorMessage = "Upload failed. ";
-        
-        if (err.name === 'TypeError' && err.message.includes('fetch')) {
-          errorMessage += "Cannot connect to server. Please check your internet connection.";
-        } else if (err.message.includes('HTTP error')) {
-          errorMessage += `Server error: ${err.message}`;
-        } else {
-          errorMessage += "Please try again.";
-        }
-        
-        alert(errorMessage);
-        // 에러 발생 시 메인 페이지로 돌아가기
-        window.location.href = "index.html";
-      });
-  }
-
-  /**
-   * 백엔드 데이터를 프론트엔드 형식으로 변환
-   */
-  function transformBackendData(backendData) {
-    try {
-      // 백엔드 데이터 구조 검증
-      if (!backendData || typeof backendData !== 'object') {
-        throw new Error('Invalid backend data structure');
-      }
-
-      // found_forbidden 배열을 안전하게 처리
-      const forbiddenIngredients = Array.isArray(backendData.found_forbidden) 
-        ? backendData.found_forbidden 
-        : [];
-
-      // OCR 텍스트에서 전체 재료 목록 추출 (옵션)
-      const allIngredients = extractIngredientsFromOCR(backendData.ocr_text || '');
-      
-      // 금지된 재료와 안전한 재료 분류
-      const safeIngredients = allIngredients.filter(ingredient => 
-        !forbiddenIngredients.some(forbidden => 
-          ingredient.toLowerCase().includes(forbidden.toLowerCase())
-        )
-      );
-
-      // 프론트엔드 형식으로 변환
-      const transformedData = {
-        // 현재는 모든 금지 재료를 danger로 분류
-        // 필요시 사용자 타입에 따라 caution으로 분류하는 로직 추가 가능
-        danger: forbiddenIngredients,
-        caution: [], // 현재는 빈 배열, 필요시 로직 추가
-        safe: safeIngredients,
-        
-        // 추가 메타데이터 (디버깅용)
-        _metadata: {
-          date: backendData.Date,
-          userType: backendData.user_type,
-          isVegan: backendData.is_vegan,
-          numberForbidden: backendData.number_forbidden,
-          ocrText: backendData.ocr_text
-        }
-      };
-
-      return transformedData;
-      
-    } catch (error) {
-      console.error('Error transforming backend data:', error);
-      
-      // 변환 실패 시 기본 구조 반환
-      return {
-        danger: [],
-        caution: [],
-        safe: [],
-        _error: 'Data transformation failed',
-        _originalData: backendData
-      };
-    }
-  }
-
-  /**
-   * OCR 텍스트에서 재료 목록 추출 (간단한 버전)
-   */
-  function extractIngredientsFromOCR(ocrText) {
-    if (!ocrText || typeof ocrText !== 'string') {
-      return [];
-    }
-
-    try {
-      // "ingredients:" 또는 "성분:" 다음의 텍스트를 찾아서 재료 추출
-      const ingredientsMatch = ocrText.match(/(?:ingredients?|성분)[:\s]([^.]*)/i);
-      
-      if (!ingredientsMatch || !ingredientsMatch[1]) {
-        return [];
-      }
-
-      // 쉼표, 세미콜론, 괄호 등으로 분리하고 정리
-      const ingredients = ingredientsMatch[1]
-        .split(/[,;()]/g)
-        .map(ingredient => ingredient.trim())
-        .filter(ingredient => 
-          ingredient.length > 1 && 
-          !/^\d+%?$/.test(ingredient) && // 숫자만 있는 것 제외
-          ingredient.length < 30 // 너무 긴 것 제외
-        )
-        .slice(0, 20); // 최대 20개까지만
-
-      return ingredients;
-      
-    } catch (error) {
-      console.warn('Error extracting ingredients from OCR:', error);
-      return [];
-    }
   }
 
   // 구현되지 않은 기능 알림
@@ -414,6 +212,322 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 아이콘 생성 라이브러리를 초기화
-  lucide.createIcons();
-
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
 });
+
+/**
+ * 무한 로딩 문제 해결된 이미지 업로드 함수
+ * 
+ * 주요 개선사항:
+ * - 업로드 상태 추적으로 중복 요청 방지
+ * - AbortController로 요청 취소 기능 추가  
+ * - 타임아웃 설정으로 무한 대기 방지
+ * - 에러 발생 시 확실한 상태 초기화
+ * - 백엔드 응답 검증 강화
+ * 
+ * @param {File} imageFile - 업로드할 이미지 파일
+ */
+function sendImageToBackend(imageFile) {
+  console.log("sendImageToBackend 시작");
+  
+  // 중복 업로드 방지
+  if (isUploading) {
+    console.warn("업로드가 이미 진행 중입니다");
+    alert("Image analysis is already in progress. Please wait.");
+    return;
+  }
+
+  // 파일 유효성 검사
+  if (!imageFile || imageFile.size === 0) {
+    alert("Please select a valid image file.");
+    return;
+  }
+
+  // 파일 크기 제한 (10MB)
+  const MAX_FILE_SIZE = 10 * 1024 * 1024;
+  if (imageFile.size > MAX_FILE_SIZE) {
+    alert("File size is too large. Please select an image under 10MB.");
+    return;
+  }
+
+  // 이미지 파일 타입 확인
+  if (!imageFile.type.startsWith('image/')) {
+    alert("Please select an image file only.");
+    return;
+  }
+
+  console.log("업로드 시작");
+  isUploading = true;
+
+  const vegType = localStorage.getItem("vegType") || "Vegan";
+  const formData = new FormData();
+  formData.append("file", imageFile);
+
+  // AbortController로 요청 취소 기능 추가
+  uploadController = new AbortController();
+  const timeoutId = setTimeout(() => {
+    console.error("요청 타임아웃");
+    uploadController.abort();
+    resetUploadState();
+    alert("Request timeout. Please check your internet connection and try again.");
+  }, 30000); // 30초 타임아웃
+
+  console.log("Sending image to backend:", {
+    vegType,
+    fileSize: imageFile.size,
+    fileName: imageFile.name,
+    fileType: imageFile.type
+  });
+
+  const fetchStart = Date.now();
+
+  // 네트워크 연결 상태 확인
+  if (!navigator.onLine) {
+    console.error("네트워크 연결 없음");
+    clearTimeout(timeoutId);
+    resetUploadState();
+    alert("No internet connection. Please check your network and try again.");
+    return;
+  }
+
+  // 핵심: fetch 성공 후에만 로딩 페이지로 이동
+  fetch("http://192.168.22.22:8000/Check_Vegan", {
+    method: "POST",
+    headers: {
+      "x-user-type": vegType
+    },
+    body: formData,
+    signal: uploadController.signal // AbortController 신호 추가
+  })
+    .then((res) => {
+      clearTimeout(timeoutId);
+      
+      console.log("응답 수신:", {
+        status: res.status,
+        statusText: res.statusText,
+        ok: res.ok
+      });
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
+      }
+
+      // ✅ fetch가 성공하면 즉시 로딩 페이지로 이동
+      console.log("로딩 페이지로 이동");
+      window.location.href = "loading.html";
+      
+      return res.json();
+    })
+    .then((backendData) => {
+      console.log("백엔드 응답 데이터:", backendData);
+      
+      // 백엔드 에러 체크 강화
+      if (backendData.error || backendData.status === 'error') {
+        throw new Error(backendData.message || backendData.error || "Backend processing failed");
+      }
+
+      // 백엔드 응답이 빈 객체인지 확인
+      if (!backendData || Object.keys(backendData).length === 0) {
+        throw new Error("Empty response from backend");
+      }
+      
+      const transformedData = transformBackendData(backendData);
+      console.log("변환된 데이터:", transformedData);
+      
+      // 최소 로딩 시간 보장
+      const elapsed = Date.now() - fetchStart;
+      const waitTime = Math.max(1500 - elapsed, 0); // 1.5초 최소 로딩
+
+      // 이미지를 Base64로 변환
+      const reader = new FileReader();
+      reader.onload = () => {
+        transformedData.imageUrl = reader.result;
+        
+        try {
+          localStorage.setItem("resultData", JSON.stringify(transformedData));
+          console.log("localStorage에 데이터 저장 완료");
+        } catch (storageError) {
+          console.error("localStorage 저장 실패:", storageError);
+          // localStorage 실패해도 계속 진행
+        }
+
+        const goToResult = () => {
+          console.log("결과 페이지로 이동");
+          resetUploadState();
+          window.location.href = "result.html";
+        };
+
+        if (waitTime > 0) {
+          setTimeout(goToResult, waitTime);
+        } else {
+          goToResult();
+        }
+      };
+      
+      reader.onerror = (readerError) => {
+        console.error("FileReader 에러:", readerError);
+        resetUploadState();
+        alert("Failed to process image. Please try again.");
+        // 에러 시 홈으로 리다이렉트하지 않고 현재 페이지 유지
+      };
+      
+      reader.readAsDataURL(imageFile);
+    })
+    .catch((error) => {
+      clearTimeout(timeoutId);
+      resetUploadState();
+      
+      console.error("업로드 에러 상세:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      
+      let errorMessage = "Upload failed. ";
+      
+      if (error.name === 'AbortError') {
+        errorMessage += "Request timeout. Please check your network connection.";
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage += "Cannot connect to server. Please check your internet connection.";
+      } else if (error.message.includes('HTTP error')) {
+        errorMessage += `Server error: ${error.message}`;
+      } else if (error.message.includes('Backend processing failed')) {
+        errorMessage += "Image analysis failed. Please try with a different image.";
+      } else if (error.message.includes('Empty response')) {
+        errorMessage += "Server returned empty response. Please try again.";
+      } else {
+        errorMessage += "Please try again.";
+      }
+      
+      alert(errorMessage);
+      
+      // 에러 발생 시 로딩 페이지에 있다면 홈으로 리다이렉트
+      if (window.location.pathname.includes('loading.html')) {
+        console.log("로딩 페이지에서 에러 발생, 홈으로 이동");
+        window.location.href = "index.html";
+      }
+    });
+}
+
+/**
+ * 업로드 상태 초기화 함수
+ */
+function resetUploadState() {
+  console.log("업로드 상태 초기화");
+  isUploading = false;
+  if (uploadController) {
+    uploadController.abort();
+    uploadController = null;
+  }
+}
+
+/**
+ * 백엔드 데이터 변환 함수
+ */
+function transformBackendData(backendData) {
+  try {
+    if (!backendData || typeof backendData !== 'object') {
+      throw new Error('Invalid backend data structure');
+    }
+
+    const forbiddenIngredients = Array.isArray(backendData.found_forbidden) 
+      ? backendData.found_forbidden 
+      : [];
+
+    // OCR 텍스트에서 전체 재료 목록 추출
+    const allIngredients = extractIngredientsFromOCR(backendData.ocr_text || '');
+    
+    // 금지된 재료가 없으면 모든 재료를 안전으로 분류
+    const safeIngredients = forbiddenIngredients.length === 0 
+      ? allIngredients 
+      : allIngredients.filter(ingredient => 
+          !forbiddenIngredients.some(forbidden => 
+            ingredient.toLowerCase().includes(forbidden.toLowerCase())
+          )
+        );
+
+    const transformedData = {
+      danger: forbiddenIngredients,
+      caution: [],
+      safe: safeIngredients,
+      _metadata: {
+        date: backendData.Date,
+        userType: backendData.user_type,
+        isVegan: backendData.is_vegan,
+        numberForbidden: backendData.number_forbidden,
+        ocrText: backendData.ocr_text
+      }
+    };
+
+    return transformedData;
+    
+  } catch (error) {
+    console.error('백엔드 데이터 변환 에러:', error);
+    
+    return {
+      danger: [],
+      caution: [],
+      safe: [],
+      _error: 'Data transformation failed',
+      _originalData: backendData
+    };
+  }
+}
+
+/**
+ * OCR 텍스트에서 재료 목록 추출
+ */
+function extractIngredientsFromOCR(ocrText) {
+  if (!ocrText || typeof ocrText !== 'string') {
+    return [];
+  }
+
+  try {
+    // 다양한 언어의 "성분" 키워드 매칭
+    const ingredientsMatch = ocrText.match(/(?:ingredients?|성분|원재료|구성품)[:\s]([^.]*)/i);
+    
+    let textToProcess = '';
+    if (ingredientsMatch && ingredientsMatch[1]) {
+      textToProcess = ingredientsMatch[1];
+    } else {
+      // 키워드가 없으면 전체 텍스트 사용
+      textToProcess = ocrText;
+    }
+
+    const ingredients = textToProcess
+      .split(/[,;()]/g)
+      .map(ingredient => ingredient.trim())
+      .filter(ingredient => 
+        ingredient.length > 1 && 
+        ingredient.length < 30 &&
+        !/^\d+%?$/.test(ingredient) && // 숫자만 있는 것 제외
+        !/^[%\d\s]+$/.test(ingredient) // 퍼센트나 숫자만 있는 것 제외
+      )
+      .slice(0, 15); // 최대 15개까지
+
+    return ingredients;
+    
+  } catch (error) {
+    console.warn('OCR에서 재료 추출 에러:', error);
+    return [];
+  }
+}
+
+// 페이지 이탈 시 업로드 상태 초기화
+window.addEventListener('beforeunload', () => {
+  resetUploadState();
+});
+
+// 로딩 페이지에서 뒤로 가기 감지
+if (window.location.pathname.includes('loading.html')) {
+  window.addEventListener('popstate', () => {
+    console.log("로딩 페이지에서 뒤로 가기 감지");
+    resetUploadState();
+    window.location.href = 'index.html';
+  });
+}
+
+// 전역 함수로 노출 (loading.html에서 사용)
+window.resetUploadState = resetUploadState;
