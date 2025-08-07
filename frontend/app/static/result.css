@@ -161,6 +161,7 @@ body {
   gap: 16px;
   flex: 1;
   padding-bottom: 20px;
+  align-items: center; /* 가운데 정렬 */
 }
 
 .result-box {
