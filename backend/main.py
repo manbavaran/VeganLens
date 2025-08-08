@@ -8,7 +8,9 @@ import pillow_heif
 import io
 import json
 import os
-from app import choice, get_logger_by_name, ban_List, section_text, check_forbidden_ingredients
+# from app import choice, get_logger_by_name, ban_List, section_text, check_forbidden_ingredients
+from app import choice, get_logger_by_name, ban_List, section_text, process_image_with_google_vision_only
+
 from datetime import datetime
 
 """
@@ -121,12 +123,14 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     
 
     # 3. 비건 여부 판단
-    text = section_text(response, debug=True, section='ing')
+    # text = section_text(response, debug=True, section='ing')
     
-    print(f"[DEBUG] OCR로부터 받은 text: {text!r}")
-    print(f"[DEBUG] 금지 목록: {ban_list}")
+    # print(f"[DEBUG] OCR로부터 받은 text: {text!r}")
+    # print(f"[DEBUG] 금지 목록: {ban_list}")
     
-    found_forbidden = check_forbidden_ingredients(text, ban_list)
+    # found_forbidden = check_forbidden_ingredients(text, ban_list)
+
+    found_forbidden, len(found_forbidden), found_caution, len(found_caution) = process_image_with_google_vision_only(response, user_type)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
@@ -136,7 +140,8 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     logger.info(f"  📅 처리 시각: {now_str}")
     logger.info(f"  🚫 감지된 금지 성분: {found_forbidden if found_forbidden else '없음'}")
     logger.info(f"  {'✅ 비건 OK' if not found_forbidden else '❌ 비건 아님'}")
-    logger.info(f"  🔍 OCR 결과: {text}")
+    logger.info(f"  🚫 감지된 주의 성분: {found_caution if found_caution else '없음'}")
+    # logger.info(f"  🔍 OCR 결과: {text}")
     
     return JSONResponse(
         content={
@@ -145,7 +150,11 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
             "is_vegan": len(found_forbidden) == 0, # True : 비건,  False : 비건 아님
             "number_forbidden": len(found_forbidden),
             "found_forbidden": found_forbidden,
-            "ocr_text": text,
+            
+            "is_caution": len(found_caution) == 0,
+            "number_caution": len(found_caution),
+            "found_caution": found_caution,
+            # "ocr_text": text,
         },
         status_code=200,  # OK 정상 응답 (모든 게 잘 처리됨)
     )

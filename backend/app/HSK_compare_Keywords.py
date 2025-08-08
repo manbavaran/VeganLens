@@ -2,6 +2,8 @@ import torch
 import os
 import json
 import re
+import io
+from google.cloud import vision
 
 # print("버전:", torch.__version__)
 # print("GPU 사용 가능:", torch.cuda.is_available())
@@ -313,26 +315,14 @@ def section_text(response, debug=True, section='ing'):
 ###################################################################################
 # --- process_image_with_google_vision_only 함수 (최종 수정) ---
 ###############################################################################
-def process_image_with_google_vision_only(image_path: str, user_type: str = "Vegan"):
+def process_image_with_google_vision_only(response, user_type: str = "Vegan"):
     """
     Google Cloud Vision API로 텍스트 탐지 및 인식 (단일 API 호출)
     '원재료명' 섹션 정교하게 추출 및 비건 성분, 주의 성분 확인을 통합한 메인 함수입니다.
     """
-    print(f"\n--- 이미지: {image_path} 처리 시작 ---")
-
-    if not os.path.exists(image_path):
-        print(f"오류: 파일 '{image_path}'를 찾을 수 없습니다. 경로를 확인해주세요.")
-        return
-
-    with io.open(image_path, 'rb') as image_file:
-        content = image_file.read()
-    image = vision.Image(content=content)
-
     try:
-        response = vision_client.document_text_detection(image=image)
-        
         full_text_from_image = response.full_text_annotation.text if response.full_text_annotation else ""
-        print("\n[이미지에서 추출된 전체 텍스트 (Raw, 일부만 출력)]: \n", full_text_from_image[:500], "...")
+        print("\n[이미지에서 추출된 전체 텍스트 : \n", full_text_from_image)
 
         # section_text 함수를 사용하여 '원재료명' 섹션의 텍스트를 추출합니다.
         final_refined_text = section_text(response, debug=False, section='ing')
@@ -346,10 +336,12 @@ def process_image_with_google_vision_only(image_path: str, user_type: str = "Veg
             found_caution = check_caution_ingredients(full_text_from_image, CAUTION_STATEMENT_KEYWORDS)
             
             print("\n--- 분석 결과 ---")
+
             if found_forbidden:
                 print(f"❌ 비건 아님: 비건 금지 성분 발견! ({len(found_forbidden)}개)")
                 for kw in found_forbidden:
                     print(f"- 금지 성분: {kw}")
+
             else:
                 print("✅ 비건 OK: 비건 금지 성분이 발견되지 않았습니다.")
             
@@ -358,6 +350,7 @@ def process_image_with_google_vision_only(image_path: str, user_type: str = "Veg
                 for kw in found_caution:
                     print(f"- 주의 성분: {kw}")
             
+            return found_forbidden, len(found_forbidden), found_caution, len(found_caution)
         else:
             print("이미지에서 '원재료명'으로 추정되는 섹션을 찾지 못했습니다.")
             print("전체 추출된 텍스트를 바탕으로 수동 확인이 필요할 수 있습니다.")
