@@ -9,7 +9,10 @@ import io
 import json
 import os
 # from app import choice, get_logger_by_name, ban_List, section_text, check_forbidden_ingredients
-from app import choice, get_logger_by_name, ban_List, section_text, process_image_with_google_vision_only
+from app import (choice, get_logger_by_name, 
+                ban_List, section_text, 
+                process_image_with_google_vision_only,
+                process_image_with_llm)
 
 from datetime import datetime
 
@@ -106,6 +109,9 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     # 클라이언트(프론트엔드)에서 x-user-type 헤더를 안 보내면,
     # 에러가 날 수 있다. 결과가 None 이 되거나 에러가 날 수 있다.
     # 그래서 그걸 방지하기 위해 기본값으로 Vegan 을 준다.
+    
+    use_llm = True
+    
     print(f"사용자 유형: {user_type}")
     
     ban_list = ban_List(user_type)
@@ -130,7 +136,10 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     
     # found_forbidden = check_forbidden_ingredients(text, ban_list)
 
-    found_forbidden, found_caution = process_image_with_google_vision_only(response, user_type)
+    if (use_llm):
+        found_forbidden, found_caution = process_image_with_llm(response, user_type)
+    else:
+        found_forbidden, found_caution = process_image_with_google_vision_only(response, user_type)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
