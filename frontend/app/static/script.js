@@ -254,10 +254,10 @@ function transformBackendData(backendData) {
 
   const danger = Array.isArray(backendData.found_forbidden) ? backendData.found_forbidden : [];
   const caution = Array.isArray(backendData.found_caution) ? backendData.found_caution : [];
-  let safe = Array.isArray(backendData.found_safe) ? backendData.found_safe : [];
+  let safe = []; // found_safe 필드 제거됨
 
-  // OCR 텍스트 기반 자동 안전 성분 추출
-  if (safe.length === 0 && backendData.ocr_text) {
+  // OCR 텍스트 기반 자동 안전 성분 추출 (기존 로직 유지)
+  if (backendData.ocr_text) {
     const allIngredients = extractIngredientsFromOCR(backendData.ocr_text);
     if (allIngredients.length > 0) {
       safe = allIngredients.filter(ing =>
@@ -277,12 +277,13 @@ function transformBackendData(backendData) {
       userType: backendData.user_type || null,
       isVegan: backendData.is_vegan ?? null,
       numberForbidden: backendData.number_forbidden ?? 0,
+      isCaution: backendData.is_caution ?? null,        // 새로 추가
+      numberCaution: backendData.number_caution ?? 0,   // 새로 추가
       ocrText: backendData.ocr_text || null,
       raw: backendData
     }
   };
 }
-
 
 // 누락된 함수 추가
 function resetUploadState() {
