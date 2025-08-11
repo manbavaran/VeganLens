@@ -227,14 +227,15 @@
   background: white;
   border-radius: 16px;
   padding: 24px;
-  margin: 20px;
-  max-width: 320px;
-  width: 100%;
+  margin: 20px; /* 좌우 여백 확보 */
+  max-width: 320px; /* 최대 너비 제한 */
+  width: calc(100% - 40px); /* 좌우 여백 확보 */
   max-height: 80vh;
   overflow-y: auto;
   transform: translateY(20px) scale(0.95);
   transition: transform 0.3s ease;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 
 .settings-modal.active .settings-modal-content {
@@ -379,5 +380,6 @@
   .settings-modal-content {
     margin: 16px;
     padding: 20px;
+    max-width: 300px;
   }
 }

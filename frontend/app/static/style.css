@@ -27,6 +27,7 @@ body {
   min-height: 100vh;
   display: flex;
   justify-content: center;
+  overflow-x: hidden; /* 가로 스크롤 방지 */
 }
 
 .container {
@@ -36,6 +37,7 @@ body {
   flex-direction: column;
   position: relative;
   min-height: 100vh;
+  box-sizing: border-box; /* 패딩 포함 계산 */
 }
 
 /* ===== 헤더 (로고) ===== */
@@ -43,6 +45,7 @@ body {
   text-align: center;
   padding: 16px 16px 10px 16px;
   border-bottom: 1px solid #eee;
+  flex-shrink: 0; /* 헤더 크기 고정 */
 }
 
 .vegan-lens-logo {
@@ -98,8 +101,9 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 16px;
-  padding: 0px 16px 70px 16px; /* bottom_nav 높이만큼 여유 공간 */
+  gap: 12px; /* 카드 간격 줄임 */
+  padding: 20px 16px 70px 16px; /* 위아래 여백 줄임 */
+  min-height: calc(100vh - 150px); /* 헤더와 네비게이션 높이 제외한 최소 높이 */
 }
 
 /* ===== 카드 컴포넌트 ===== */
@@ -111,13 +115,16 @@ body {
   box-shadow: var(--shadow);
   transition: transform 0.2s ease;
   border: 1.5px solid;
-  height: 200px;
+  height: auto; /* 고정 높이 제거 */
+  min-height: 180px; /* 최소 높이만 설정 */
+  max-height: 200px; /* 최대 높이 제한 */
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 8px;
+  box-sizing: border-box;
 }
 
 .card:hover {
@@ -125,17 +132,19 @@ body {
 }
 
 .card img {
-  width: 110px;
-  height: 110px;
+  width: 100px; /* 이미지 크기 줄임 */
+  height: 100px;
   object-fit: contain;
   margin-bottom: 8px;
+  flex-shrink: 0; /* 이미지 크기 고정 */
 }
 
 .card p {
   font-weight: bold;
   color: #333;
-  font-size: 14px;
+  font-size: 13px; /* 폰트 크기 줄임 */
   margin: 0;
+  flex-shrink: 0; /* 텍스트 크기 고정 */
 }
 
 /* 카드 색상 변형 */
@@ -168,6 +177,7 @@ body {
   align-items: center;
   padding: 8px 20px; /* 세로 패딩 추가 */
   box-shadow: 0 -2px 8px rgba(0,0,0,0.1); /* 그림자 추가 */
+  flex-shrink: 0; /* 네비게이션 크기 고정 */
 }
 
 .nav-icon {
@@ -228,10 +238,11 @@ body {
   background: white;
   border-radius: 12px;
   padding: 24px;
-  margin: 20px;
-  max-width: 350px;
-  width: 90%;
+  margin: 20px; /* 좌우 여백 확보 */
+  max-width: 320px; /* 최대 너비 제한 */
+  width: calc(100% - 40px); /* 좌우 여백 확보 */
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
 }
 
 .modal-content h2 {
@@ -240,32 +251,36 @@ body {
   color: #333;
   margin-bottom: 16px;
   text-align: center;
+  padding: 0px 0px 20px;
 }
 
 .modal-content form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  /* gap: 8px;  설정 페이지와 동일한 간격 */
 }
 
 .modal-content label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px; 
   font-size: 14px;
   color: #333;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
+  padding: 10px; 
+  border-radius: 8px; 
+  transition: all 0.2s ease; 
+  border: 1px solid transparent; 
 }
 
 .modal-content label:hover {
-  background-color: #f8f9fa;
+  background: #f8f9fa; 
+  border-color: var(--green);
 }
 
 .modal-content input[type="radio"] {
   accent-color: var(--green);
+  transform: scale(1.2); 
 }
 
 .modal-content button[type="submit"] {
@@ -292,7 +307,7 @@ body {
   }
   
   .logo {
-    padding: 14px 12px 8px 12px;
+    padding: 12px 12px 8px 12px; /* 상단 패딩 줄임 */
   }
   
   .vegan-lens-logo {
@@ -300,23 +315,25 @@ body {
   }
   
   .button-area {
-    padding: 16px 12px 72px 12px;
+    padding: 16px 12px 70px 12px; /* 위아래 여백 줄임 */
     gap: 10px;
+    min-height: calc(100vh - 130px); /* 헤더와 네비게이션 높이 조정 */
   }
   
   .card {
     width: 95%;
-    height: 180px; /* 태블릿 고정 높이 */
-    padding: 14px;
+    min-height: 150px; /* 최소 높이 줄임 */
+    max-height: 170px;
+    padding: 12px;
   }
   
   .card img {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
   }
   
   .card p {
-    font-size: 13px;
+    font-size: 12px;
   }
   
   .bottom-nav {
@@ -334,13 +351,13 @@ body {
   .modal-content {
     margin: 16px;
     padding: 20px;
-    max-width: 320px;
+    max-width: 300px;
   }
 }
 
 @media (max-width: 480px) {
   .logo {
-    padding: 12px 10px 6px 10px;
+    padding: 10px 10px 6px 10px; /* 상단 패딩 더욱 줄임 */
   }
   
   .vegan-lens-logo {
@@ -352,23 +369,26 @@ body {
   }
   
   .button-area {
-    padding: 0px 10px 62px 10px;
-    gap: 12px;
+    padding: 12px 10px 60px 10px; /* 위아래 여백 더욱 줄임 */
+    gap: 8px;
+    min-height: calc(100vh - 120px); /* 헤더와 네비게이션 높이 조정 */
   }
   
   .card {
     width: 100%;
-    padding: 12px;
+    min-height: 140px; /* 최소 높이 더욱 줄임 */
+    max-height: 160px;
+    padding: 10px;
   }
   
   .card img {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 10px;
+    width: 85px; /* 이미지 크기 더욱 줄임 */
+    height: 85px;
+    margin-bottom: 6px;
   }
   
   .card p {
-    font-size: 12px;
+    font-size: 11px;
   }
   
   .bottom-nav {
@@ -383,7 +403,7 @@ body {
 
 @media (max-width: 360px) {
   .logo {
-    padding: 10px 8px 5px 8px;
+    padding: 8px 8px 5px 8px; /* 상단 패딩 최대한 줄임 */
   }
   
   .vegan-lens-logo {
@@ -401,23 +421,26 @@ body {
   }
   
   .button-area {
-    padding: 0px 8px 58px 8px;
-    gap: 10px;
+    padding: 8px 8px 56px 8px; /* 위아래 여백 최대한 줄임 */
+    gap: 6px;
+    min-height: calc(100vh - 110px); /* 헤더와 네비게이션 높이 조정 */
   }
   
   .card {
-    padding: 10px;
+    min-height: 130px; /* 최소 높이 최대한 줄임 */
+    max-height: 150px;
+    padding: 8px;
     border-radius: 14px;
   }
   
   .card img {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 8px;
+    width: 80px; /* 이미지 크기 최대한 줄임 */
+    height: 80px;
+    margin-bottom: 4px;
   }
   
   .card p {
-    font-size: 11px;
+    font-size: 10px;
   }
   
   .bottom-nav {
@@ -434,23 +457,25 @@ body {
 @media (max-height: 500px) and (orientation: landscape) {
   .button-area {
     justify-content: flex-start;
-    padding-top: 10px;
-    gap: 10px;
+    padding-top: 5px; /* 상단 여백 최소화 */
+    gap: 6px;
   }
   
   .card {
     width: 85%;
-    padding: 10px;
+    min-height: 120px;
+    max-height: 140px;
+    padding: 8px;
   }
   
   .card img {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 6px;
+    width: 75px;
+    height: 75px;
+    margin-bottom: 4px;
   }
   
   .card p {
-    font-size: 11px;
+    font-size: 10px;
   }
   
   .modal-content {
