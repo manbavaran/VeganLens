@@ -130,7 +130,7 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     
     # found_forbidden = check_forbidden_ingredients(text, ban_list)
 
-    found_forbidden, len(found_forbidden), found_caution, len(found_caution) = process_image_with_google_vision_only(response, user_type)
+    found_forbidden, found_caution = process_image_with_google_vision_only(response, user_type)
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
