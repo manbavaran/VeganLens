@@ -350,7 +350,7 @@ def process_image_with_google_vision_only(response, user_type: str = "Vegan"):
                 for kw in found_caution:
                     print(f"- 주의 성분: {kw}")
             
-            return found_forbidden, len(found_forbidden), found_caution, len(found_caution)
+            return found_forbidden, found_caution
         else:
             print("이미지에서 '원재료명'으로 추정되는 섹션을 찾지 못했습니다.")
             print("전체 추출된 텍스트를 바탕으로 수동 확인이 필요할 수 있습니다.")
@@ -358,14 +358,15 @@ def process_image_with_google_vision_only(response, user_type: str = "Vegan"):
     except Exception as e:
         print(f"Google Cloud Vision API 호출 중 오류 발생: {e}")
 
-# --- 메인 실행 부분 ---
-if __name__ == "__main__":
-    # 이 부분은 테스트를 위한 이미지 파일 경로 리스트입니다.
-    # 실제 사용 시에는 적절한 이미지 파일 경로를 입력해야 합니다.
-    image_files = ["/content/image1.jpg", "/content/image2.png"]
+
+# # --- 메인 실행 부분 ---
+# if __name__ == "__main__":
+#     # 이 부분은 테스트를 위한 이미지 파일 경로 리스트입니다.
+#     # 실제 사용 시에는 적절한 이미지 파일 경로를 입력해야 합니다.
+#     image_files = ["/content/image1.jpg", "/content/image2.png"]
     
-    # user_type을 "Vegan"으로 고정하고 테스트
-    test_user_type = "Vegan"
+#     # user_type을 "Vegan"으로 고정하고 테스트
+#     test_user_type = "Vegan"
     
-    for img_file in image_files:
-        process_image_with_google_vision_only(img_file, user_type=test_user_type)
+#     for img_file in image_files:
+#         process_image_with_google_vision_only(img_file, user_type=test_user_type)
