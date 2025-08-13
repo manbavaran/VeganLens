@@ -246,21 +246,6 @@ body {
   display: none;
 }
 
-/* Enhanced caution box with notice text */
-.caution-info {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.caution-description {
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1.4;
-  text-align: left;
-  color: #b8860b;
-}
-
 /* 툴팁 스타일 */
 .tooltip-wrapper {
   position: relative;
@@ -459,10 +444,6 @@ body {
   .image-preview {
     width: 160px;
     height: 200px;
-  }
-  
-  .caution-description {
-    font-size: 12px;
   }
   
   .error-content {
