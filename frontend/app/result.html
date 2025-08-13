@@ -33,7 +33,12 @@
     <!-- 결과 박스 리스트 -->
     <div class="box-list">
       <div class="result-box" id="dangerBox">🚫 Unsafe Ingredients</div>
-      <div class="result-box" id="cautionBox">⚠️ Caution Required</div>
+      <div class="result-box" id="cautionBox">
+        <div class="caution-info">⚠️ Caution Required</div>
+        <div class="caution-description" id="cautionDescription" style="display: none;">
+          This product is made in a facility that handles animal ingredients, which may cause cross-contamination.
+        </div>
+      </div>
       <div class="result-box" id="safeBox">✅ Safe Ingredients</div>
     </div>
 
