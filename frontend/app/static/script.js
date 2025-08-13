@@ -218,32 +218,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**
- * OCR 텍스트에서 재료 목록 추출
- */
-function extractIngredientsFromOCR(ocrText) {
-  if (!ocrText || typeof ocrText !== 'string') return [];
-
-  try {
-    const ingredientsMatch = ocrText.match(/(?:ingredients?|성분|원재료|구성품)[:\s]([^.]*)/i);
-    let textToProcess = ingredientsMatch?.[1] || ocrText;
-
-    return textToProcess
-      .split(/[,;()]/g)
-      .map(i => i.trim())
-      .filter(i =>
-        i.length > 1 &&
-        i.length < 30 &&
-        !/^\d+%?$/.test(i) &&
-        !/^[%\d\s]+$/.test(i)
-      )
-      .slice(0, 15);
-  } catch (e) {
-    console.warn("OCR 성분 추출 실패:", e);
-    return [];
-  }
-}
-
-/**
  * 백엔드 응답 데이터를 로컬스토리지에 저장할 형식으로 변환
  */
 function transformBackendData(backendData) {
@@ -255,17 +229,6 @@ function transformBackendData(backendData) {
   const danger = Array.isArray(backendData.found_forbidden) ? backendData.found_forbidden : [];
   const caution = Array.isArray(backendData.found_caution) ? backendData.found_caution : [];
   let safe = []; // found_safe 필드 제거됨
-
-  // OCR 텍스트 기반 자동 안전 성분 추출 (기존 로직 유지)
-  if (backendData.ocr_text) {
-    const allIngredients = extractIngredientsFromOCR(backendData.ocr_text);
-    if (allIngredients.length > 0) {
-      safe = allIngredients.filter(ing =>
-        !danger.some(d => ing.toLowerCase().includes(d.toLowerCase())) &&
-        !caution.some(c => ing.toLowerCase().includes(c.toLowerCase()))
-      );
-    }
-  }
 
   return {
     imageUrl: "",
@@ -344,7 +307,6 @@ function sendImageToBackend(imageFile) {
   }
 
   console.log("파일 유효성 검사 통과");
-  setTimeout(() => {
     console.log("업로드 시작");
     isUploading = true;
 
@@ -361,15 +323,6 @@ function sendImageToBackend(imageFile) {
       alert("Request timeout. Please check your internet connection and try again.");
     }, 30000);
 
-    setTimeout(() => {
-      console.log("백엔드로 전송 중:", {
-        vegType,
-        fileSize: imageFile.size,
-        fileName: imageFile.name,
-        fileType: imageFile.type
-      });
-    }, 500);
-
     const fetchStart = Date.now();
 
     // 네트워크 연결 상태 확인
@@ -384,10 +337,6 @@ function sendImageToBackend(imageFile) {
     // 동적 서버 URL 감지
     const currentHost = window.location.hostname;
     const SERVER_URL = `http://${currentHost}:8000/Check_Vegan`;
-    
-    setTimeout(() => {
-      console.log("동적 서버 URL:", SERVER_URL);
-    }, 1000);
 
     fetch(SERVER_URL, {
       method: "POST",
@@ -400,14 +349,6 @@ function sendImageToBackend(imageFile) {
       .then((res) => {
         clearTimeout(timeoutId);
         
-        setTimeout(() => {
-          console.log("응답 수신:", {
-            status: res.status,
-            statusText: res.statusText,
-            ok: res.ok
-          });
-        }, 1500);
-        
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
         }
@@ -416,9 +357,6 @@ function sendImageToBackend(imageFile) {
         return res.json();
       })
       .then((backendData) => {
-        setTimeout(() => {
-          console.log("백엔드 응답 데이터:", backendData);
-        }, 2000);
         
         // 백엔드 에러 체크
         if (backendData.error || backendData.status === 'error') {
@@ -431,10 +369,6 @@ function sendImageToBackend(imageFile) {
         
         const transformedData = transformBackendData(backendData);
         
-        setTimeout(() => {
-          console.log("변환된 데이터:", transformedData);
-        }, 2500);
-        
         // 이미지 처리도 완료한 후 페이지 이동
         const reader = new FileReader();
         reader.onload = () => {
@@ -442,9 +376,6 @@ function sendImageToBackend(imageFile) {
           
           try {
             localStorage.setItem("resultData", JSON.stringify(transformedData));
-            setTimeout(() => {
-              console.log("localStorage에 데이터 저장 완료");
-            }, 3000);
           } catch (storageError) {
             console.error("localStorage 저장 실패:", storageError);
           }
@@ -454,11 +385,9 @@ function sendImageToBackend(imageFile) {
           const waitTime = Math.max(1500 - elapsed, 0);
 
           const goToLoading = () => {
-            setTimeout(() => {
-              console.log("모든 처리 완료, 로딩 페이지로 이동");
-              resetUploadState();
-              window.location.href = "loading.html";
-            }, 3500); // 콘솔 메시지 확인을 위한 딜레이
+            console.log("모든 처리 완료, 로딩 페이지로 이동");
+            resetUploadState();
+            window.location.href = "loading.html";
           };
 
           if (waitTime > 0) {
@@ -480,14 +409,6 @@ function sendImageToBackend(imageFile) {
         clearTimeout(timeoutId);
         resetUploadState();
         
-        setTimeout(() => {
-          console.error("업로드 에러 상세:", {
-            name: error.name,
-            message: error.message,
-            stack: error.stack
-          });
-        }, 1000);
-        
         let errorMessage = "Upload failed. ";
         
         if (error.name === 'AbortError') {
@@ -506,7 +427,6 @@ function sendImageToBackend(imageFile) {
         
         alert(errorMessage);
       });
-  }, 500); // 초기 딜레이
 }
 
 // ========== Settings 페이지 전용 JavaScript ==========
