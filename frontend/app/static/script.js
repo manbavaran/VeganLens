@@ -269,27 +269,59 @@ function resetUploadState() {
   }
 }
 
-// 이미지 압축 함수 추가
+// 이미지 압축 함수(수정)
 function compressImage(file, maxWidth = 800, quality = 0.7) {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    
-    img.onload = () => {
-      // 비율 유지하면서 크기 조정
-      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
-      canvas.width = img.width * ratio;
-      canvas.height = img.height * ratio;
+  return new Promise((resolve, reject) => {  // reject 추가
+    try {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
       
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      if (!ctx) {
+        reject(new Error('Canvas context not supported'));
+        return;
+      }
       
-      // 압축된 이미지를 Base64로 변환
-      const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-      resolve(compressedDataUrl);
-    };
-    
-    img.src = URL.createObjectURL(file);
+      const img = new Image();
+      
+      img.onload = () => {
+        try {
+          // 비율 유지하면서 크기 조정
+          const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+          canvas.width = img.width * ratio;
+          canvas.height = img.height * ratio;
+          
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // 압축된 이미지를 Base64로 변환
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+          
+          // URL 정리
+          URL.revokeObjectURL(img.src);
+          
+          resolve(compressedDataUrl);
+        } catch (error) {
+          URL.revokeObjectURL(img.src);
+          reject(new Error(`Image processing failed: ${error.message}`));
+        }
+      };
+      
+      // 에러 처리 추가
+      img.onerror = () => {
+        URL.revokeObjectURL(img.src);
+        reject(new Error('Failed to load image for compression'));
+      };
+      
+      // 타임아웃 처리 (5초)
+      setTimeout(() => {
+        URL.revokeObjectURL(img.src);
+        reject(new Error('Image compression timeout'));
+      }, 5000);
+      
+      img.src = URL.createObjectURL(file);
+      
+    } catch (error) {
+      reject(new Error(`Compression setup failed: ${error.message}`));
+    }
   });
 }
 
