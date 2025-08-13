@@ -262,45 +262,6 @@ function setupBox(element, type, ingredients, isOnlySafe = false) {
     }
     return;
   }
-
-  // caution 타입 특별 처리 추가
-  if (type === "caution") {
-    const cautionDescription = document.getElementById('cautionDescription');
-    
-    if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
-      // 주의 성분이 없으면 안내 문구 숨기고 비활성화
-      if (cautionDescription) {
-        cautionDescription.style.display = 'none';
-      }
-      element.classList.add("disabled");
-      if (element._clickHandler) {
-        element.removeEventListener("click", element._clickHandler);
-      }
-      return;
-    }
-
-    // 주의 성분이 있으면 안내 문구 표시
-    if (cautionDescription) {
-      cautionDescription.style.display = 'block';
-    }
-    
-    element.classList.add(type, "folded");
-    
-    // 이전 이벤트 리스너 제거
-    if (element._clickHandler) {
-      element.removeEventListener("click", element._clickHandler);
-    }
-    
-    // 새 이벤트 리스너 추가
-    element._clickHandler = () => {
-      const title = getTypeDisplayName(type);
-      const content = `${title} Ingredients:\n${ingredients.join(", ")}`;
-      showModal(content);
-    };
-    
-    element.addEventListener("click", element._clickHandler);
-    return;
-  }
   
   // 위험/주의 박스 처리
   if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
