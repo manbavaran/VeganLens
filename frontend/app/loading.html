@@ -28,22 +28,27 @@
     </div>
   </div>
 
-  <script>
-    // 로딩 페이지 타임아웃 및 상태 관리
+    <script>
+    // 개선된 로딩 페이지 스크립트
     let loadingStartTime = Date.now();
     let statusUpdateInterval;
     let timeoutWarningTimer;
     let forceRedirectTimer;
-    let resultCheckInterval; // 결과 확인 인터벌 추가
+    let resultCheckInterval;
+    let errorCheckInterval;
 
     document.addEventListener('DOMContentLoaded', () => {
       console.log("로딩 페이지 시작");
       
+      // 임시 이미지 데이터 확인 및 표시
+      displayTempImage();
+      
       // 상태 텍스트 업데이트
       updateStatusText();
       
-      // 핵심 추가: 결과 데이터 확인 시작
+      // 핵심: 결과 및 에러 데이터 확인 시작
       startResultCheck();
+      startErrorCheck();
       
       // 15초 후 경고 메시지 표시
       timeoutWarningTimer = setTimeout(showTimeoutWarning, 15000);
@@ -58,7 +63,26 @@
       window.addEventListener('beforeunload', cleanup);
     });
 
-    // 결과 데이터 확인 함수 추가
+    /**
+    * 임시 이미지 데이터 표시
+    */
+    function displayTempImage() {
+      try {
+        const tempData = localStorage.getItem("tempImageData");
+        if (tempData) {
+          const data = JSON.parse(tempData);
+          if (data.imageUrl) {
+            console.log("임시 이미지 데이터 발견, 미리보기 준비됨");
+          }
+        }
+      } catch (error) {
+        console.warn("임시 이미지 데이터 로드 실패:", error);
+      }
+    }
+
+    /**
+    * 결과 데이터 확인 함수 (개선됨)
+    */
     function startResultCheck() {
       console.log("결과 데이터 확인 시작");
       
@@ -70,12 +94,12 @@
             console.log("데이터 내용:", JSON.parse(resultData));
             
             clearInterval(resultCheckInterval);
+            clearInterval(errorCheckInterval);
             cleanup();
             
-            setTimeout(() => {
-              console.log("결과 페이지로 이동");
-              window.location.href = "result.html";
-            }, 1000); // 1초 후 이동
+            // 즉시 결과 페이지로 이동
+            console.log("결과 페이지로 즉시 이동");
+            window.location.href = "result.html";
             
             return;
           }
@@ -83,26 +107,67 @@
         } catch (error) {
           console.error("결과 데이터 확인 중 에러:", error);
         }
-      }, 500); // 0.5초마다 확인
+      }, 300); // 더 빠른 체크 간격 (0.3초)
     }
 
+    /**
+    * 에러 데이터 확인 함수 (새로 추가)
+    */
+    function startErrorCheck() {
+      console.log("에러 데이터 확인 시작");
+      
+      errorCheckInterval = setInterval(() => {
+        try {
+          const errorData = localStorage.getItem("uploadError");
+          if (errorData) {
+            console.log("에러 데이터 발견!");
+            const error = JSON.parse(errorData);
+            
+            clearInterval(resultCheckInterval);
+            clearInterval(errorCheckInterval);
+            cleanup();
+            
+            // 에러 데이터 정리
+            localStorage.removeItem("uploadError");
+            localStorage.removeItem("tempImageData");
+            
+            // 에러 메시지 표시 후 홈으로 이동
+            alert(error.message || "An error occurred during analysis.");
+            window.location.href = 'index.html';
+            
+            return;
+          }
+        } catch (error) {
+          console.error("에러 데이터 확인 중 에러:", error);
+        }
+      }, 500); // 0.5초마다 에러 체크
+    }
+
+    /**
+    * 상태 텍스트 업데이트
+    */
     function updateStatusText() {
       const statusEl = document.getElementById('statusText');
       const elapsed = Date.now() - loadingStartTime;
       
-      if (elapsed < 3000) {
-        statusEl.textContent = 'Connecting to server...';
-      } else if (elapsed < 8000) {
+      if (elapsed < 2000) {
+        statusEl.textContent = 'Preparing analysis...';
+      } else if (elapsed < 5000) {
         statusEl.textContent = 'Processing image...';
-      } else if (elapsed < 15000) {
+      } else if (elapsed < 10000) {
         statusEl.textContent = 'Analyzing ingredients...';
+      } else if (elapsed < 15000) {
+        statusEl.textContent = 'Finalizing results...';
       } else {
         statusEl.textContent = 'Almost done...';
       }
       
-      statusUpdateInterval = setTimeout(updateStatusText, 2000);
+      statusUpdateInterval = setTimeout(updateStatusText, 1500);
     }
 
+    /**
+    * 타임아웃 경고 표시
+    */
     function showTimeoutWarning() {
       console.log("타임아웃 경고 표시");
       const warning = document.getElementById('timeoutWarning');
@@ -114,6 +179,9 @@
       }
     }
 
+    /**
+    * 강제 홈 리다이렉트
+    */
     function forceRedirectToHome() {
       console.log("강제 홈 리다이렉트");
       cleanup();
@@ -121,33 +189,53 @@
       window.location.href = 'index.html';
     }
 
+    /**
+    * 홈으로 돌아가기
+    */
     function goBackHome() {
       console.log("사용자가 홈으로 돌아가기 선택");
       cleanup();
       window.location.href = 'index.html';
     }
 
+    /**
+    * 재시도
+    */
     function retryAnalysis() {
       console.log("사용자가 재시도 선택");
       cleanup();
       window.location.href = 'index.html';
     }
 
+    /**
+    * 뒤로 가기 처리
+    */
     function handleBackButton(event) {
-      console.log("⬅뒤로 가기 감지");
+      console.log("뒤로 가기 감지");
       event.preventDefault();
       cleanup();
       window.location.href = 'index.html';
     }
 
+    /**
+    * 정리 함수 (개선됨)
+    */
     function cleanup() {
       console.log("로딩 페이지 정리");
       if (statusUpdateInterval) clearTimeout(statusUpdateInterval);
       if (timeoutWarningTimer) clearTimeout(timeoutWarningTimer);
       if (forceRedirectTimer) clearTimeout(forceRedirectTimer);
-      if (resultCheckInterval) clearInterval(resultCheckInterval); // 추가
+      if (resultCheckInterval) clearInterval(resultCheckInterval);
+      if (errorCheckInterval) clearInterval(errorCheckInterval);
       
-      // 업로드 상태 초기화 (전역 함수가 있다면)
+      // 임시 데이터 정리
+      try {
+        localStorage.removeItem("tempImageData");
+      } catch (error) {
+        console.warn("임시 데이터 정리 실패:", error);
+      }
+      
+      // 업로드 상태 초기화
       if (typeof resetUploadState === 'function') {
         resetUploadState();
       }
