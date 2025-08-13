@@ -269,6 +269,30 @@ function resetUploadState() {
   }
 }
 
+// 이미지 압축 함수 추가
+function compressImage(file, maxWidth = 800, quality = 0.7) {
+  return new Promise((resolve) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      // 비율 유지하면서 크기 조정
+      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+      
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      
+      // 압축된 이미지를 Base64로 변환
+      const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressedDataUrl);
+    };
+    
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 /**
  * 개선된 이미지 업로드 함수 - 빠른 로딩 페이지 전환
  */
@@ -309,39 +333,26 @@ function sendImageToBackend(imageFile) {
   // 핵심 개선: 즉시 로딩 페이지로 이동
   console.log("즉시 로딩 페이지로 이동");
   isUploading = true;
-  
-  // 이미지를 미리 Base64로 변환하여 localStorage에 임시 저장
-  const reader = new FileReader();
-  reader.onload = () => {
-    const imageUrl = reader.result;
-    
-    // 임시 데이터를 먼저 저장
+
+  // 압축된 이미지 사용
+  compressImage(imageFile).then(compressedImage => {
+    // 압축된 이미지를 임시 데이터에 저장
     const tempData = {
-      imageUrl: imageUrl,
+      imageUrl: compressedImage,
       status: 'processing',
       timestamp: Date.now()
     };
     
-    try {
-      localStorage.setItem("tempImageData", JSON.stringify(tempData));
-    } catch (error) {
-      console.warn("임시 데이터 저장 실패:", error);
-    }
-    
-    // 즉시 로딩 페이지로 이동
+    localStorage.setItem("tempImageData", JSON.stringify(tempData));
     window.location.href = "loading.html";
     
-    // 백그라운드에서 백엔드 요청 처리
-    processImageInBackground(imageFile, imageUrl);
-  };
-  
-  reader.onerror = (error) => {
-    console.error("FileReader 에러:", error);
+    // 원본 이미지로 백엔드 요청
+    processImageInBackground(imageFile, compressedImage);
+  }).catch(error => {
+    console.error("이미지 압축 실패:", error);
     resetUploadState();
     alert("Failed to process image. Please try again.");
-  };
-  
-  reader.readAsDataURL(imageFile);
+  });
 }
 
 /**
@@ -581,12 +592,6 @@ function initializeSettingsPage() {
       if (!file) return;
       
       const reader = new FileReader();
-      reader.onload = () => {
-        const imageUrl = reader.result;
-        profileImage.style.backgroundImage = `url(${imageUrl})`;
-        profileImage.classList.add('has-image');
-        localStorage.setItem("profileImage", imageUrl);
-      };
       reader.readAsDataURL(file);
     });
   }
