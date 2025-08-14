@@ -1,13 +1,28 @@
 # app/llm_Analysis.py
 import os
 import json
-
+import sys
 # 기존 로직 재사용: 금지어 로드/매칭/섹션 추출
 from .Test_compare_Keywords import (
     ban_List,                       # user_type -> JSON 로드
     check_forbidden_ingredients,    # 텍스트에서 금지어 찾아 "영어 keyword" 반환
     section_text                    # (백업) 규칙기반 원재료 섹션 추출
 )
+
+# exe 여부에 따라 base_dir 결정
+if getattr(sys, 'frozen', False):
+    # exe 실행 시: exe가 있는 폴더 기준
+    base_dir = os.path.dirname(sys.executable)
+else:
+    # 개발 환경: 이 파일이 있는 폴더 기준
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+
+# data 폴더 경로
+data_dir = os.path.join(base_dir, "data")
+
+key_path = os.path.join(data_dir, "openai_key.txt")
+
 
 # ----------------------------
 # OpenAI 키 로딩 & 호출 유틸
@@ -18,9 +33,6 @@ def _read_openai_api_key() -> str:
     if k and k.strip():
         return k.strip()
     # 2) data/openai_key.txt
-    base_dir = os.path.abspath(os.path.dirname(__file__))
-    data_dir = os.path.abspath(os.path.join(base_dir, "..", "..", "data"))
-    key_path = os.path.join(data_dir, "openai_key.txt")
     if os.path.exists(key_path):
         with open(key_path, "r", encoding="utf-8") as f:
             line = f.readline().strip()

@@ -16,6 +16,7 @@ from app import (choice, get_logger_by_name,
                 process_image_with_llm)
 
 from datetime import datetime
+import sys
 
 """
 cd backend 로 main.py가 있는 폴더로 이동
@@ -25,9 +26,13 @@ http://localhost:8000/docs 점속
 Swagger UI 확인하기
 """
 
-base_dir = os.path.dirname(os.path.abspath(__file__))  # 현재 파일 기준
+# exe 여부에 따라 base_dir 결정
+if getattr(sys, 'frozen', False):
+    base_dir = sys._MEIPASS  # exe 실행 위치
+else:
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) # 프로젝트 루트폴더
 
-frontend_dir = os.path.abspath(os.path.join(base_dir, "..", "frontend", "app"))
+frontend_dir = os.path.abspath(os.path.join(base_dir, "frontend", "app"))
 
 static_dir = os.path.abspath(os.path.join(frontend_dir, "static"))
 
@@ -171,17 +176,18 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
 
 
 
-# ===== Runner (멀티 워커 + 브라우저 자동 열기, subprocess 방식) =====
-import os
-import sys
-import time
-import socket
-import threading
-import webbrowser
-import subprocess
+# app = FastAPI(...) 정의 ‘아래쪽 아무데나’ (runner 전) 추가
+if getattr(sys, "frozen", False):
+    # PyInstaller exe에서 uvicorn 멀티워커가 "main:app"을 import할 수 있게 alias 등록
+    sys.modules.setdefault("main", sys.modules[__name__])
 
-def _open_browser_when_ready(url: str, host: str, port: int, timeout: float = 20.0) -> None:
-    """서버 포트가 열릴 때까지 기다렸다가 기본 브라우저로 접속."""
+
+# ===== Runner (exe=멀티워커 in-process / dev=멀티워커 subprocess) =====
+import os, sys, time, socket, threading, webbrowser, subprocess
+import uvicorn
+import multiprocessing as mp
+
+def _open_browser_when_ready(url: str, host: str, port: int, timeout: float = 25.0):
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:
@@ -192,35 +198,46 @@ def _open_browser_when_ready(url: str, host: str, port: int, timeout: float = 20
             time.sleep(0.2)
 
 if __name__ == "__main__":
-    # 환경변수에서 읽거나 기본값 설정
-    HOST = os.getenv("UVICORN_HOST", "0.0.0.0")
-    PORT = int(os.getenv("UVICORN_PORT", "8000"))
-    WORKERS = int(os.getenv("UVICORN_WORKERS", "8"))
-    BACKLOG = int(os.getenv("UVICORN_BACKLOG", "512"))
+    mp.freeze_support()  # Windows에서 멀티프로세스 필수
+    HOST       = os.getenv("UVICORN_HOST", "0.0.0.0")
+    PORT       = int(os.getenv("UVICORN_PORT", "8000"))
+    WORKERS    = int(os.getenv("UVICORN_WORKERS", "8"))
+    BACKLOG    = int(os.getenv("UVICORN_BACKLOG", "512"))
     KEEP_ALIVE = int(os.getenv("UVICORN_KEEPALIVE", "5"))
-    LOG_LEVEL = os.getenv("UVICORN_LOG_LEVEL", "info")
+    LOG_LEVEL  = os.getenv("UVICORN_LOG_LEVEL", "info")
 
-    # 브라우저 오픈 스레드 시작
-    BROWSER_URL = f"http://127.0.0.1:{PORT}"
+    # 브라우저 자동 오픈(포트 열리면)
     threading.Thread(
         target=_open_browser_when_ready,
-        args=(BROWSER_URL, "127.0.0.1", PORT, 20.0),
+        args=(f"http://127.0.0.1:{PORT}", "127.0.0.1", PORT, 25.0),
         daemon=True,
     ).start()
 
-    # uvicorn 명령어를 subprocess로 실행
-    cmd = [
-        sys.executable, "-m", "uvicorn",
-        "main:app",  # main.py 파일에 app 객체가 있어야 함
-        "--host", HOST,
-        "--port", str(PORT),
-        "--workers", str(WORKERS),
-        "--backlog", str(BACKLOG),
-        "--timeout-keep-alive", str(KEEP_ALIVE),
-        "--log-level", LOG_LEVEL
-    ]
-
-    # subprocess는 uvicorn을 외부 프로세스처럼 실행하므로
-    # Windows exe 환경에서도 멀티워커 안정적으로 동작
-    subprocess.run(cmd)
+    if getattr(sys, "frozen", False):
+        # ★ exe 내부에서 멀티워커: 반드시 "임포트 문자열" 사용
+        #   Windows에서 안정성↑: loop="asyncio", http="h11"
+        uvicorn.run(
+            "main:app",
+            host=HOST, port=PORT,
+            workers=WORKERS,                # exe에서도 멀티워커 동작
+            backlog=BACKLOG,
+            timeout_keep_alive=KEEP_ALIVE,
+            log_level=LOG_LEVEL,
+            loop="asyncio",
+            http="h11",
+        )
+    else:
+        # ★ 개발/스크립트: uvicorn CLI 멀티워커
+        #   프로젝트 루트에서 실행한다고 가정 (backend/main.py 기준)
+        cmd = [
+            sys.executable, "-m", "uvicorn",
+            "backend.main:app",
+            "--host", HOST,
+            "--port", str(PORT),
+            "--workers", str(WORKERS),
+            "--backlog", str(BACKLOG),
+            "--timeout-keep-alive", str(KEEP_ALIVE),
+            "--log-level", LOG_LEVEL,
+        ]
+        subprocess.run(cmd)
 # ===== /Runner =====
