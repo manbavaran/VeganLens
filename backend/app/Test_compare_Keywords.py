@@ -3,7 +3,7 @@ import json
 import re
 import io
 from google.cloud import vision
-
+import sys
 # print("버전:", torch.__version__)
 # print("GPU 사용 가능:", torch.cuda.is_available())
 # print("GPU 이름:", torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A")
@@ -34,9 +34,17 @@ CAUTION_STATEMENT_KEYWORDS = [
 #####################################################
 
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
+# exe 여부에 따라 base_dir 결정
+if getattr(sys, 'frozen', False):
+    # exe 실행 시: exe가 있는 폴더 기준
+    base_dir = os.path.dirname(sys.executable)
+else:
+    # 개발 환경: 이 파일이 있는 폴더 기준
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-data_dir = os.path.abspath(os.path.join(base_dir, "..", "..", "data"))
+
+# data 폴더 경로
+data_dir = os.path.join(base_dir, "data")
 
 
 

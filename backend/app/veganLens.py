@@ -3,14 +3,23 @@ from PIL import Image
 from io import BytesIO
 from .logger import get_logger
 import os
-from concurrent.futures import ThreadPoolExecutor
-from functools import partial
-
+import sys
 # :흰색_확인_표시: IMY 전용 Google Vision 기반 OCR 함수
 
-base_dir = os.path.abspath(os.path.dirname(__file__))
+# exe 여부에 따라 base_dir 결정
+if getattr(sys, 'frozen', False):
+    # exe 실행 시: exe가 있는 폴더 기준
+    base_dir = os.path.dirname(sys.executable)
+else:
+    # 개발 환경: 이 파일이 있는 폴더 기준
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-API_PATH = os.path.abspath(os.path.join(base_dir, "..", "..","data", "veganlens_API_Key.json"))
+
+# data 폴더 경로
+data_dir = os.path.join(base_dir, "data")
+
+# API Key 경로
+API_PATH = os.path.join(data_dir, "veganlens_API_Key.json")
 
 # JSON 키 경로 등록
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = API_PATH
