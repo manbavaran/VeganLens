@@ -15,7 +15,6 @@ body {
   font-family: sans-serif;
   background: white; /* 메인과 동일한 흰색 배경 */
   min-height: 100vh;
-  overflow-x: hidden; /* 가로 스크롤 방지 */
 }
 
 /* 메인과 동일한 컨테이너 구조 */
@@ -28,7 +27,6 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  box-sizing: border-box; /* 패딩 포함 계산으로 가로 스크롤 방지 */
 }
 
 /* 메인 스타일과 일치하는 헤더 */
@@ -104,7 +102,6 @@ body {
   padding: 16px;
   border-radius: 16px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  box-sizing: border-box; /* 패딩 포함 계산으로 가로 스크롤 방지 */
 }
 
 .result-message.danger {
@@ -134,11 +131,10 @@ body {
 /* 안내 영역 */
 .notice-row {
   display: flex;
-  justify-content: flex-start; /* 왼쪽 정렬로 변경 */
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
   padding: 0 4px;
-  gap: 8px; /* 텍스트와 아이콘 사이 간격 */
 }
 
 .notice-title {
@@ -180,7 +176,6 @@ body {
   transition: all 0.2s ease;
   border: 1.5px solid transparent;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* 메인 카드와 동일 */
-  box-sizing: border-box; /* 패딩 포함 계산으로 가로 스크롤 방지 */
 }
 
 .result-box:hover:not(.disabled) {
@@ -303,45 +298,11 @@ body {
   background: white;
   padding: 2rem;
   border-radius: 16px; /* 메인 카드와 동일 */
-  max-width: 85%; /* 최대 너비 제한 */
-  width: 350px; /* 기본 너비 설정 */
+  max-width: 90%;
   max-height: 80%;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   border: 1.5px solid #eee;
-  box-sizing: border-box; /* 패딩 포함 계산 */
-}
-
-/* 모달 내 텍스트 스타일링 */
-.modal p {
-  white-space: pre-wrap; /* 줄바꿈 문자 인식 */
-  word-wrap: break-word; /* 긴 단어 자동 줄바꿈 */
-  word-break: break-word; /* 강제 줄바꿈 */
-  text-align: justify; /* 양끝 맞춤 */
-  line-height: 1.6; /* 읽기 편한 줄간격 */
-  margin-bottom: 1.5rem;
-  font-size: 14px;
-  color: #333;
-}
-
-/* 모달 버튼 스타일 개선 */
-.modal button {
-  background: var(--green);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 100%;
-  margin-top: 0.5rem;
-}
-
-.modal button:hover {
-  background: #45a049;
-  transform: scale(1.02);
 }
 
 /* 에러 오버레이 스타일 */
@@ -454,17 +415,6 @@ body {
   .error-btn {
     padding: 10px 16px;
     font-size: 0.9rem;
-  }
-  
-  /* 모바일에서 모달 너비 조정 */
-  .modal > div {
-    width: 90%;
-    max-width: 320px;
-    padding: 1.5rem;
-  }
-  
-  .modal p {
-    font-size: 13px;
   }
 }
 
