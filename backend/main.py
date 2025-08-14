@@ -168,3 +168,59 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
         },
         status_code=200,  # OK 정상 응답 (모든 게 잘 처리됨)
     )
+
+
+
+# ===== Runner (멀티 워커 + 브라우저 자동 열기, subprocess 방식) =====
+import os
+import sys
+import time
+import socket
+import threading
+import webbrowser
+import subprocess
+
+def _open_browser_when_ready(url: str, host: str, port: int, timeout: float = 20.0) -> None:
+    """서버 포트가 열릴 때까지 기다렸다가 기본 브라우저로 접속."""
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            with socket.create_connection((host, port), timeout=1.0):
+                webbrowser.open(url)
+                return
+        except OSError:
+            time.sleep(0.2)
+
+if __name__ == "__main__":
+    # 환경변수에서 읽거나 기본값 설정
+    HOST = os.getenv("UVICORN_HOST", "0.0.0.0")
+    PORT = int(os.getenv("UVICORN_PORT", "8000"))
+    WORKERS = int(os.getenv("UVICORN_WORKERS", "8"))
+    BACKLOG = int(os.getenv("UVICORN_BACKLOG", "512"))
+    KEEP_ALIVE = int(os.getenv("UVICORN_KEEPALIVE", "5"))
+    LOG_LEVEL = os.getenv("UVICORN_LOG_LEVEL", "info")
+
+    # 브라우저 오픈 스레드 시작
+    BROWSER_URL = f"http://127.0.0.1:{PORT}"
+    threading.Thread(
+        target=_open_browser_when_ready,
+        args=(BROWSER_URL, "127.0.0.1", PORT, 20.0),
+        daemon=True,
+    ).start()
+
+    # uvicorn 명령어를 subprocess로 실행
+    cmd = [
+        sys.executable, "-m", "uvicorn",
+        "main:app",  # main.py 파일에 app 객체가 있어야 함
+        "--host", HOST,
+        "--port", str(PORT),
+        "--workers", str(WORKERS),
+        "--backlog", str(BACKLOG),
+        "--timeout-keep-alive", str(KEEP_ALIVE),
+        "--log-level", LOG_LEVEL
+    ]
+
+    # subprocess는 uvicorn을 외부 프로세스처럼 실행하므로
+    # Windows exe 환경에서도 멀티워커 안정적으로 동작
+    subprocess.run(cmd)
+# ===== /Runner =====
