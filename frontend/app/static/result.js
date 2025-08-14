@@ -91,6 +91,25 @@ function validateResultData(data) {
     data.imageUrl = '';
   }
 
+  // 금지 성분이 없을 때 안전 성분 자동 생성
+  const dangerCount = data.danger.length;
+  const cautionCount = data.caution.length;
+  const safeCount = data.safe.length;
+  const totalIngredients = dangerCount + cautionCount + safeCount;
+  
+  // OCR 텍스트에서 안전한 성분들을 추출하여 safe 배열에 추가
+  if (data._metadata && data._metadata.ocrText && safeCount === 0 && dangerCount === 0 && cautionCount === 0) {
+    const extractedIngredients = extractIngredientsFromOCR(data._metadata.ocrText);
+    if (extractedIngredients.length > 0) {
+      data.safe = extractedIngredients;
+      console.log("자동으로 안전 성분 생성:", data.safe);
+    }
+  }
+
+  if (totalIngredients === 0) {
+    console.warn("No ingredients found in analysis result");
+  }
+
   // 백엔드 에러 필드 확인
   if (data.error || data.status === 'error') {
     console.error("Backend analysis error:", data.error || data.message);
@@ -98,6 +117,45 @@ function validateResultData(data) {
   }
 
   return true;
+}
+
+/**
+ * OCR 텍스트에서 재료 목록 추출 (개선된 버전)
+ */
+function extractIngredientsFromOCR(ocrText) {
+  if (!ocrText || typeof ocrText !== 'string') {
+    return [];
+  }
+
+  try {
+    // 다양한 언어의 "성분" 키워드 매칭
+    const ingredientsMatch = ocrText.match(/(?:ingredients?|성분|원재료|구성품)[:\s]([^.]*)/i);
+    
+    let textToProcess = '';
+    if (ingredientsMatch && ingredientsMatch[1]) {
+      textToProcess = ingredientsMatch[1];
+    } else {
+      // 키워드가 없으면 전체 텍스트 사용
+      textToProcess = ocrText;
+    }
+
+    const ingredients = textToProcess
+      .split(/[,;()]/g)
+      .map(ingredient => ingredient.trim())
+      .filter(ingredient => 
+        ingredient.length > 1 && 
+        ingredient.length < 30 &&
+        !/^\d+%?$/.test(ingredient) && // 숫자만 있는 것 제외
+        !/^[%\d\s]+$/.test(ingredient) // 퍼센트나 숫자만 있는 것 제외
+      )
+      .slice(0, 15); // 최대 15개까지
+
+    return ingredients;
+    
+  } catch (error) {
+    console.warn('Error extracting ingredients from OCR:', error);
+    return [];
+  }
 }
 
 /**
@@ -190,7 +248,7 @@ function renderMessage(analysisResult) {
   let messageClass = "info";
 
   if (totalIngredients === 0) {
-    message = "No unsuitable ingredients detected.";
+    message = "No ingredients detected in the analysis.";
     messageClass = "info";
   } else if (dangerCount > 0) {
     message = "Not suitable for consumption.";
@@ -222,7 +280,7 @@ function renderResultBoxes(analysisResult) {
   const dangerCount = analysisResult.danger?.length || 0;
   const cautionCount = analysisResult.caution?.length || 0;
   const safeCount = analysisResult.safe?.length || 0;
-  const isOnlySafe = dangerCount === 0 && cautionCount === 0;
+  const isOnlySafe = dangerCount === 0 && cautionCount === 0 && safeCount > 0;
 
   boxes.forEach(box => {
     const element = document.getElementById(box.id);
@@ -242,28 +300,7 @@ function setupBox(element, type, ingredients, isOnlySafe = false) {
   // 기존 클래스 초기화
   element.className = "result-box";
   
-  // 안전 박스 특별 처리: 위험/주의가 없을 때만 활성화하되 클릭 불가
-  if (type === "safe") {
-    if (isOnlySafe) {
-      // 위험/주의가 없을 때: 강조 표시하지만 클릭 불가
-      element.classList.add("safe", "highlighted");
-      // 클릭 이벤트 제거
-      if (element._clickHandler) {
-        element.removeEventListener("click", element._clickHandler);
-        element._clickHandler = null;
-      }
-    } else {
-      // 위험/주의가 있을 때: 비활성화
-      element.classList.add("disabled");
-      if (element._clickHandler) {
-        element.removeEventListener("click", element._clickHandler);
-        element._clickHandler = null;
-      }
-    }
-    return;
-  }
-  
-  // 위험/주의 박스 처리
+  // ingredients가 undefined이거나 빈 배열인 경우 처리
   if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
     element.classList.add("disabled");
     if (element._clickHandler) {
@@ -273,6 +310,11 @@ function setupBox(element, type, ingredients, isOnlySafe = false) {
   }
 
   element.classList.add(type, "folded");
+
+  // 안전 성분만 있을 때 강조 표시
+  if (type === "safe" && isOnlySafe) {
+    element.classList.add("highlighted");
+  }
   
   // 이전 이벤트 리스너 제거
   if (element._clickHandler) {

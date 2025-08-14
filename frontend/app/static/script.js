@@ -215,12 +215,33 @@ document.addEventListener("DOMContentLoaded", () => {
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
-
-  // Settings 페이지에서만 실행
-  if (window.location.pathname.includes('settings.html')) {
-    initializeSettingsPage();
-  }
 });
+
+/**
+ * OCR 텍스트에서 재료 목록 추출
+ */
+function extractIngredientsFromOCR(ocrText) {
+  if (!ocrText || typeof ocrText !== 'string') return [];
+
+  try {
+    const ingredientsMatch = ocrText.match(/(?:ingredients?|성분|원재료|구성품)[:\s]([^.]*)/i);
+    let textToProcess = ingredientsMatch?.[1] || ocrText;
+
+    return textToProcess
+      .split(/[,;()]/g)
+      .map(i => i.trim())
+      .filter(i =>
+        i.length > 1 &&
+        i.length < 30 &&
+        !/^\d+%?$/.test(i) &&
+        !/^[%\d\s]+$/.test(i)
+      )
+      .slice(0, 15);
+  } catch (e) {
+    console.warn("OCR 성분 추출 실패:", e);
+    return [];
+  }
+}
 
 /**
  * 백엔드 응답 데이터를 로컬스토리지에 저장할 형식으로 변환
@@ -233,7 +254,18 @@ function transformBackendData(backendData) {
 
   const danger = Array.isArray(backendData.found_forbidden) ? backendData.found_forbidden : [];
   const caution = Array.isArray(backendData.found_caution) ? backendData.found_caution : [];
-  let safe = [];
+  let safe = Array.isArray(backendData.found_safe) ? backendData.found_safe : [];
+
+  // OCR 텍스트 기반 자동 안전 성분 추출
+  if (safe.length === 0 && backendData.ocr_text) {
+    const allIngredients = extractIngredientsFromOCR(backendData.ocr_text);
+    if (allIngredients.length > 0) {
+      safe = allIngredients.filter(ing =>
+        !danger.some(d => ing.toLowerCase().includes(d.toLowerCase())) &&
+        !caution.some(c => ing.toLowerCase().includes(c.toLowerCase()))
+      );
+    }
+  }
 
   return {
     imageUrl: "",
@@ -245,17 +277,14 @@ function transformBackendData(backendData) {
       userType: backendData.user_type || null,
       isVegan: backendData.is_vegan ?? null,
       numberForbidden: backendData.number_forbidden ?? 0,
-      isCaution: backendData.is_caution ?? null,
-      numberCaution: backendData.number_caution ?? 0,
       ocrText: backendData.ocr_text || null,
       raw: backendData
     }
   };
 }
 
-/**
- * 업로드 상태 초기화 함수
- */
+
+// 누락된 함수 추가
 function resetUploadState() {
   console.log("resetUploadState 실행");
   isUploading = false;
@@ -269,64 +298,17 @@ function resetUploadState() {
   }
 }
 
-// 이미지 압축 함수(수정)
-function compressImage(file, maxWidth = 800, quality = 0.7) {
-  return new Promise((resolve, reject) => {  // reject 추가
-    try {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      
-      if (!ctx) {
-        reject(new Error('Canvas context not supported'));
-        return;
-      }
-      
-      const img = new Image();
-      
-      img.onload = () => {
-        try {
-          // 비율 유지하면서 크기 조정
-          const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
-          canvas.width = img.width * ratio;
-          canvas.height = img.height * ratio;
-          
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          
-          // 압축된 이미지를 Base64로 변환
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-          
-          // URL 정리
-          URL.revokeObjectURL(img.src);
-          
-          resolve(compressedDataUrl);
-        } catch (error) {
-          URL.revokeObjectURL(img.src);
-          reject(new Error(`Image processing failed: ${error.message}`));
-        }
-      };
-      
-      // 에러 처리 추가
-      img.onerror = () => {
-        URL.revokeObjectURL(img.src);
-        reject(new Error('Failed to load image for compression'));
-      };
-      
-      // 타임아웃 처리 (5초)
-      setTimeout(() => {
-        URL.revokeObjectURL(img.src);
-        reject(new Error('Image compression timeout'));
-      }, 5000);
-      
-      img.src = URL.createObjectURL(file);
-      
-    } catch (error) {
-      reject(new Error(`Compression setup failed: ${error.message}`));
-    }
-  });
-}
 
 /**
- * 개선된 이미지 업로드 함수 - 빠른 로딩 페이지 전환
+ * 수정된 이미지 업로드 함수 - 동적 서버 URL 및 응답 처리 순서 개선
+ * 
+ * 주요 개선사항:
+ * - 동적 서버 URL 감지로 하드코딩 문제 해결
+ * - JSON 파싱 완료 후 페이지 이동으로 AbortError 방지
+ * - 업로드 상태 추적으로 중복 요청 방지
+ * - 타임아웃 설정으로 무한 대기 방지
+ * 
+ * @param {File} imageFile - 업로드할 이미지 파일
  */
 function sendImageToBackend(imageFile) {
   console.log("sendImageToBackend 시작");
@@ -361,145 +343,183 @@ function sendImageToBackend(imageFile) {
   }
 
   console.log("파일 유효성 검사 통과");
-  
-  // 핵심 개선: 즉시 로딩 페이지로 이동
-  console.log("즉시 로딩 페이지로 이동");
-  isUploading = true;
+  setTimeout(() => {
+    console.log("업로드 시작");
+    isUploading = true;
 
-  // 압축된 이미지 사용
-  compressImage(imageFile).then(compressedImage => {
-    // 압축된 이미지를 임시 데이터에 저장
-    const tempData = {
-      imageUrl: compressedImage,
-      status: 'processing',
-      timestamp: Date.now()
-    };
-    
-    localStorage.setItem("tempImageData", JSON.stringify(tempData));
-    window.location.href = "loading.html";
-    
-    // 원본 이미지로 백엔드 요청
-    processImageInBackground(imageFile, compressedImage);
-  }).catch(error => {
-    console.error("이미지 압축 실패:", error);
-    resetUploadState();
-    alert("Failed to process image. Please try again.");
-  });
-}
+    const vegType = localStorage.getItem("vegType") || "Vegan";
+    const formData = new FormData();
+    formData.append("file", imageFile);
 
-/**
- * 백그라운드에서 이미지 처리
- */
-function processImageInBackground(imageFile, imageUrl) {
-  const vegType = localStorage.getItem("vegType") || "Vegan";
-  const formData = new FormData();
-  formData.append("file", imageFile);
-
-  uploadController = new AbortController();
-  const timeoutId = setTimeout(() => {
-    console.error("요청 타임아웃");
-    uploadController.abort();
-    handleBackgroundError("Request timeout. Please check your internet connection and try again.");
-  }, 30000);
-
-  if (!navigator.onLine) {
-    console.error("네트워크 연결 없음");
-    clearTimeout(timeoutId);
-    handleBackgroundError("No internet connection. Please check your network and try again.");
-    return;
-  }
-
-  const currentHost = window.location.hostname;
-  const SERVER_URL = `http://${currentHost}:8000/Check_Vegan`;
-
-  fetch(SERVER_URL, {
-    method: "POST",
-    headers: {
-      "x-user-type": vegType
-    },
-    body: formData,
-    signal: uploadController.signal
-  })
-    .then((res) => {
-      clearTimeout(timeoutId);
-      
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
-      }
-
-      return res.json();
-    })
-    .then((backendData) => {
-      if (backendData.error || backendData.status === 'error') {
-        throw new Error(backendData.message || backendData.error || "Backend processing failed");
-      }
-
-      if (!backendData || Object.keys(backendData).length === 0) {
-        throw new Error("Empty response from backend");
-      }
-      
-      const transformedData = transformBackendData(backendData);
-      transformedData.imageUrl = imageUrl;
-      
-      try {
-        localStorage.setItem("resultData", JSON.stringify(transformedData));
-        localStorage.removeItem("tempImageData");
-        console.log("백그라운드 처리 완료, 결과 데이터 저장됨");
-      } catch (storageError) {
-        console.error("localStorage 저장 실패:", storageError);
-        handleBackgroundError("Failed to save results.");
-      }
-      
+    // AbortController로 요청 취소 기능 추가
+    uploadController = new AbortController();
+    const timeoutId = setTimeout(() => {
+      console.error("요청 타임아웃");
+      uploadController.abort();
       resetUploadState();
-    })
-    .catch((error) => {
-      clearTimeout(timeoutId);
-      console.error("백그라운드 처리 에러:", error);
-      
-      let errorMessage = "Upload failed. ";
-      
-      if (error.name === 'AbortError') {
-        errorMessage += "Request timeout. Please check your network connection.";
-      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage += "Cannot connect to server. Please check your internet connection.";
-      } else if (error.message.includes('HTTP error')) {
-        errorMessage += `Server error: ${error.message}`;
-      } else if (error.message.includes('Backend processing failed')) {
-        errorMessage += "Image analysis failed. Please try with a different image.";
-      } else if (error.message.includes('Empty response')) {
-        errorMessage += "Server returned empty response. Please try again.";
-      } else {
-        errorMessage += "Please try again.";
-      }
-      
-      handleBackgroundError(errorMessage);
-    });
-}
+      alert("Request timeout. Please check your internet connection and try again.");
+    }, 30000);
 
-/**
- * 백그라운드 처리 중 에러 발생 시 처리
- */
-function handleBackgroundError(errorMessage) {
-  resetUploadState();
-  
-  const errorData = {
-    error: true,
-    message: errorMessage,
-    timestamp: Date.now()
-  };
-  
-  try {
-    localStorage.setItem("uploadError", JSON.stringify(errorData));
-    localStorage.removeItem("tempImageData");
-  } catch (error) {
-    console.warn("에러 데이터 저장 실패:", error);
-  }
+    setTimeout(() => {
+      console.log("백엔드로 전송 중:", {
+        vegType,
+        fileSize: imageFile.size,
+        fileName: imageFile.name,
+        fileType: imageFile.type
+      });
+    }, 500);
+
+    const fetchStart = Date.now();
+
+    // 네트워크 연결 상태 확인
+    if (!navigator.onLine) {
+      console.error("네트워크 연결 없음");
+      clearTimeout(timeoutId);
+      resetUploadState();
+      alert("No internet connection. Please check your network and try again.");
+      return;
+    }
+
+    // 동적 서버 URL 감지
+    const currentHost = window.location.hostname;
+    const SERVER_URL = `http://${currentHost}:8000/Check_Vegan`;
+    
+    setTimeout(() => {
+      console.log("동적 서버 URL:", SERVER_URL);
+    }, 1000);
+
+    fetch(SERVER_URL, {
+      method: "POST",
+      headers: {
+        "x-user-type": vegType
+      },
+      body: formData,
+      signal: uploadController.signal
+    })
+      .then((res) => {
+        clearTimeout(timeoutId);
+        
+        setTimeout(() => {
+          console.log("응답 수신:", {
+            status: res.status,
+            statusText: res.statusText,
+            ok: res.ok
+          });
+        }, 1500);
+        
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status} - ${res.statusText}`);
+        }
+
+        // JSON 파싱을 먼저 완료
+        return res.json();
+      })
+      .then((backendData) => {
+        setTimeout(() => {
+          console.log("백엔드 응답 데이터:", backendData);
+        }, 2000);
+        
+        // 백엔드 에러 체크
+        if (backendData.error || backendData.status === 'error') {
+          throw new Error(backendData.message || backendData.error || "Backend processing failed");
+        }
+
+        if (!backendData || Object.keys(backendData).length === 0) {
+          throw new Error("Empty response from backend");
+        }
+        
+        const transformedData = transformBackendData(backendData);
+        
+        setTimeout(() => {
+          console.log("변환된 데이터:", transformedData);
+        }, 2500);
+        
+        // 이미지 처리도 완료한 후 페이지 이동
+        const reader = new FileReader();
+        reader.onload = () => {
+          transformedData.imageUrl = reader.result;
+          
+          try {
+            localStorage.setItem("resultData", JSON.stringify(transformedData));
+            setTimeout(() => {
+              console.log("localStorage에 데이터 저장 완료");
+            }, 3000);
+          } catch (storageError) {
+            console.error("localStorage 저장 실패:", storageError);
+          }
+
+          // 최소 로딩 시간 보장
+          const elapsed = Date.now() - fetchStart;
+          const waitTime = Math.max(1500 - elapsed, 0);
+
+          const goToLoading = () => {
+            setTimeout(() => {
+              console.log("모든 처리 완료, 로딩 페이지로 이동");
+              resetUploadState();
+              window.location.href = "loading.html";
+            }, 3500); // 콘솔 메시지 확인을 위한 딜레이
+          };
+
+          if (waitTime > 0) {
+            setTimeout(goToLoading, waitTime);
+          } else {
+            goToLoading();
+          }
+        };
+        
+        reader.onerror = (readerError) => {
+          console.error("FileReader 에러:", readerError);
+          resetUploadState();
+          alert("Failed to process image. Please try again.");
+        };
+        
+        reader.readAsDataURL(imageFile);
+      })
+      .catch((error) => {
+        clearTimeout(timeoutId);
+        resetUploadState();
+        
+        setTimeout(() => {
+          console.error("업로드 에러 상세:", {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+          });
+        }, 1000);
+        
+        let errorMessage = "Upload failed. ";
+        
+        if (error.name === 'AbortError') {
+          errorMessage += "Request timeout. Please check your network connection.";
+        } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          errorMessage += "Cannot connect to server. Please check your internet connection.";
+        } else if (error.message.includes('HTTP error')) {
+          errorMessage += `Server error: ${error.message}`;
+        } else if (error.message.includes('Backend processing failed')) {
+          errorMessage += "Image analysis failed. Please try with a different image.";
+        } else if (error.message.includes('Empty response')) {
+          errorMessage += "Server returned empty response. Please try again.";
+        } else {
+          errorMessage += "Please try again.";
+        }
+        
+        alert(errorMessage);
+      });
+  }, 500); // 초기 딜레이
 }
 
 // ========== Settings 페이지 전용 JavaScript ==========
 
+document.addEventListener("DOMContentLoaded", () => {
+  // Settings 페이지에서만 실행
+  if (window.location.pathname.includes('settings.html')) {
+    initializeSettingsPage();
+  }
+});
+
 /**
  * 식단 타입 표시명 변환 함수
+ * value 값을 하이픈 없는 깔끔한 표시명으로 변환
  */
 function formatDietTypeDisplay(value) {
   const displayMap = {
@@ -516,6 +536,7 @@ function formatDietTypeDisplay(value) {
 function initializeSettingsPage() {
   console.log("Settings 페이지 초기화 시작");
 
+  // Settings 전용 요소들 참조 (충돌 방지를 위해 고유한 ID 사용)
   const dietTypeSelector = document.getElementById('settingsDietTypeSelector');
   const dietTypeModal = document.getElementById('settingsDietTypeModal');
   const cancelDietType = document.getElementById('settingsCancelDietType');
@@ -532,10 +553,11 @@ function initializeSettingsPage() {
   const profileInput = document.getElementById('settingsProfileInput');
   const profileImage = document.getElementById('settingsProfileImage');
 
-  // 식단 타입 모달 처리
+  // ========== 식단 타입 모달 처리 ==========
   if (dietTypeSelector && dietTypeModal) {
     dietTypeSelector.addEventListener('click', () => {
       dietTypeModal.classList.add('active');
+      // 현재 선택된 값 체크 - 표시명이 아닌 실제 저장된 value로 체크
       const currentValue = localStorage.getItem("vegType") || "Vegan";
       const radio = document.querySelector(`input[name="settingsVegtype"][value="${currentValue}"]`);
       if (radio) radio.checked = true;
@@ -551,10 +573,12 @@ function initializeSettingsPage() {
       confirmDietType.addEventListener('click', () => {
         const selected = document.querySelector('input[name="settingsVegtype"]:checked');
         if (selected) {
+          // 수정된 부분: formatDietTypeDisplay 사용하여 하이픈 없는 표시명으로 변환
           selectedType.textContent = formatDietTypeDisplay(selected.value);
           localStorage.setItem("vegType", selected.value);
           updateSettingsFoodGroups(selected.value);
           
+          // 백엔드에 업데이트 전송
           fetch('/api/update-user-type', {
             method: 'POST',
             headers: {
@@ -568,6 +592,7 @@ function initializeSettingsPage() {
       });
     }
 
+    // 모달 바깥 클릭시 닫기
     dietTypeModal.addEventListener('click', (e) => {
       if (e.target === dietTypeModal) {
         dietTypeModal.classList.remove('active');
@@ -575,11 +600,12 @@ function initializeSettingsPage() {
     });
   }
 
-  // 이름 수정 모달 처리
+  // ========== 이름 수정 모달 처리 ==========
   if (editNameBtn && nameModal && nameInput && userName) {
     editNameBtn.addEventListener('click', () => {
       nameInput.value = userName.textContent;
       nameModal.classList.add('active');
+      // 입력 필드에 포커스
       setTimeout(() => nameInput.focus(), 100);
     });
 
@@ -600,12 +626,14 @@ function initializeSettingsPage() {
       });
     }
 
+    // Enter 키로 저장
     nameInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         saveName.click();
       }
     });
 
+    // 모달 바깥 클릭시 닫기
     nameModal.addEventListener('click', (e) => {
       if (e.target === nameModal) {
         nameModal.classList.remove('active');
@@ -613,7 +641,7 @@ function initializeSettingsPage() {
     });
   }
 
-  // 프로필 이미지 처리
+  // ========== 프로필 이미지 처리 ==========
   if (profileImage && profileInput) {
     profileImage.addEventListener('click', () => {
       profileInput.click();
@@ -624,13 +652,21 @@ function initializeSettingsPage() {
       if (!file) return;
       
       const reader = new FileReader();
+      reader.onload = () => {
+        const imageUrl = reader.result;
+        profileImage.style.backgroundImage = `url(${imageUrl})`;
+        profileImage.classList.add('has-image');
+        localStorage.setItem("profileImage", imageUrl);
+      };
       reader.readAsDataURL(file);
     });
   }
 
+  // ========== 저장된 데이터 불러오기 ==========
   loadSettingsData();
 }
 
+// Settings 데이터 불러오기 함수
 function loadSettingsData() {
   const savedType = localStorage.getItem("vegType");
   const savedName = localStorage.getItem("userName");
@@ -640,27 +676,34 @@ function loadSettingsData() {
   const userName = document.getElementById('settingsUserName');
   const profileImage = document.getElementById('settingsProfileImage');
 
+  // 식단 타입 설정
   if (savedType && selectedType) {
+    // 수정된 부분: formatDietTypeDisplay 사용하여 하이픈 없는 표시명으로 변환
     selectedType.textContent = formatDietTypeDisplay(savedType);
     updateSettingsFoodGroups(savedType);
   } else {
+    // 기본값으로 Vegan 설정
     selectedType.textContent = "Vegan";
     updateSettingsFoodGroups('Vegan');
   }
 
+  // 사용자 이름 설정
   if (savedName && userName) {
     userName.textContent = savedName;
   }
 
+  // 프로필 이미지 설정
   if (savedImage && profileImage) {
     profileImage.style.backgroundImage = `url(${savedImage})`;
     profileImage.classList.add('has-image');
   }
 }
 
+// Settings 전용 식품군 아이콘 업데이트 함수
 function updateSettingsFoodGroups(dietType) {
   const allItems = document.querySelectorAll('.settings-icon-item');
   
+  // 모든 아이템 비활성화
   allItems.forEach(item => {
     item.classList.remove('active');
     const icon = item.querySelector('.settings-food-icon');
@@ -670,6 +713,7 @@ function updateSettingsFoodGroups(dietType) {
     }
   });
 
+  // 허용된 식품군 활성화
   const allowedFoods = getSettingsAllowedFoods(dietType);
   allowedFoods.forEach(food => {
     const item = document.querySelector(`.settings-icon-item[data-food="${food}"]`);
@@ -678,6 +722,7 @@ function updateSettingsFoodGroups(dietType) {
       const icon = item.querySelector('.settings-food-icon');
       if (icon) {
         if (food === 'meat') {
+          // 고기는 항상 비활성화 상태 유지
           icon.src = `/static/images/icons/meat_gray.png`;
         } else {
           icon.src = `/static/images/icons/${food}.png`;
@@ -689,35 +734,44 @@ function updateSettingsFoodGroups(dietType) {
   console.log(`식품군 업데이트 완료: ${dietType}`, allowedFoods);
 }
 
+// Settings 전용 허용 식품군 가져오기 함수
 function getSettingsAllowedFoods(dietType) {
   const allowedFoods = [];
   
+  // 모든 채식 유형은 채소 포함
   if (["Vegan", "Lacto vegetarian", "Lacto-ovo vegetarian", "Ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(dietType)) {
     allowedFoods.push("vegetable");
   }
   
+  // 유제품 허용 유형
   if (["Lacto vegetarian", "Lacto-ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(dietType)) {
     allowedFoods.push("dairy");
   }
   
+  // 달걀 허용 유형
   if (["Ovo vegetarian", "Lacto-ovo vegetarian", "Pesco-vegetarian", "Pollo-vegetarian"].includes(dietType)) {
     allowedFoods.push("egg");
   }
   
+  // 생선 허용 유형
   if (["Pesco-vegetarian", "Pollo-vegetarian"].includes(dietType)) {
     allowedFoods.push("fish");
   }
   
+  // 가금류 허용 유형
   if (dietType === "Pollo-vegetarian") {
     allowedFoods.push("chicken");
   }
   
+  // 고기는 모든 채식 유형에서 제외 (표시만 하고 활성화하지 않음)
+  
   return allowedFoods;
 }
 
-// ESC 키로 모달 닫기
+// ========== ESC 키로 모달 닫기 ==========
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && window.location.pathname.includes('settings.html')) {
+    // 열린 모달들 찾아서 닫기
     const activeModals = document.querySelectorAll('.settings-modal.active');
     activeModals.forEach(modal => {
       modal.classList.remove('active');
@@ -725,6 +779,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ========== 디버깅용 로그 함수 ==========
 function logSettingsState() {
   console.log('=== Settings 상태 확인 ===');
   console.log('저장된 식단 타입:', localStorage.getItem("vegType"));
