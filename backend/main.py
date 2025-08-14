@@ -8,6 +8,7 @@ import pillow_heif
 import io
 import json
 import os
+from starlette.concurrency import run_in_threadpool
 # from app import choice, get_logger_by_name, ban_List, section_text, check_forbidden_ingredients
 from app import (choice, get_logger_by_name, 
                 ban_List, section_text, 
@@ -125,8 +126,8 @@ async def analyze_image(request: Request, file: UploadFile = File(...)):
     base_filename = os.path.splitext(os.path.basename(original_filename))[0]
     
     # 2. OCR 수행
-    response = choice(image, debug=True, base_filename=base_filename, version = 1, what='google')
-    
+    # response = choice(image, debug=True, base_filename=base_filename, version = 1, what='google')
+    response = await run_in_threadpool(choice, image, True, base_filename, 1, 'google')
 
     # 3. 비건 여부 판단
     # text = section_text(response, debug=True, section='ing')
