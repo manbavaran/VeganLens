@@ -36,6 +36,8 @@ img/
 
 data/veganlens_API_Key.json
 
+data/openai_key.txt
+
 models/*.pth
 
 models/*.pt
