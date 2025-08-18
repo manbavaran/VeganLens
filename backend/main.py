@@ -10,7 +10,7 @@ import json
 import os
 from starlette.concurrency import run_in_threadpool
 # from app import choice, get_logger_by_name, ban_List, section_text, check_forbidden_ingredients
-from app import (choice, get_logger_by_name, 
+from backend.app import (choice, get_logger_by_name, 
                 ban_List, section_text, 
                 process_image_with_google_vision_only,
                 process_image_with_llm)
@@ -19,8 +19,8 @@ from datetime import datetime
 import sys
 
 """
-cd backend 로 main.py가 있는 폴더로 이동
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+프로젝트 루트 폴더로 이동
+uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 이거 실행하고 
 http://localhost:8000/docs 점속
 Swagger UI 확인하기
