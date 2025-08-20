@@ -55,7 +55,7 @@ async function loadResultData() {
 }
 
 /**
- * 결과 데이터 유효성 검증 (개선)
+ * 결과 데이터 유효성 검증 (백엔드 데이터만 사용)
  */
 function validateResultData(data) {
   if (!data || typeof data !== 'object') {
@@ -64,10 +64,10 @@ function validateResultData(data) {
   }
 
   // 필수 필드 확인 및 기본값 설정
-  const requiredFields = ['imageUrl', 'danger', 'caution', 'safe'];
+  const requiredFields = ['imageUrl', 'danger', 'caution'];
   for (const field of requiredFields) {
     if (!(field in data)) {
-      console.warn(`Missing required field: ${field}, setting default empty array`);
+      console.warn(`Missing required field: ${field}, setting default value`);
       if (field === 'imageUrl') {
         data[field] = '';
       } else {
@@ -77,7 +77,7 @@ function validateResultData(data) {
   }
 
   // 배열 필드 검증 및 수정
-  const arrayFields = ['danger', 'caution', 'safe'];
+  const arrayFields = ['danger', 'caution'];
   for (const field of arrayFields) {
     if (!Array.isArray(data[field])) {
       console.warn(`Field ${field} is not an array, converting:`, data[field]);
@@ -85,29 +85,13 @@ function validateResultData(data) {
     }
   }
 
+  // safe 필드는 백엔드에서 제공되지 않으므로 항상 빈 배열로 설정
+  data.safe = [];
+
   // 이미지 URL 기본 검증
   if (typeof data.imageUrl !== 'string') {
     console.warn("Invalid imageUrl, setting empty string");
     data.imageUrl = '';
-  }
-
-  // 금지 성분이 없을 때 안전 성분 자동 생성
-  const dangerCount = data.danger.length;
-  const cautionCount = data.caution.length;
-  const safeCount = data.safe.length;
-  const totalIngredients = dangerCount + cautionCount + safeCount;
-  
-  // OCR 텍스트에서 안전한 성분들을 추출하여 safe 배열에 추가
-  if (data._metadata && data._metadata.ocrText && safeCount === 0 && dangerCount === 0 && cautionCount === 0) {
-    const extractedIngredients = extractIngredientsFromOCR(data._metadata.ocrText);
-    if (extractedIngredients.length > 0) {
-      data.safe = extractedIngredients;
-      console.log("자동으로 안전 성분 생성:", data.safe);
-    }
-  }
-
-  if (totalIngredients === 0) {
-    console.warn("No ingredients found in analysis result");
   }
 
   // 백엔드 에러 필드 확인
@@ -117,45 +101,6 @@ function validateResultData(data) {
   }
 
   return true;
-}
-
-/**
- * OCR 텍스트에서 재료 목록 추출 (개선된 버전)
- */
-function extractIngredientsFromOCR(ocrText) {
-  if (!ocrText || typeof ocrText !== 'string') {
-    return [];
-  }
-
-  try {
-    // 다양한 언어의 "성분" 키워드 매칭
-    const ingredientsMatch = ocrText.match(/(?:ingredients?|성분|원재료|구성품)[:\s]([^.]*)/i);
-    
-    let textToProcess = '';
-    if (ingredientsMatch && ingredientsMatch[1]) {
-      textToProcess = ingredientsMatch[1];
-    } else {
-      // 키워드가 없으면 전체 텍스트 사용
-      textToProcess = ocrText;
-    }
-
-    const ingredients = textToProcess
-      .split(/[,;()]/g)
-      .map(ingredient => ingredient.trim())
-      .filter(ingredient => 
-        ingredient.length > 1 && 
-        ingredient.length < 30 &&
-        !/^\d+%?$/.test(ingredient) && // 숫자만 있는 것 제외
-        !/^[%\d\s]+$/.test(ingredient) // 퍼센트나 숫자만 있는 것 제외
-      )
-      .slice(0, 15); // 최대 15개까지
-
-    return ingredients;
-    
-  } catch (error) {
-    console.warn('Error extracting ingredients from OCR:', error);
-    return [];
-  }
 }
 
 /**
@@ -230,7 +175,7 @@ function sanitizeUrl(url) {
 }
 
 /**
- * 결과 메시지 렌더링 (개선된 로직)
+ * 결과 메시지 렌더링 (수정된 로직)
  */
 function renderMessage(analysisResult) {
   const messageEl = document.getElementById("resultMessage");
@@ -241,23 +186,18 @@ function renderMessage(analysisResult) {
 
   const dangerCount = analysisResult.danger?.length || 0;
   const cautionCount = analysisResult.caution?.length || 0;
-  const safeCount = analysisResult.safe?.length || 0;
-  const totalIngredients = dangerCount + cautionCount + safeCount;
 
   let message = "Check your analysis results.";
   let messageClass = "info";
 
-  if (totalIngredients === 0) {
-    message = "No ingredients detected in the analysis.";
-    messageClass = "info";
-  } else if (dangerCount > 0) {
+  if (dangerCount > 0) {
     message = "Not suitable for consumption.";
     messageClass = "danger";
   } else if (cautionCount > 0) {
     message = "Consume with caution.";
     messageClass = "caution";
-  } else if (safeCount > 0) {
-    // 핵심: 위험/주의 성분이 없고 안전 성분만 있으면 안전 메시지
+  } else {
+    // 위험/주의 성분이 모두 없을 때만 안전 메시지
     message = "Safe to consume!";
     messageClass = "safe";
   }
@@ -267,20 +207,19 @@ function renderMessage(analysisResult) {
 }
 
 /**
- * 결과 박스들 렌더링 (안전 성분 강조)
+ * 결과 박스들 렌더링 (수정된 로직)
  */
 function renderResultBoxes(analysisResult) {
   const boxes = [
     { id: "dangerBox", type: "danger", ingredients: analysisResult.danger },
     { id: "cautionBox", type: "caution", ingredients: analysisResult.caution },
-    { id: "safeBox", type: "safe", ingredients: analysisResult.safe }
+    { id: "safeBox", type: "safe", ingredients: [] } // 항상 빈 배열
   ];
 
-  // 위험/주의 성분이 없고 안전 성분만 있는 경우 체크
+  // 위험/주의 성분이 없을 때만 안전 상태로 간주
   const dangerCount = analysisResult.danger?.length || 0;
   const cautionCount = analysisResult.caution?.length || 0;
-  const safeCount = analysisResult.safe?.length || 0;
-  const isOnlySafe = dangerCount === 0 && cautionCount === 0 && safeCount > 0;
+  const isSafe = dangerCount === 0 && cautionCount === 0;
 
   boxes.forEach(box => {
     const element = document.getElementById(box.id);
@@ -289,32 +228,46 @@ function renderResultBoxes(analysisResult) {
       return;
     }
 
-    setupBox(element, box.type, box.ingredients, isOnlySafe);
+    setupBox(element, box.type, box.ingredients, isSafe);
   });
+
+  // 주의 성분이 있을 때 안내문구 표시
+  renderCautionNotice(cautionCount > 0);
 }
 
 /**
- * 개별 박스 설정 (안전 성분 강조 기능 추가)
+ * 개별 박스 설정 (수정된 로직)
  */
-function setupBox(element, type, ingredients, isOnlySafe = false) {
+function setupBox(element, type, ingredients, isSafe = false) {
   // 기존 클래스 초기화
   element.className = "result-box";
   
-  // ingredients가 undefined이거나 빈 배열인 경우 처리
+  if (type === "safe") {
+    // 안전 박스는 위험/주의가 없을 때만 활성화, 클릭 불가
+    if (isSafe) {
+      element.classList.add("safe", "highlighted");
+    } else {
+      element.classList.add("disabled");
+    }
+    // 안전 박스는 클릭 불가 - 이벤트 리스너 제거
+    if (element._clickHandler) {
+      element.removeEventListener("click", element._clickHandler);
+      element._clickHandler = null;
+    }
+    return;
+  }
+
+  // 위험/주의 박스 처리
   if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
     element.classList.add("disabled");
     if (element._clickHandler) {
       element.removeEventListener("click", element._clickHandler);
+      element._clickHandler = null;
     }
     return;
   }
 
   element.classList.add(type, "folded");
-
-  // 안전 성분만 있을 때 강조 표시
-  if (type === "safe" && isOnlySafe) {
-    element.classList.add("highlighted");
-  }
   
   // 이전 이벤트 리스너 제거
   if (element._clickHandler) {
@@ -329,6 +282,29 @@ function setupBox(element, type, ingredients, isOnlySafe = false) {
   };
   
   element.addEventListener("click", element._clickHandler);
+}
+
+/**
+ * 주의 안내문구 렌더링
+ */
+function renderCautionNotice(showNotice) {
+  // 기존 안내문구가 있으면 제거
+  const existingNotice = document.querySelector('.caution-notice');
+  if (existingNotice) {
+    existingNotice.remove();
+  }
+
+  if (showNotice) {
+    const cautionBox = document.getElementById("cautionBox");
+    if (cautionBox) {
+      const noticeDiv = document.createElement('div');
+      noticeDiv.className = 'caution-notice';
+      noticeDiv.textContent = 'This product is made in a facility that handles animal ingredients, which may cause cross-contamination.';
+      
+      // cautionBox 다음에 삽입
+      cautionBox.parentNode.insertBefore(noticeDiv, cautionBox.nextSibling);
+    }
+  }
 }
 
 /**
