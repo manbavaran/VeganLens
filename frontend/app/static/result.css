@@ -294,15 +294,19 @@ body {
   display: none;
 }
 
+/* 모달 스타일 통일 */
 .modal > div {
   background: white;
-  padding: 2rem;
-  border-radius: 16px; /* 메인 카드와 동일 */
-  max-width: 90%;
-  max-height: 80%;
+  padding: 24px;
+  border-radius: 16px;
+  margin: 20px;
+  max-width: 320px;
+  width: calc(100% - 40px);
+  max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1.5px solid #eee;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  border: none;
 }
 
 /* 에러 오버레이 스타일 */
