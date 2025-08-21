@@ -10,7 +10,7 @@ import json
 import os
 from starlette.concurrency import run_in_threadpool
 # from app import choice, get_logger_by_name, ban_List, section_text, check_forbidden_ingredients
-from backend.app import (choice, get_logger_by_name, 
+from app import (choice, get_logger_by_name, 
                 ban_List, section_text, 
                 process_image_with_google_vision_only,
                 process_image_with_llm)
