@@ -55,7 +55,7 @@ async function loadResultData() {
 }
 
 /**
- * 결과 데이터 유효성 검증 (백엔드 데이터만 사용)
+ * 결과 데이터 유효성 검증 (백엔드 데이터만)
  */
 function validateResultData(data) {
   if (!data || typeof data !== 'object') {
@@ -63,7 +63,6 @@ function validateResultData(data) {
     return false;
   }
 
-  // 필수 필드 확인 및 기본값 설정
   const requiredFields = ['imageUrl', 'danger', 'caution'];
   for (const field of requiredFields) {
     if (!(field in data)) {
@@ -76,7 +75,6 @@ function validateResultData(data) {
     }
   }
 
-  // 배열 필드 검증 및 수정
   const arrayFields = ['danger', 'caution'];
   for (const field of arrayFields) {
     if (!Array.isArray(data[field])) {
@@ -85,16 +83,13 @@ function validateResultData(data) {
     }
   }
 
-  // safe 필드는 백엔드에서 제공되지 않으므로 항상 빈 배열로 설정
   data.safe = [];
 
-  // 이미지 URL 기본 검증
   if (typeof data.imageUrl !== 'string') {
     console.warn("Invalid imageUrl, setting empty string");
     data.imageUrl = '';
   }
 
-  // 백엔드 에러 필드 확인
   if (data.error || data.status === 'error') {
     console.error("Backend analysis error:", data.error || data.message);
     return false;
@@ -119,7 +114,7 @@ async function renderResults(analysisResult) {
 }
 
 /**
- * 이미지 렌더링 (로드 확인 포함)
+ * 이미지 로드 체크와 함께 이미지 렌더링
  */
 function renderImage(imageUrl) {
   return new Promise((resolve, reject) => {
@@ -147,14 +142,14 @@ function renderImage(imageUrl) {
       console.warn("Failed to load image:", imageUrl);
       imagePreview.classList.add("no-image");
       imagePreview.textContent = "Unable to load image";
-      resolve(); // 이미지 로드 실패해도 계속 진행
+      resolve();
     };
     img.src = imageUrl;
   });
 }
 
 /**
- * 이미지 URL 유효성 검사
+ * 이미지 URL 유효성 검증
  */
 function isValidImageUrl(url) {
   if (typeof url !== 'string' || !url.trim()) return false;
@@ -168,14 +163,14 @@ function isValidImageUrl(url) {
 }
 
 /**
- * URL 새니타이징
+ * URL 문자열 처리
  */
 function sanitizeUrl(url) {
   return url.replace(/[<>'"]/g, '');
 }
 
 /**
- * 결과 메시지 렌더링 (수정된 로직)
+ * 결과 메시지 렌더링
  */
 function renderMessage(analysisResult) {
   const messageEl = document.getElementById("resultMessage");
@@ -197,7 +192,6 @@ function renderMessage(analysisResult) {
     message = "Consume with caution.";
     messageClass = "caution";
   } else {
-    // 위험/주의 성분이 모두 없을 때만 안전 메시지
     message = "Safe to consume!";
     messageClass = "safe";
   }
@@ -207,16 +201,15 @@ function renderMessage(analysisResult) {
 }
 
 /**
- * 결과 박스들 렌더링 (수정된 로직)
+ * 수정: 주의사항 텍스트가 통합된 결과 박스 렌더링
  */
 function renderResultBoxes(analysisResult) {
   const boxes = [
     { id: "dangerBox", type: "danger", ingredients: analysisResult.danger },
     { id: "cautionBox", type: "caution", ingredients: analysisResult.caution },
-    { id: "safeBox", type: "safe", ingredients: [] } // 항상 빈 배열
+    { id: "safeBox", type: "safe", ingredients: [] }
   ];
 
-  // 위험/주의 성분이 없을 때만 안전 상태로 간주
   const dangerCount = analysisResult.danger?.length || 0;
   const cautionCount = analysisResult.caution?.length || 0;
   const isSafe = dangerCount === 0 && cautionCount === 0;
@@ -228,28 +221,33 @@ function renderResultBoxes(analysisResult) {
       return;
     }
 
-    setupBox(element, box.type, box.ingredients, isSafe);
+    setupBox(element, box.type, box.ingredients, isSafe, cautionCount > 0);
   });
-
-  // 주의 성분이 있을 때 안내문구 표시
-  renderCautionNotice(cautionCount > 0);
 }
 
 /**
- * 개별 박스 설정 (수정된 로직)
+ * 수정: 주의사항 텍스트가 통합된 개별 박스 설정
  */
-function setupBox(element, type, ingredients, isSafe = false) {
+function setupBox(element, type, ingredients, isSafe = false, hasCautionIngredients = false) {
   // 기존 클래스 초기화
   element.className = "result-box";
   
+  // 기존 콘텐츠 제거
+  element.innerHTML = '';
+  
   if (type === "safe") {
-    // 안전 박스는 위험/주의가 없을 때만 활성화, 클릭 불가
+    // 안전 박스: 위험/주의 성분이 없을 때만 활성화, 클릭 불가
+    const mainText = document.createElement('div');
+    mainText.textContent = '✅ Safe Ingredients';
+    element.appendChild(mainText);
+    
     if (isSafe) {
       element.classList.add("safe", "highlighted");
     } else {
       element.classList.add("disabled");
     }
-    // 안전 박스는 클릭 불가 - 이벤트 리스너 제거
+    
+    // 기존 클릭 핸들러 제거
     if (element._clickHandler) {
       element.removeEventListener("click", element._clickHandler);
       element._clickHandler = null;
@@ -259,12 +257,29 @@ function setupBox(element, type, ingredients, isSafe = false) {
 
   // 위험/주의 박스 처리
   if (!ingredients || !Array.isArray(ingredients) || ingredients.length === 0) {
+    const mainText = document.createElement('div');
+    mainText.textContent = getBoxDisplayText(type);
+    element.appendChild(mainText);
+    
     element.classList.add("disabled");
     if (element._clickHandler) {
       element.removeEventListener("click", element._clickHandler);
       element._clickHandler = null;
     }
     return;
+  }
+
+  // 성분이 있는 활성 박스
+  const mainText = document.createElement('div');
+  mainText.textContent = getBoxDisplayText(type);
+  element.appendChild(mainText);
+  
+  // 수정: 주의 박스에 통합된 주의사항 텍스트 추가
+  if (type === "caution" && hasCautionIngredients) {
+    const cautionText = document.createElement('div');
+    cautionText.className = 'caution-integrated-text';
+    cautionText.textContent = 'This product is made in a facility that handles animal ingredients, which may cause cross-contamination.';
+    element.appendChild(cautionText);
   }
 
   element.classList.add(type, "folded");
@@ -285,30 +300,19 @@ function setupBox(element, type, ingredients, isSafe = false) {
 }
 
 /**
- * 주의 안내문구 렌더링
+ * 박스 표시 텍스트 반환
  */
-function renderCautionNotice(showNotice) {
-  // 기존 안내문구가 있으면 제거
-  const existingNotice = document.querySelector('.caution-notice');
-  if (existingNotice) {
-    existingNotice.remove();
-  }
-
-  if (showNotice) {
-    const cautionBox = document.getElementById("cautionBox");
-    if (cautionBox) {
-      const noticeDiv = document.createElement('div');
-      noticeDiv.className = 'caution-notice';
-      noticeDiv.textContent = 'This product is made in a facility that handles animal ingredients, which may cause cross-contamination.';
-      
-      // cautionBox 다음에 삽입
-      cautionBox.parentNode.insertBefore(noticeDiv, cautionBox.nextSibling);
-    }
-  }
+function getBoxDisplayText(type) {
+  const displayTexts = {
+    danger: "🚫 Unsafe Ingredients",
+    caution: "⚠️ Caution Required",
+    safe: "✅ Safe Ingredients"
+  };
+  return displayTexts[type] || type.toUpperCase();
 }
 
 /**
- * 타입별 표시명 반환
+ * 모달용 타입 표시명 반환
  */
 function getTypeDisplayName(type) {
   const typeNames = {
@@ -340,14 +344,12 @@ function setupModalEvents() {
       hideModal();
     });
 
-    // ESC 키로 모달 닫기
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !modal.classList.contains("hidden")) {
         hideModal();
       }
     });
 
-    // 모달 외부 클릭시 닫기
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {
         hideModal();
@@ -373,7 +375,6 @@ function setupTooltipEvents() {
       hideTooltip();
     });
 
-    // 툴팁 내부 클릭시 닫히지 않도록
     tooltip.addEventListener("click", (e) => {
       e.stopPropagation();
     });
@@ -381,13 +382,12 @@ function setupTooltipEvents() {
 }
 
 /**
- * 닫기 버튼 이벤트 설정
+ * 닫기 버튼 설정
  */
 function setupCloseButton() {
   const closeBtn = document.getElementById("closeBtn");
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
-      // 결과 데이터 정리
       try {
         localStorage.removeItem("resultData");
       } catch (error) {
@@ -410,7 +410,6 @@ function showModal(text) {
     modalContent.textContent = text;
     modal.classList.remove("hidden");
     
-    // 접근성: 첫 번째 포커스 가능한 요소에 포커스
     const focusableElement = modal.querySelector("button, [tabindex]");
     if (focusableElement) {
       focusableElement.focus();
@@ -452,7 +451,6 @@ function hideTooltip() {
  * 에러 표시
  */
 function showError(message, shouldRedirect = false) {
-  // 기존 에러 메시지 제거
   const existingError = document.querySelector(".error-overlay");
   if (existingError) {
     existingError.remove();
@@ -476,7 +474,6 @@ function showError(message, shouldRedirect = false) {
   document.body.appendChild(errorOverlay);
 
   if (shouldRedirect) {
-    // 5초 후 자동 리다이렉트
     setTimeout(() => {
       navigateToHome();
     }, 5000);
@@ -484,7 +481,7 @@ function showError(message, shouldRedirect = false) {
 }
 
 /**
- * HTML 이스케이프
+ * HTML 이스케이프 처리
  */
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -493,11 +490,11 @@ function escapeHtml(text) {
 }
 
 /**
- * 홈으로 이동
+ * 홈 페이지로 이동
  */
 function navigateToHome() {
   window.location.href = "index.html";
 }
 
-// 전역 함수로 노출 (에러 오버레이에서 사용)
+// 전역 함수 노출
 window.navigateToHome = navigateToHome;
