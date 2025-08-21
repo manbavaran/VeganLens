@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
   <!-- 메타 정보 및 외부 리소스 링크 -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0" />
@@ -21,11 +20,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Kai&display=swap" rel="stylesheet">
-
 </head>
 
 <body>
-
   <div class="container">
     <!-- 상단 로고 영역 -->
     <header class="logo">
@@ -58,8 +55,8 @@
       <input type="file" id="galleryInput" accept="image/*" hidden />
     </main>
 
-    <nav class="bottom-nav">
-      <!-- 하단 내비게이션 영역 -->
+    <!-- 하단 내비게이션 영역 - settings.html과 일치하도록 footer 태그 사용 -->
+    <footer class="bottom-nav">
       <div class="nav-icon" data-tab="grid">
         <i data-lucide="layout-grid"></i>
       </div>
@@ -71,12 +68,11 @@
       <div class="nav-icon" data-tab="settings">
         <i data-lucide="settings"></i>
       </div>
-    </nav>
+    </footer>
 
     <!-- 최초 1회 선택지 입력용 팝업 -->
     <div id="onboardingPopup" class="modal hidden">
       <div class="modal-content">
-        
         <h2>Let us know your dietary style!</h2>
         <form id="popupForm" style="margin-top: 20px;">
           <!-- 다양한 채식 유형 선택 -->
@@ -90,8 +86,6 @@
         </form>
       </div>
     </div>
-    
   </div>
-  
 </body>
 </html>

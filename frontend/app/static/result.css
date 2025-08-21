@@ -1,4 +1,4 @@
-/* 메인 페이지와 통일된 디자인 시스템 */
+/* 모바일 반응형 개선 */
 :root {
   --green: #4caf50;
   --blue-bg: #e6f3fc;
@@ -13,30 +13,87 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  background: white; /* 메인과 동일한 흰색 배경 */
+  background: white;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* 메인과 동일한 컨테이너 구조 */
+/* 수정됨: 결과 컨테이너 여백 최적화 */
 .result-container {
   width: 100%;
-  max-width: 430px; /* 메인과 동일 */
+  max-width: 430px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 12px; /* 수정됨: 패딩 줄임 16px -> 12px */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
-/* 메인 스타일과 일치하는 헤더 */
+@media (max-width: 768px) {
+  .result-container {
+    max-width: 100vw;
+    padding: 12px 10px; /* 수정됨: 모바일 패딩 줄임 */
+  }
+}
+
+@media (max-width: 480px) {
+  .result-container {
+    padding: 10px 8px; /* 수정됨: 더 작은 패딩 */
+  }
+}
+
+@media (max-width: 360px) {
+  .result-container {
+    padding: 8px 6px; /* 수정됨: 최소 패딩 */
+  }
+}
+
+/* 세로 화면 크기에 따른 패딩 조정 */
+@media (max-height: 700px) {
+  .result-container {
+    padding: 10px 12px; /* 세로가 짧으면 패딩 줄임 */
+  }
+}
+
+@media (max-height: 600px) {
+  .result-container {
+    padding: 8px 12px; /* 더 짧으면 더 줄임 */
+  }
+}
+
+@media (max-height: 500px) {
+  .result-container {
+    padding: 6px 12px; /* 매우 짧으면 최소화 */
+  }
+}
+
+/* 수정됨: 헤더 여백 조정 */
 .result-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
-  border-bottom: 1px solid #eee; /* 메인 로고 영역과 동일 */
-  margin-bottom: 20px;
+  padding: 12px 0; /* 수정됨: 상하 패딩 줄임 16px -> 12px */
+  border-bottom: 1px solid #eee;
+  margin-bottom: 16px; /* 수정됨: 하단 여백 줄임 20px -> 16px */
+  flex-shrink: 0;
+}
+
+/* 세로 화면이 작을 때 헤더 여백 더 줄임 */
+@media (max-height: 600px) {
+  .result-header {
+    padding: 8px 0;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-height: 500px) {
+  .result-header {
+    padding: 6px 0;
+    margin-bottom: 8px;
+  }
 }
 
 .header-title {
@@ -45,7 +102,13 @@ body {
   color: #333;
 }
 
-/* 메인 버튼 스타일과 일치하는 닫기 버튼 */
+/* 세로 화면이 작을 때 제목 크기 조정 */
+@media (max-height: 500px) {
+  .header-title {
+    font-size: 16px;
+  }
+}
+
 #closeBtn {
   background: var(--green-bg);
   border: 1.5px solid var(--green-border);
@@ -64,22 +127,61 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-/* 이미지 영역 - 카드 스타일 적용 */
+/* 수정됨: 이미지 섹션 여백 조정 + 크기 동적 조정 */
 .image-section {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px; /* 수정됨: 하단 여백 줄임 20px -> 16px */
+  flex-shrink: 0;
+}
+
+/* 세로 화면이 작을 때 이미지 섹션 여백 줄임 */
+@media (max-height: 600px) {
+  .image-section {
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-height: 500px) {
+  .image-section {
+    margin-bottom: 8px;
+  }
 }
 
 .image-preview {
   width: 180px;
   height: 220px;
   background-color: #f8f9fa;
-  margin: 0 auto 16px;
+  margin: 0 auto 12px; /* 수정됨: 하단 여백 줄임 16px -> 12px */
   background-size: cover;
   background-position: center;
-  border-radius: 16px; /* 메인 카드와 동일 */
+  border-radius: 16px;
   border: 1.5px solid #e9ecef;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* 메인 카드와 동일 */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* 세로 화면이 작을 때 이미지 크기 조정 */
+@media (max-height: 700px) {
+  .image-preview {
+    width: 160px;
+    height: 200px;
+    margin: 0 auto 10px;
+  }
+}
+
+@media (max-height: 600px) {
+  .image-preview {
+    width: 140px;
+    height: 180px;
+    margin: 0 auto 8px;
+  }
+}
+
+@media (max-height: 500px) {
+  .image-preview {
+    width: 120px;
+    height: 160px;
+    margin: 0 auto 6px;
+  }
 }
 
 .image-preview.no-image {
@@ -93,15 +195,32 @@ body {
   background-image: none !important;
 }
 
-/* 메인 색상 시스템을 활용한 결과 메시지 */
+/* 수정됨: 결과 메시지 여백 조정 */
 .result-message {
   font-size: 16px;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 24px;
-  padding: 16px;
+  margin-bottom: 20px; /* 수정됨: 하단 여백 줄임 24px -> 20px */
+  padding: 14px; /* 수정됨: 패딩 줄임 16px -> 14px */
   border-radius: 16px;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* 세로 화면이 작을 때 메시지 여백과 크기 조정 */
+@media (max-height: 600px) {
+  .result-message {
+    margin-bottom: 16px;
+    padding: 12px;
+    font-size: 15px;
+  }
+}
+
+@media (max-height: 500px) {
+  .result-message {
+    margin-bottom: 12px;
+    padding: 10px;
+    font-size: 14px;
+  }
 }
 
 .result-message.danger {
@@ -128,19 +247,40 @@ body {
   border: 1.5px solid var(--blue-border);
 }
 
-/* 안내 영역 */
+/* 수정됨: 안내 영역 여백 조정 */
 .notice-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding: 0 4px;
+  margin-bottom: 12px; /* 수정됨: 하단 여백 줄임 16px -> 12px */
+  padding: 0 2px; /* 수정됨: 좌우 패딩 줄임 4px -> 2px */
+  flex-shrink: 0;
+}
+
+/* 세로 화면이 작을 때 안내 영역 여백 줄임 */
+@media (max-height: 600px) {
+  .notice-row {
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-height: 500px) {
+  .notice-row {
+    margin-bottom: 6px;
+  }
 }
 
 .notice-title {
   font-size: 16px;
   font-weight: bold;
   color: #333;
+}
+
+/* 세로 화면이 작을 때 제목 크기 조정 */
+@media (max-height: 500px) {
+  .notice-title {
+    font-size: 14px;
+  }
 }
 
 .info-icon {
@@ -154,20 +294,88 @@ body {
   color: #666;
 }
 
-/* 메인과 동일한 카드 기반 박스 리스트 */
+/* 수정됨: 박스 리스트 여백 최적화 + 세로 크기 동적 조정 */
 .box-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px; /* 수정됨: 박스 간격 줄임 16px -> 12px */
   flex: 1;
-  padding-bottom: 20px;
-  align-items: center; /* 가운데 정렬 */
+  padding-bottom: 16px; /* 수정됨: 하단 패딩 줄임 20px -> 16px */
+  align-items: stretch;
+  overflow-y: auto;
+  max-height: calc(100vh - 400px);
 }
 
+/* 세로 화면 크기별 박스 리스트 조정 */
+@media (max-height: 700px) {
+  .box-list {
+    max-height: calc(100vh - 350px);
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+}
+
+@media (max-height: 600px) {
+  .box-list {
+    max-height: calc(100vh - 300px);
+    gap: 8px;
+    padding-bottom: 10px;
+  }
+}
+
+@media (max-height: 500px) {
+  .box-list {
+    max-height: calc(100vh - 250px);
+    gap: 6px;
+    padding-bottom: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .box-list {
+    max-height: calc(100vh - 380px);
+    gap: 10px; /* 수정됨: 모바일 간격 더 줄임 */
+  }
+}
+
+@media (max-width: 480px) {
+  .box-list {
+    max-height: calc(100vh - 360px);
+    gap: 8px; /* 수정됨: 더 촘촘한 간격 */
+    padding-bottom: 12px; /* 수정됨: 패딩 줄임 */
+  }
+}
+
+@media (max-width: 360px) {
+  .box-list {
+    max-height: calc(100vh - 340px);
+    gap: 6px; /* 수정됨: 최소 간격 */
+    padding-bottom: 10px; /* 수정됨: 최소 패딩 */
+  }
+}
+
+/* 세로+가로 동시 고려 (작은 화면) */
+@media (max-width: 480px) and (max-height: 600px) {
+  .box-list {
+    max-height: calc(100vh - 280px);
+    gap: 6px;
+    padding-bottom: 8px;
+  }
+}
+
+@media (max-width: 360px) and (max-height: 500px) {
+  .box-list {
+    max-height: calc(100vh - 240px);
+    gap: 4px;
+    padding-bottom: 6px;
+  }
+}
+
+/* 수정됨: 결과 박스 패딩 최적화 + 세로 크기 동적 조정 */
 .result-box {
   width: 100%;
-  padding: 20px;
-  border-radius: 16px; /* 메인 카드와 동일 */
+  padding: 18px; /* 수정됨: 패딩 줄임 20px -> 18px */
+  border-radius: 16px;
   font-size: 16px;
   font-weight: bold;
   text-align: center;
@@ -175,11 +383,42 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   border: 1.5px solid transparent;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* 메인 카드와 동일 */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 세로 화면이 작을 때 박스 패딩과 크기 조정 */
+@media (max-height: 700px) {
+  .result-box {
+    padding: 16px;
+    min-height: 55px;
+    font-size: 15px;
+  }
+}
+
+@media (max-height: 600px) {
+  .result-box {
+    padding: 14px;
+    min-height: 50px;
+    font-size: 14px;
+  }
+}
+
+@media (max-height: 500px) {
+  .result-box {
+    padding: 12px;
+    min-height: 45px;
+    font-size: 13px;
+  }
 }
 
 .result-box:hover:not(.disabled) {
-  transform: scale(1.02); /* 메인 카드와 동일한 호버 효과 */
+  transform: scale(1.02);
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
@@ -192,7 +431,6 @@ body {
   opacity: 0.7;
 }
 
-/* 메인 색상 시스템 적용 */
 .result-box.danger {
   background: #FCEDED;
   border-color: #F4AFB0;
@@ -211,7 +449,6 @@ body {
   color: var(--green);
 }
 
-/* 안전 성분 강조 - 더 통일감 있게 */
 .result-box.safe.highlighted {
   background: var(--green);
   border-color: var(--green);
@@ -241,24 +478,36 @@ body {
   display: none;
 }
 
-/* 주의 안내문구 스타일 추가 */
-.caution-notice {
-  width: 100%;
-  background: var(--yellow-bg);
-  border: 1.5px solid var(--yellow-border);
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin-top: 8px;
-  font-size: 13px;
+/* 수정됨: 주의 통합 텍스트 여백 조정 */
+.caution-integrated-text {
+  font-size: 12px;
   font-weight: 500;
   color: #ed8936;
-  text-align: center;
   line-height: 1.4;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  animation: fadeIn 0.3s ease-out;
+  margin-top: 6px; /* 수정됨: 상단 여백 줄임 8px -> 6px */
+  opacity: 0.9;
+  text-align: center;
+  border-top: 1px solid rgba(237, 137, 54, 0.2);
+  padding-top: 6px; /* 수정됨: 상단 패딩 줄임 8px -> 6px */
 }
 
-/* 툴팁 스타일 */
+/* 세로 화면이 작을 때 주의 텍스트 크기 조정 */
+@media (max-height: 600px) {
+  .caution-integrated-text {
+    font-size: 11px;
+    margin-top: 5px;
+    padding-top: 5px;
+  }
+}
+
+@media (max-height: 500px) {
+  .caution-integrated-text {
+    font-size: 10px;
+    margin-top: 4px;
+    padding-top: 4px;
+  }
+}
+
 .tooltip-wrapper {
   position: relative;
   display: inline-block;
@@ -293,7 +542,6 @@ body {
   display: none;
 }
 
-/* 메인과 일치하는 모달 스타일 */
 .modal {
   position: fixed;
   top: 0;
@@ -311,14 +559,14 @@ body {
   display: none;
 }
 
-/* 모달 스타일 통일 */
+/* 수정됨: 모달 여백 조정 */
 .modal > div {
   background: white;
-  padding: 24px;
+  padding: 20px; /* 수정됨: 패딩 줄임 24px -> 20px */
   border-radius: 16px;
-  margin: 20px;
+  margin: 16px; /* 수정됨: 외부 여백 줄임 20px -> 16px */
   max-width: 320px;
-  width: calc(100% - 40px);
+  width: calc(100% - 32px); /* 수정됨: 여백 40px -> 32px */
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -326,7 +574,6 @@ body {
   border: none;
 }
 
-/* 에러 오버레이 스타일 */
 .error-overlay {
   position: fixed;
   top: 0;
@@ -341,10 +588,11 @@ body {
   animation: fadeIn 0.3s ease-out;
 }
 
+/* 수정됨: 에러 콘텐츠 여백 조정 */
 .error-content {
   background: white;
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1.5rem; /* 수정됨: 패딩 줄임 2rem -> 1.5rem */
   max-width: 90%;
   width: 320px;
   text-align: center;
@@ -372,7 +620,7 @@ body {
 }
 
 .error-btn {
-  padding: 12px 20px;
+  padding: 10px 18px; /* 수정됨: 패딩 줄임 12px 20px -> 10px 18px */
   border: 1.5px solid var(--green-border);
   border-radius: 12px;
   font-size: 1rem;
@@ -400,7 +648,6 @@ body {
   border-color: #45a049;
 }
 
-/* 애니메이션 */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -417,34 +664,107 @@ body {
   }
 }
 
-/* 반응형 개선 */
-@media (max-width: 768px) {
+/* 수정됨: 모바일 반응형 세부 조정 */
+@media (max-width: 430px) {
   .result-container {
-    padding: 12px;
+    padding: 10px 8px;
+  }
+  
+  .result-header {
+    padding: 10px 0;
+    margin-bottom: 14px;
+  }
+  
+  .image-section {
+    margin-bottom: 14px;
   }
   
   .image-preview {
     width: 160px;
     height: 200px;
+    margin: 0 auto 10px;
   }
   
-  .caution-notice {
-    font-size: 12px;
-    padding: 10px 14px;
+  .result-message {
+    margin-bottom: 18px;
+    padding: 12px;
+  }
+  
+  .notice-row {
+    margin-bottom: 10px;
+  }
+  
+  .result-box {
+    padding: 14px; /* 수정됨: 모바일 박스 패딩 줄임 */
+  }
+  
+  .caution-integrated-text {
+    font-size: 11px;
+    margin-top: 5px;
+    padding-top: 5px;
   }
   
   .error-content {
-    padding: 1.5rem;
-    margin: 1rem;
+    padding: 1.25rem;
+    margin: 12px;
   }
   
   .error-btn {
-    padding: 10px 16px;
+    padding: 8px 16px;
     font-size: 0.9rem;
   }
 }
 
-/* 접근성 개선 */
+@media (max-width: 360px) {
+  .result-container {
+    padding: 8px 6px;
+  }
+  
+  .result-header {
+    padding: 8px 0;
+    margin-bottom: 12px;
+  }
+  
+  .image-section {
+    margin-bottom: 12px;
+  }
+  
+  .image-preview {
+    width: 140px;
+    height: 180px;
+    margin: 0 auto 8px;
+  }
+  
+  .result-message {
+    margin-bottom: 16px;
+    padding: 10px;
+  }
+  
+  .notice-row {
+    margin-bottom: 8px;
+  }
+  
+  .result-box {
+    padding: 12px; /* 수정됨: 최소 박스 패딩 */
+  }
+  
+  .caution-integrated-text {
+    font-size: 10px;
+    margin-top: 4px;
+    padding-top: 4px;
+  }
+  
+  .error-content {
+    padding: 1rem;
+    margin: 8px;
+  }
+  
+  .error-btn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+  }
+}
+
 .result-box:focus,
 button:focus {
   outline: 2px solid var(--green);
