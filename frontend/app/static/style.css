@@ -12,11 +12,11 @@
   --hover-shadow: 0 2px 8px rgba(0,0,0,0.15);
   --hover-scale: 1.02;
   
-  /* 원본과 동일한 유동적 반응형 변수들 */
+  /* 수정된 반응형 변수들 */
   --container-padding: clamp(8px, 3vw, 16px);
   --card-gap: clamp(4px, 1.8vh, 10px);
   --card-padding: clamp(12px, 4vw, 20px);
-  --card-height: clamp(140px, 24vh, 220px); /* 원본과 동일한 카드 높이 비율 */
+  --card-height: clamp(120px, 18vh, 180px); /* 24vh → 18vh로 줄임 */
   --font-size-base: clamp(12px, 3.5vw, 16px);
   --image-size: clamp(60px, 12vw, 110px);
   --nav-height: clamp(50px, 12vh, 70px);
@@ -31,11 +31,17 @@
 
 body {
   background: white;
-  height: 100vh; /* 스크롤 방지를 위한 정확한 화면 높이 */
+  height: 100vh;
+  height: 100dvh; /* 동적 뷰포트 높이 사용 */
   display: flex;
   justify-content: center;
   overflow-x: hidden;
   width: 100%;
+  position: fixed; /* 모바일 주소창 변화 방지 */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .container {
@@ -44,7 +50,8 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  height: 100vh; /* 스크롤 방지를 위한 정확한 화면 높이 */
+  height: 100vh;
+  height: 100dvh; /* 동적 뷰포트 높이 사용 */
   overflow-x: hidden;
 }
 
@@ -63,7 +70,7 @@ body {
 
 .vegan-lens-logo {
   font-family: 'Roboto Condensed', sans-serif;
-  font-size: clamp(24px, 6vw, 32px); /* 원본과 동일한 폰트 크기 */
+  font-size: clamp(24px, 6vw, 32px);
   font-weight: 400;
   display: inline-flex;
   align-items: center;
@@ -99,7 +106,7 @@ body {
 
 .sub-title {
   text-align: center;
-  font-size: calc(var(--font-size-base) * 0.875); /* 원본과 동일한 서브타이틀 */
+  font-size: calc(var(--font-size-base) * 0.875);
   color: #666;
   margin: clamp(2px, 1vh, 6px) 0 0 0;
   font-family: 'Roboto Condensed', sans-serif; 
@@ -107,7 +114,7 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* 메인 콘텐츠 - 높이별 정확한 중앙 정렬 */
+/* 메인 콘텐츠 - 주소창 변화에 대응한 높이 계산 */
 .button-area {
   flex: 1;
   display: flex;
@@ -115,10 +122,11 @@ body {
   justify-content: center;
   align-items: center;
   gap: var(--card-gap);
-  /* 상하 패딩을 균등하게 설정하여 중앙 정렬 보장 */
   padding: clamp(16px, 3vh, 24px) var(--container-padding) clamp(80px, 13vh, 100px);
   height: calc(100vh - 120px);
+  height: calc(100dvh - 120px); /* 동적 뷰포트 높이 사용 */
   max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -128,35 +136,97 @@ body {
   .button-area {
     padding: clamp(20px, 4vh, 32px) var(--container-padding) clamp(80px, 12vh, 90px);
     height: calc(100vh - 130px);
+    height: calc(100dvh - 130px);
     max-height: calc(100vh - 130px);
+    max-height: calc(100dvh - 130px);
   }
 }
 
 /* 세로 높이 700px 이하: 네비에 가려지는 문제 해결 */
 @media (max-height: 700px) {
+  :root {
+    --card-height: clamp(100px, 15vh, 140px);
+    --card-padding: clamp(8px, 3vw, 16px); /* 패딩 줄임 */
+  }
+  
   .button-area {
     padding: clamp(12px, 2vh, 16px) var(--container-padding) clamp(60px, 10vh, 70px);
     height: calc(100vh - 110px);
+    height: calc(100dvh - 110px);
     max-height: calc(100vh - 110px);
-    gap: clamp(3px, 1.2vh, 8px); /* 간격을 조금 줄여서 공간 확보 */
+    max-height: calc(100dvh - 110px);
+    gap: clamp(3px, 1.2vh, 8px);
+  }
+  
+  .card {
+    gap: clamp(4px, 1vh, 8px); /* 카드 내부 간격 줄임 */
+  }
+  
+  .card p {
+    font-size: clamp(11px, 3vw, 14px) !important;
+    line-height: 1.1;
+  }
+  
+  .card img {
+    margin-bottom: clamp(4px, 1vh, 8px);
   }
 }
 
 @media (max-height: 600px) {
+  :root {
+    --card-height: clamp(90px, 13vh, 120px);
+    --card-padding: clamp(6px, 2.5vw, 12px); /* 패딩 더 줄임 */
+  }
+  
   .button-area {
     padding: clamp(8px, 1.5vh, 12px) var(--container-padding) clamp(50px, 8vh, 60px);
     height: calc(100vh - 100px);
+    height: calc(100dvh - 100px);
     max-height: calc(100vh - 100px);
+    max-height: calc(100dvh - 100px);
     gap: clamp(2px, 1vh, 6px);
+  }
+  
+  .card {
+    gap: clamp(3px, 0.8vh, 6px);
+  }
+  
+  .card p {
+    font-size: clamp(10px, 2.8vw, 13px) !important;
+    line-height: 1.0;
+  }
+  
+  .card img {
+    margin-bottom: clamp(3px, 0.8vh, 6px);
   }
 }
 
 @media (max-height: 500px) {
+  :root {
+    --card-height: clamp(80px, 11vh, 100px);
+    --card-padding: clamp(4px, 2vw, 10px); /* 패딩 최소화 */
+  }
+  
   .button-area {
     padding: clamp(6px, 1vh, 10px) var(--container-padding) clamp(45px, 7vh, 55px);
     height: calc(100vh - 90px);
+    height: calc(100dvh - 90px);
     max-height: calc(100vh - 90px);
+    max-height: calc(100dvh - 90px);
     gap: clamp(2px, 0.8vh, 5px);
+  }
+  
+  .card {
+    gap: clamp(2px, 0.6vh, 4px);
+  }
+  
+  .card p {
+    font-size: clamp(9px, 2.5vw, 12px) !important;
+    line-height: 1.0;
+  }
+  
+  .card img {
+    margin-bottom: clamp(2px, 0.6vh, 4px);
   }
 }
 
@@ -165,7 +235,9 @@ body {
   .button-area {
     padding: clamp(4px, 1vh, 8px) var(--container-padding) clamp(40px, 6vh, 50px);
     height: calc(100vh - 80px);
+    height: calc(100dvh - 80px);
     max-height: calc(100vh - 80px);
+    max-height: calc(100dvh - 80px);
     gap: clamp(2px, 0.5vh, 4px);
   }
 }
@@ -175,12 +247,12 @@ body {
   width: 100%;
   max-width: clamp(300px, 90vw, 400px);
   border-radius: var(--border-radius);
-  padding: var(--card-padding); /* 원본과 동일한 패딩 */
+  padding: var(--card-padding);
   text-align: center;
   box-shadow: var(--shadow);
   transition: transform 0.2s ease;
   border: 1.5px solid;
-  height: var(--card-height); /* 원본과 동일한 카드 높이 */
+  height: var(--card-height);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -215,32 +287,13 @@ body {
   }
 }
 
-/* 원본과 동일한 세로 화면 크기별 카드 높이 조정 */
-@media (max-height: 700px) {
-  .card {
-    min-height: 140px;
-  }
-}
-
-@media (max-height: 600px) {
-  .card {
-    min-height: 120px;
-  }
-}
-
-@media (max-height: 500px) {
-  .card {
-    min-height: 100px;
-  }
-}
-
 .card:hover {
   transform: scale(var(--hover-scale));
 }
 
 /* 카드 내부 이미지 - 원본과 동일한 크기 */
 .card img {
-  width: var(--image-size); /* 원본과 동일한 이미지 크기 */
+  width: var(--image-size);
   height: var(--image-size);
   object-fit: contain;
   margin-bottom: clamp(6px, 1.5vh, 12px);
@@ -251,7 +304,7 @@ body {
   transform: scale(1.1);
 }
 
-/* 원본과 동일한 세로 화면 크기별 이미지 크기 조정 */
+/* 세로 화면 크기별 이미지 크기 조정 */
 @media (max-height: 700px) {
   .card img {
     width: 90px;
@@ -276,24 +329,13 @@ body {
 .card p {
   font-weight: bold;
   color: #333;
-  font-size: var(--font-size-base); /* 원본과 동일한 폰트 크기 */
+  font-size: var(--font-size-base);
   margin: 0;
   line-height: 1.3;
   word-break: keep-all;
 }
 
-/* 원본과 동일한 세로 화면 크기별 텍스트 크기 조정 */
-@media (max-height: 600px) {
-  .card p {
-    font-size: 13px;
-  }
-}
-
-@media (max-height: 500px) {
-  .card p {
-    font-size: 12px;
-  }
-}
+/* 세로 화면 크기별 텍스트 크기 조정 - 기존 규칙 제거 */
 
 .card.blue {
   background: var(--blue-bg);
@@ -318,7 +360,7 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 430px;
-  height: var(--nav-height); /* 원본과 동일한 네비 높이 */
+  height: var(--nav-height);
   background: #f3f3f3;
   border-top: 1px solid #ddd;
   display: flex;
@@ -338,7 +380,7 @@ body {
   }
 }
 
-/* 원본과 동일한 세로 화면 크기별 네비 높이 조정 */
+/* 세로 화면 크기별 네비 높이 조정 */
 @media (max-height: 600px) {
   .bottom-nav {
     height: 56px;
@@ -354,7 +396,7 @@ body {
 .nav-icon {
   color: #999;
   transition: all 0.3s ease;
-  font-size: clamp(24px, 6vw, 32px); /* 원본과 동일한 아이콘 크기 */
+  font-size: clamp(24px, 6vw, 32px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -365,7 +407,7 @@ body {
   cursor: pointer;
 }
 
-/* 원본과 동일한 세로 화면 크기별 아이콘 크기 조정 */
+/* 세로 화면 크기별 아이콘 크기 조정 */
 @media (max-height: 600px) {
   .nav-icon {
     font-size: 28px;
@@ -422,7 +464,6 @@ body {
   display: none !important;
 }
 
-/* 원본과 동일한 모달 여백 */
 .modal-content {
   background: white;
   border-radius: 16px; 
@@ -487,7 +528,7 @@ body {
   background: #45a049;
 }
 
-/* 원본과 동일한 극단적 화면 크기 대응 */
+/* 극단적 화면 크기 대응 */
 
 /* 세로 화면이 매우 짧을 때 (가로 모드) */
 @media (max-height: 500px) and (orientation: landscape) {
@@ -503,7 +544,7 @@ body {
   }
 }
 
-/* 매우 작은 화면 (320px 이하) - 원본과 동일 */
+/* 매우 작은 화면 (320px 이하) */
 @media (max-width: 320px) {
   :root {
     --container-padding: clamp(6px, 2vw, 12px);
@@ -514,7 +555,7 @@ body {
   }
 }
 
-/* 매우 세로가 긴 화면 (Ultra tall screens) - 원본과 동일 */
+/* 매우 세로가 긴 화면 (Ultra tall screens) */
 @media (min-height: 900px) {
   :root {
     --card-height: clamp(170px, 22vh, 260px);
@@ -522,7 +563,7 @@ body {
   }
 }
 
-/* 원본과 동일한 반응형 세부 조정 */
+/* 반응형 세부 조정 */
 @media (max-width: 430px) {
   .logo {
     padding: 14px 10px 8px 10px;
@@ -605,7 +646,7 @@ body {
   }
 }
 
-/* 원본과 동일한 접근성 개선 */
+/* 접근성 개선 */
 @media (prefers-reduced-motion: reduce) {
   .card,
   .nav-icon,
@@ -614,7 +655,7 @@ body {
   }
 }
 
-/* 원본과 동일한 고대비 모드 지원 */
+/* 고대비 모드 지원 */
 @media (prefers-contrast: high) {
   .card {
     border-width: 2px;
@@ -622,7 +663,7 @@ body {
   }
 }
 
-/* 원본과 동일한 터치 디바이스 최적화 */
+/* 터치 디바이스 최적화 */
 @media (pointer: coarse) {
   .card,
   .nav-icon {
