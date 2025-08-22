@@ -107,35 +107,66 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* 메인 콘텐츠 - 원본 간격 비율 유지하되 스크롤 방지 */
+/* 메인 콘텐츠 - 높이별 정확한 중앙 정렬 */
 .button-area {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: var(--card-gap); /* 원본과 동일한 카드 간격 */
-  padding: 0 var(--container-padding) clamp(70px, 12vh, 90px); /* 원본과 동일한 패딩, 하단 네비게이션 공간 확보 */
-  min-height: calc(100vh - 140px); /* 스크롤 방지를 위한 최대 높이 제한 */
-  overflow: hidden; /* 스크롤 방지 */
+  gap: var(--card-gap);
+  /* 상하 패딩을 균등하게 설정하여 중앙 정렬 보장 */
+  padding: clamp(16px, 3vh, 24px) var(--container-padding) clamp(80px, 13vh, 100px);
+  height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-/* 세로 화면 크기에 따른 동적 조정 - 원본과 동일 */
+/* 세로 높이 700~900px: 헤더에 붙는 문제 해결 */
+@media (min-height: 700px) and (max-height: 900px) {
+  .button-area {
+    padding: clamp(20px, 4vh, 32px) var(--container-padding) clamp(80px, 12vh, 90px);
+    height: calc(100vh - 130px);
+    max-height: calc(100vh - 130px);
+  }
+}
+
+/* 세로 높이 700px 이하: 네비에 가려지는 문제 해결 */
 @media (max-height: 700px) {
   .button-area {
-    padding: 6px var(--container-padding) 50px;
+    padding: clamp(12px, 2vh, 16px) var(--container-padding) clamp(60px, 10vh, 70px);
+    height: calc(100vh - 110px);
+    max-height: calc(100vh - 110px);
+    gap: clamp(3px, 1.2vh, 8px); /* 간격을 조금 줄여서 공간 확보 */
   }
 }
 
 @media (max-height: 600px) {
   .button-area {
-    padding: 4px var(--container-padding) 45px;
+    padding: clamp(8px, 1.5vh, 12px) var(--container-padding) clamp(50px, 8vh, 60px);
+    height: calc(100vh - 100px);
+    max-height: calc(100vh - 100px);
+    gap: clamp(2px, 1vh, 6px);
   }
 }
 
 @media (max-height: 500px) {
   .button-area {
-    padding: 2px var(--container-padding) 40px;
+    padding: clamp(6px, 1vh, 10px) var(--container-padding) clamp(45px, 7vh, 55px);
+    height: calc(100vh - 90px);
+    max-height: calc(100vh - 90px);
+    gap: clamp(2px, 0.8vh, 5px);
+  }
+}
+
+/* 가로 모드일 때 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .button-area {
+    padding: clamp(4px, 1vh, 8px) var(--container-padding) clamp(40px, 6vh, 50px);
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+    gap: clamp(2px, 0.5vh, 4px);
   }
 }
 
