@@ -114,35 +114,24 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* 메인 콘텐츠 - 주소창 변화에 대응한 높이 계산 */
+
+/* 메인 콘텐츠 - 원본 간격 비율 유지하되 스크롤 방지 */
+
 .button-area {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: var(--card-gap);
-  padding: clamp(16px, 3vh, 24px) var(--container-padding) clamp(80px, 13vh, 100px);
-  height: calc(100vh - 120px);
-  height: calc(100dvh - 120px); /* 동적 뷰포트 높이 사용 */
-  max-height: calc(100vh - 120px);
-  max-height: calc(100dvh - 120px);
-  overflow: hidden;
-  box-sizing: border-box;
+
+  gap: var(--card-gap); /* 원본과 동일한 카드 간격 */
+  padding: 0 var(--container-padding) clamp(70px, 12vh, 90px); /* 원본과 동일한 패딩, 하단 네비게이션 공간 확보 */
+  min-height: calc(100vh - 140px); /* 스크롤 방지를 위한 최대 높이 제한 */
+  overflow: hidden; /* 스크롤 방지 */
+
 }
 
-/* 세로 높이 700~900px: 헤더에 붙는 문제 해결 */
-@media (min-height: 700px) and (max-height: 900px) {
-  .button-area {
-    padding: clamp(20px, 4vh, 32px) var(--container-padding) clamp(80px, 12vh, 90px);
-    height: calc(100vh - 130px);
-    height: calc(100dvh - 130px);
-    max-height: calc(100vh - 130px);
-    max-height: calc(100dvh - 130px);
-  }
-}
-
-/* 세로 높이 700px 이하: 네비에 가려지는 문제 해결 */
+/* 세로 화면 크기에 따른 동적 조정 - 원본과 동일 */
 @media (max-height: 700px) {
   :root {
     --card-height: clamp(100px, 15vh, 140px);
@@ -150,25 +139,9 @@ body {
   }
   
   .button-area {
-    padding: clamp(12px, 2vh, 16px) var(--container-padding) clamp(60px, 10vh, 70px);
-    height: calc(100vh - 110px);
-    height: calc(100dvh - 110px);
-    max-height: calc(100vh - 110px);
-    max-height: calc(100dvh - 110px);
-    gap: clamp(3px, 1.2vh, 8px);
-  }
-  
-  .card {
-    gap: clamp(4px, 1vh, 8px); /* 카드 내부 간격 줄임 */
-  }
-  
-  .card p {
-    font-size: clamp(11px, 3vw, 14px) !important;
-    line-height: 1.1;
-  }
-  
-  .card img {
-    margin-bottom: clamp(4px, 1vh, 8px);
+
+    padding: 6px var(--container-padding) 50px;
+
   }
 }
 
@@ -179,12 +152,9 @@ body {
   }
   
   .button-area {
-    padding: clamp(8px, 1.5vh, 12px) var(--container-padding) clamp(50px, 8vh, 60px);
-    height: calc(100vh - 100px);
-    height: calc(100dvh - 100px);
-    max-height: calc(100vh - 100px);
-    max-height: calc(100dvh - 100px);
-    gap: clamp(2px, 1vh, 6px);
+
+    padding: 4px var(--container-padding) 45px;
+
   }
   
   .card {
@@ -208,37 +178,9 @@ body {
   }
   
   .button-area {
-    padding: clamp(6px, 1vh, 10px) var(--container-padding) clamp(45px, 7vh, 55px);
-    height: calc(100vh - 90px);
-    height: calc(100dvh - 90px);
-    max-height: calc(100vh - 90px);
-    max-height: calc(100dvh - 90px);
-    gap: clamp(2px, 0.8vh, 5px);
-  }
-  
-  .card {
-    gap: clamp(2px, 0.6vh, 4px);
-  }
-  
-  .card p {
-    font-size: clamp(9px, 2.5vw, 12px) !important;
-    line-height: 1.0;
-  }
-  
-  .card img {
-    margin-bottom: clamp(2px, 0.6vh, 4px);
-  }
-}
 
-/* 가로 모드일 때 */
-@media (max-height: 500px) and (orientation: landscape) {
-  .button-area {
-    padding: clamp(4px, 1vh, 8px) var(--container-padding) clamp(40px, 6vh, 50px);
-    height: calc(100vh - 80px);
-    height: calc(100dvh - 80px);
-    max-height: calc(100vh - 80px);
-    max-height: calc(100dvh - 80px);
-    gap: clamp(2px, 0.5vh, 4px);
+    padding: 2px var(--container-padding) 40px;
+
   }
 }
 
