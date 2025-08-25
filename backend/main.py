@@ -23,7 +23,7 @@ import sys
 uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 이거 실행하고 
 http://localhost:8000/docs 점속
-Swagger UI 확인하기
+Swagger UI 확인하기.
 """
 
 # exe 여부에 따라 base_dir 결정
