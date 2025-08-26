@@ -587,18 +587,7 @@
     "category": "other",
     "e_code": []
   },
-  {
-    "keyword": "vitamin E",
-    "korean": ["비타민E"],
-    "category": "other",
-    "e_code": []
-  },
-  {
-    "keyword": "vitamin E",
-    "korean": ["토코페롤"],
-    "category": "other",
-    "e_code": []
-  },
+
   {
     "keyword": "natural flavoring",
     "korean": ["천연향료"],
@@ -1337,12 +1326,7 @@
     "category": "fish",
     "e_code": []
   },
-  {
-    "keyword": "coral",
-    "korean": ["산호"],
-    "category": "fish",
-    "e_code": []
-  },
+
   {
     "keyword": "sponge",
     "korean": ["해면"],
