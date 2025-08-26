@@ -105,7 +105,7 @@ def check_forbidden_ingredients(text: str, ban_list: list[dict]) -> list[str]:
     found_forbidden = set()
     
     # 예외 키워드 목록
-    exception_keywords = ['식물성', '야채', '채소', '콩', 'vegetable', 'plant-based', 'soy', 'bean']
+    exception_keywords = ['식물성', '야채', '채소', '콩']
     
     for entry in ban_list:
         keyword = entry.get("keyword", "")
@@ -142,7 +142,7 @@ def check_caution_ingredients(text: str, caution_keywords: list) -> list[str]:
     found_caution = set()
     
     # 예외 키워드 목록
-    exception_keywords = ['식물성', '야채', '채소', '콩', 'vegetable', 'plant-based', 'soy', 'bean']
+    exception_keywords = ['식물성', '야채', '채소', '콩']
 
     # 텍스트를 문장 단위로 분리
     sentences = re.split(r'[.,\n]', text)
