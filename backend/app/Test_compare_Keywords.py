@@ -91,54 +91,60 @@ def contains_keyword(text_content: str, keywords: list) -> bool:
     return False
 
 
+import re
+
 def check_forbidden_ingredients(text: str, ban_list: list[dict]) -> list[str]:
     """
     OCR로 추출된 전체 텍스트(text) 내에서 주어진 금지 키워드 리스트(ban_list)를 찾아 반환합니다.
     - 발견된 금지 성분들을 중복 없이 정렬된 리스트로 반환합니다.
-    - 이 함수는 카테고리(확실한 금지, 주의 필요 등) 분류는 하지 않고,
-    - 단순히 ban_list에 있는 성분이 텍스트에 포함되었는지 여부만 확인합니다.
+    - 예외 키워드(식물성, 야채 등)가 앞에 있는 경우는 제외합니다.
     """
-    if not text or not ban_list: # 텍스트나 금지 리스트가 비어있으면 빈 리스트 반환
+    if not text or not ban_list:
         return []
-    
-    text_clean = re.sub(r"[^가-힣a-zA-Z0-9]", "", text)
-    # 텍스트에서 공백과 줄바꿈 제거하여 검색 효율 높임
-    print(text_clean)
-    found_forbidden = []
 
+    found_forbidden = set()
+    
+    # 예외 키워드 목록
+    exception_keywords = ['식물성', '야채', '채소', '콩', 'vegetable', 'plant-based', 'soy', 'bean']
+    
     for entry in ban_list:
         keyword = entry.get("keyword", "")
         
+        # 한국어 및 E-Code 키워드에 대해 반복
         for kw in entry.get("korean", []) + entry.get("e_code", []):
             if len(kw.strip()) < 2:
-                # 검색할 키워드가 너무 짧으면 오탐(잘못된 탐지) 방지를 위해 건너뜁니다.
                 continue
-            kw_clean = kw.replace(" ", "")
-            if kw_clean in text_clean:
-                # 키워드를 공백 제거 후 텍스트에 포함되는지 확인
-                found_forbidden.append(keyword)
-                # 발견되면 리스트에 추가
-                
-                
-                
-    print(f"found_forbidden: {found_forbidden}")
-    return sorted(list(set(found_forbidden)))
-    # 중복 제거 후 알파벳 순으로 정렬하여 반환
 
-#########################################################################
-# --- 비건 주의 성분을 추출하는 새로운 함수 추가 ---
-# 기존 파일에 추가된 부분입니다.
-#########################################################################
+            # 원본 텍스트에서 키워드와 그 앞에 올 수 있는 예외 키워드 패턴을 함께 검색
+            # 예: "식물성유지"를 찾아 매칭시킵니다.
+            # '유지'만 찾는 것이 아니라, '식물성 유지' 같은 문구를 먼저 찾습니다.
+            exception_pattern = rf'({"|".join(exception_keywords)})\s*{re.escape(kw)}'
+            
+            # 예외 키워드가 앞에 있는 경우를 먼저 확인
+            if re.search(exception_pattern, text, re.IGNORECASE):
+                continue
+            
+            # 예외 키워드 조합이 아닌, 순수한 금지어만 검색
+            if re.search(re.escape(kw), text, re.IGNORECASE):
+                found_forbidden.add(keyword)
+
+    return sorted(list(found_forbidden))
+
+
 def check_caution_ingredients(text: str, caution_keywords: list) -> list[str]:
     """
     전체 텍스트에서 교차오염 관련 문구를 찾아, 해당 문장 내의 주의 성분(알레르기 유발물질 등)을 추출합니다.
+    예외 키워드가 앞에 있는 경우는 제외합니다.
     """
     if not text or not caution_keywords:
         return []
     
-    found_caution = []
+    found_caution = set()
     
-    # 텍스트를 문장 단위로 분리 (마침표, 쉼표, 줄바꿈 등을 기준으로)
+    # 예외 키워드 목록
+    exception_keywords = ['식물성', '야채', '채소', '콩', 'vegetable', 'plant-based', 'soy', 'bean']
+
+    # 텍스트를 문장 단위로 분리
     sentences = re.split(r'[.,\n]', text)
     
     for sentence in sentences:
@@ -147,20 +153,28 @@ def check_caution_ingredients(text: str, caution_keywords: list) -> list[str]:
             continue
         
         # 교차오염 키워드가 포함된 문장인지 확인
-        if contains_keyword(sentence, caution_keywords):
-            # 문장에서 성분 추출을 위한 정규표현식 패턴:
-            # "우유, 땅콩, 대두,밀 ,고등어를 사용한 제품"에서 '우유', '땅콩', '대두', '밀', '고등어'를 추출
+        if any(kw in sentence for kw in caution_keywords):
+            # 문장 내 모든 단어를 추출
             ingredients_found = re.findall(r'[\w가-힣]+', sentence)
-
+            
             # 불필요한 키워드 제거
-            exclude_words = ["제품", "제조시설", "혼입", "가능", "원료", "이력", "사용", "원재료", "성분"]
+            exclude_words = {"제품", "제조시설", "혼입", "가능", "원료", "이력", "사용", "원재료", "성분"}
             
             for ing in ingredients_found:
                 if ing in exclude_words or len(ing) < 2:
                     continue
-                found_caution.append(ing)
+                
+                # 추출된 성분 앞에 예외 키워드가 있는지 확인
+                is_exception = False
+                for ex_kw in exception_keywords:
+                    if re.search(rf'{re.escape(ex_kw)}\s*{re.escape(ing)}', sentence, re.IGNORECASE):
+                        is_exception = True
+                        break
+                
+                if not is_exception:
+                    found_caution.add(ing)
 
-    return sorted(list(set(found_caution))) # 중복 제거 및 정렬
+    return sorted(list(found_caution))
 
 
 
