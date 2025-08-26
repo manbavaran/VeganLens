@@ -105,7 +105,7 @@ def check_forbidden_ingredients(text: str, ban_list: list[dict]) -> list[str]:
     found_forbidden = set()
     
     # 예외 키워드 목록
-    exception_keywords = ['식물성', '야채', '채소', '콩']
+    exception_keywords = ['식물성', '야채', '채소', '콩'] # test
     
     for entry in ban_list:
         keyword = entry.get("keyword", "")
